@@ -88,7 +88,9 @@
             transition: all .18s;
         }
 
-        .authTabs button.active { opacity: 0.9; }
+        .authTabs button.active {
+            opacity: 0.9;
+        }
 
         .authCard input {
             width: 100%;
@@ -149,15 +151,6 @@
             align-items: center;
         }
 
-        #chatHeader .meta {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            color: var(--muted);
-            font-weight: 600;
-            font-size: 13px;
-        }
-
         #bottomBar {
             display: flex;
             gap: 12px;
@@ -176,27 +169,18 @@
             font-size: 15px;
         }
 
-        .sidebarButtons {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
         #channelList {
             flex: 1;
             overflow: auto;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding-right: 4px;
         }
 
         .channelRow {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
             padding: 8px 10px;
             border-radius: 10px;
             background: var(--channel-bg);
@@ -215,46 +199,7 @@
         .channelRow.active {
             background: var(--accent);
             color: white;
-            transform: scale(1.02);
         }
-
-        .badge {
-            background: #ff5b5b;
-            color: white;
-            border-radius: 999px;
-            padding: 2px 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        #rightbar {
-            width: 260px;
-            background: var(--panel);
-            padding: 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: -2px 0 18px rgba(0,0,0,0.18);
-        }
-
-        .userRow {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 6px;
-            border-radius: 8px;
-            cursor: default;
-        }
-
-        .statusDot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .status-online { background: #2ecc71; }
-        .status-away { background: #f1c40f; }
-        .status-offline { background: #95a5a6; }
 
         #messages {
             flex: 1;
@@ -270,9 +215,9 @@
             gap: 12px;
             align-items: flex-start;
             max-width: 980px;
-            transition: all .28s;
             opacity: 0;
             transform: translateY(10px);
+            transition: all 0.28s;
             position: relative;
         }
 
@@ -301,27 +246,6 @@
             min-width: 0;
         }
 
-        .msgHeader {
-            font-weight: 700;
-            font-size: 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .timestamp {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .msgText {
-            margin-top: 4px;
-            color: var(--text);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
         .message-menu {
             position: absolute;
             top: -10px;
@@ -333,20 +257,10 @@
             display: none;
             cursor: pointer;
             z-index: 10;
-            gap: 4px;
         }
 
-        .message:hover .message-menu { display: flex; }
-
-        .menu-item {
-            padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .menu-item:hover {
-            background: var(--accent);
-            color: white;
+        .message:hover .message-menu {
+            display: flex;
         }
 
         #scrollBtn {
@@ -360,10 +274,12 @@
             color: white;
             cursor: pointer;
             opacity: 0;
-            transition: opacity .25s, transform .18s;
+            transition: opacity .25s;
         }
 
-        #scrollBtn.show { opacity: 1; }
+        #scrollBtn.show {
+            opacity: 1;
+        }
 
         #submitBtn, .sidebarButtons button, #sendBtn, .modalActions button {
             padding: 12px 16px;
@@ -373,7 +289,6 @@
             color: white;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             transition: all 0.2s;
         }
 
@@ -406,17 +321,29 @@
             gap: 10px;
         }
 
-        .requirement.valid { color: #2ecc71; }
-        
-        @media (max-width:1000px) {
-            #rightbar { display: none; }
-            #sidebar { width: 220px; }
+        .requirement {
+            font-size: 13px;
+            color: var(--muted);
         }
+
+        .requirement.valid {
+            color: #2ecc71;
+        }
+
+        .statusDot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: #2ecc71; }
+        .status-away { background: #f1c40f; }
+        .status-offline { background: #95a5a6; }
     </style>
 </head>
 <body>
 
-    <!-- Auth UI -->
+    <!-- Auth System -->
     <div id="authDiv">
         <div class="authCard">
             <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -432,27 +359,25 @@
             <input id="authUsername" placeholder="Username" />
             <input id="authPassword" placeholder="Password" type="password" />
             <input id="authConfirm" placeholder="Confirm Password" type="password" style="display:none" />
-            <div id="passwordRequirements" style="display: none; font-size: 12px;">
-                <div id="req-length" class="requirement">✖ At least 8 characters</div>
-                <div id="req-uppercase" class="requirement">✖ One uppercase letter</div>
-                <div id="req-number" class="requirement">✖ One number</div>
+            <div id="passwordRequirements" style="display: none;">
+                <div id="req-length" class="requirement">✖ 8+ characters</div>
+                <div id="req-upper" class="requirement">✖ 1 Uppercase</div>
             </div>
             <button id="submitBtn" onclick="submitAuth()">Login</button>
             <div id="authMessage"></div>
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- Main Chat App -->
     <div id="app" style="display: none;">
         <div id="sidebar">
             <div id="sidebarHeader">
-                <div>Channels 🗨️</div>
+                <div>Chat 🗨️</div>
                 <div class="controls">
-                    <button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()">🔔 <div class="badge" id="notifBadge"></div></button>
+                    <button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()">🔔</button>
                     <button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()">🟢</button>
                     <button id="settingsBtn" class="tinyBtn" onclick="showSettingsModal()">⚙️</button>
                     <button id="logoutBtn" class="tinyBtn" onclick="logout()">🚪</button>
-                    <div id="meLabel" style="font-size:12px;color:var(--muted)"></div>
                 </div>
             </div>
             <div id="channelList"></div>
@@ -463,18 +388,14 @@
 
         <div id="main">
             <div id="chatHeader">
-                <div id="chatTitle">No channel selected</div>
+                <div id="chatTitle">Select a Channel</div>
             </div>
             <div style="display:flex; flex:1; min-height:0;">
                 <div id="messages"></div>
-                <div id="rightbar">
-                    <div style="font-weight:800;">Users 👥</div>
-                    <div id="userList" style="overflow:auto; display:flex; flex-direction:column; gap:6px;"></div>
+                <div id="rightbar" style="width:200px; padding:10px; background:var(--panel);">
+                    <div style="font-weight:800; margin-bottom:10px;">Users 👥</div>
+                    <div id="userList"></div>
                 </div>
-            </div>
-            <div id="replyPreview" style="display:none; padding:8px; background:var(--panel);">
-                <span id="cancelReplyBtn" onclick="cancelReply()">✖️</span>
-                Replying to <strong id="replyUser"></strong>
             </div>
             <div id="bottomBar">
                 <input id="msgInput" placeholder="Type a message..." />
@@ -485,14 +406,14 @@
 
     <button id="scrollBtn">⬇️</button>
 
-    <!-- Modal System -->
+    <!-- Modal Overlay -->
     <div id="modalOverlay">
         <div class="modalCard">
             <h3 id="modalTitle">Modal</h3>
-            <div id="modalSubtitle"></div>
+            <div id="modalSubtitle" style="font-size:14px; color:var(--muted);"></div>
             <div id="modalCustomContent"></div>
-            <input id="modalInput" autocomplete="off" />
-            <div class="modalActions">
+            <input id="modalInput" style="padding:10px; border-radius:8px; border:none; background:var(--input-bg); color:var(--text);" />
+            <div class="modalActions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
                 <button id="modalConfirmBtn" onclick="submitModal()">OK</button>
                 <button id="modalCancelBtn" onclick="closeModal()">Cancel</button>
             </div>
@@ -503,7 +424,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // --- CONFIG & GLOBALS ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyDbyrqzcZ4Wk57xBNVDzNuRerQaBx2p1L0",
             authDomain: "htmlchat-8b2c5.firebaseapp.com",
@@ -519,42 +440,46 @@
         let username = "";
         let currentChannel = "";
         let myStatus = "online";
-        let replyingToId = null;
-        let lastMessageTime = 0; // For AutoMod Rate Limiting
+        let lastMessageTime = 0;
+
+        // --- AUTOMOD WORD LIST ---
+        const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
 
         // --- AUTOMOD LOGIC ---
-        const autoMod = (text) => {
+        function autoMod(text) {
             let processed = text;
 
-            // 1. Filter Bad Words
-            const banned = ["spam", "scam", "hate", "badword1"]; // Add your list here
-            banned.forEach(word => {
-                const regex = new RegExp(word, "gi");
+            // 1. Length Limit
+            if (processed.length > 500) processed = processed.substring(0, 500) + "...";
+
+            // 2. Anti-Flood (Repeated characters like "aaaaaaaaa")
+            if (/(.)\1{8,}/.test(processed)) return "🤐 (AutoMod: Flooding)";
+
+            // 3. Rate Limit (Logic in sendMessage)
+
+            // 4. Word Filter
+            BLACKLIST.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
                 processed = processed.replace(regex, "🤐");
             });
 
-            // 2. Prevent excessive caps
-            const capsCount = (processed.match(/[A-Z]/g) || []).length;
-            if (capsCount > processed.length * 0.7 && processed.length > 5) {
-                processed = processed.toLowerCase() + " (AutoMod: Please don't yell)";
-            }
-
-            // 3. Repetitive character check (Flood protection)
-            if (/(.)\1{9,}/.test(processed)) {
-                processed = "🤐 (AutoMod: Message blocked for flooding)";
+            // 5. Caps Control (If 70%+ caps, make lowercase)
+            const caps = (processed.match(/[A-Z]/g) || []).length;
+            if (caps > processed.length * 0.7 && processed.length > 5) {
+                processed = processed.toLowerCase();
             }
 
             return processed;
-        };
+        }
 
-        // --- AUTH LOGIC ---
+        // --- AUTH UI LOGIC ---
         const switchAuth = (mode) => {
-            const isSignup = mode === 'signup';
-            document.getElementById("authConfirm").style.display = isSignup ? "block" : "none";
-            document.getElementById("passwordRequirements").style.display = isSignup ? "block" : "none";
-            document.getElementById("loginTab").classList.toggle("active", !isSignup);
-            document.getElementById("signupTab").classList.toggle("active", isSignup);
-            document.getElementById("submitBtn").textContent = isSignup ? "Sign Up" : "Login";
+            const isSign = (mode === 'signup');
+            document.getElementById("authConfirm").style.display = isSign ? "block" : "none";
+            document.getElementById("passwordRequirements").style.display = isSign ? "block" : "none";
+            document.getElementById("loginTab").classList.toggle("active", !isSign);
+            document.getElementById("signupTab").classList.toggle("active", isSign);
+            document.getElementById("submitBtn").textContent = isSign ? "Sign Up" : "Login";
         };
 
         document.getElementById("loginTab").onclick = () => switchAuth('login');
@@ -571,7 +496,7 @@
                     username = u;
                     afterLogin();
                 } else {
-                    alert("Wrong password!");
+                    document.getElementById("authMessage").textContent = "❌ Wrong password";
                 }
             } else {
                 await db.ref("users/" + u).set({ password: p });
@@ -580,11 +505,10 @@
             }
         }
 
-        // --- CORE APP LOGIC ---
+        // --- CHAT LOGIC ---
         function afterLogin() {
             document.getElementById("authDiv").style.display = "none";
             document.getElementById("app").style.display = "flex";
-            document.getElementById("meLabel").textContent = "👤 " + username;
             loadChannels();
             loadUserList();
             startPresence();
@@ -604,12 +528,11 @@
             });
         }
 
-        async function joinChannel(name) {
+        function joinChannel(name) {
             currentChannel = name;
             document.getElementById("chatTitle").textContent = "# " + name;
             const messagesDiv = document.getElementById("messages");
             messagesDiv.innerHTML = "";
-            
             db.ref("messages/" + name).on("child_added", snap => {
                 appendMessage(snap.val(), snap.key);
             });
@@ -617,19 +540,16 @@
 
         function appendMessage(m, id) {
             const container = document.getElementById("messages");
-            const msg = document.createElement("div");
-            msg.className = "message show";
-            msg.innerHTML = `
+            const div = document.createElement("div");
+            div.className = "message show";
+            div.innerHTML = `
                 <div class="avatar" style="background:${uidColor(m.user)}">${m.user[0].toUpperCase()}</div>
                 <div class="msgBody">
-                    <div class="msgHeader">
-                        <span style="color:${uidColor(m.user)}">${m.user}</span>
-                        <span class="timestamp">${new Date(m.ts).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
+                    <div style="font-weight:700; font-size:12px; color:${uidColor(m.user)}">${m.user}</div>
                     <div class="msgText">${m.text}</div>
                 </div>
             `;
-            container.appendChild(msg);
+            container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
 
@@ -638,14 +558,14 @@
             let text = input.value.trim();
             if (!text || !currentChannel) return;
 
-            // --- AUTOMOD TRIGGER ---
+            // --- SPAM RATE LIMIT ---
             const now = Date.now();
             if (now - lastMessageTime < 1500) {
-                alert("⏳ Slow down! Don't spam.");
+                alert("⏳ Slow down! (AutoMod)");
                 return;
             }
 
-            text = autoMod(text); // Process through filters
+            text = autoMod(text); // Apply Automod Filters
 
             await db.ref("messages/" + currentChannel).push({
                 user: username,
@@ -659,10 +579,10 @@
 
         // --- UTILS ---
         function uidColor(name) {
-            const colors = ["#e67e22","#e74c3c","#9b59b6","#3498db","#2ecc71"];
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            return colors[Math.abs(hash) % colors.length];
+            const palette = ["#e67e22","#e74c3c","#9b59b6","#3498db","#2ecc71"];
+            let h = 0;
+            for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+            return palette[Math.abs(h) % palette.length];
         }
 
         function toggleTheme() {
@@ -671,8 +591,8 @@
 
         function cycleStatus() {
             const btn = document.getElementById("myStatusBtn");
-            const statuses = { "online": ["🟢", "away"], "away": ["🟡", "offline"], "offline": ["⚪", "online"] };
-            const [icon, next] = statuses[myStatus];
+            const map = { "online": ["🟢", "away"], "away": ["🟡", "offline"], "offline": ["⚪", "online"] };
+            const [icon, next] = map[myStatus];
             myStatus = next;
             btn.textContent = icon;
             db.ref("presence/" + username).update({ status: myStatus });
@@ -680,7 +600,7 @@
 
         function startPresence() {
             const ref = db.ref("presence/" + username);
-            ref.set({ status: "online", lastSeen: Date.now() });
+            ref.set({ status: "online" });
             ref.onDisconnect().remove();
         }
 
@@ -690,18 +610,14 @@
                 list.innerHTML = "";
                 snap.forEach(u => {
                     const row = document.createElement("div");
-                    row.className = "userRow";
+                    row.style.marginBottom = "5px";
                     row.innerHTML = `<span class="statusDot status-${u.val().status}"></span> ${u.key}`;
                     list.appendChild(row);
                 });
             });
         }
 
-        // Enter key listener
-        document.getElementById("msgInput").onkeydown = (e) => {
-            if (e.key === "Enter") sendMessage();
-        };
-
+        document.getElementById("msgInput").onkeydown = (e) => { if (e.key === "Enter") sendMessage(); };
     </script>
 </body>
 </html>
