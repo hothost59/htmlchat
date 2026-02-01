@@ -6,85 +6,527 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
         :root {
-            --bg: #36393f; --panel: #2f3136; --muted: #b9bbbe;
-            --accent: #7289da; --card: #4f545c; --card-hover: #5b616b;
+            --bg: #36393f;
+            --panel: #2f3136;
+            --muted: #b9bbbe;
+            --accent: #7289da;
+            --card: #4f545c;
+            --card-hover: #5b616b;
             --sidebar-grad: linear-gradient(to bottom, #2f3136, #202225);
-            --text: #e6e6e6; --input-bg: #202225;
+            --text: #e6e6e6;
+            --input-bg: #202225;
             --auth-grad: linear-gradient(135deg, var(--panel), #202225);
-            --channel-bg: #99aab5; --channel-text: #000000;
+            --channel-bg: #99aab5;
+            --channel-text: #000000;
         }
+
         .light {
-            --bg: #f4f6f8; --panel: #ffffff; --muted: #6b7280;
-            --accent: #4f46e5; --card: #f3f4f6; --text: #111827;
+            --bg: #f4f6f8;
+            --panel: #ffffff;
+            --muted: #6b7280;
+            --accent: #4f46e5;
+            --card: #f3f4f6;
+            --text: #111827;
             --sidebar-grad: linear-gradient(to bottom, #ffffff, #f1f5f9);
             --input-bg: #e5e7eb;
             --auth-grad: linear-gradient(135deg, var(--panel), #f9fafb);
-            --channel-bg: #e5e7eb; --channel-text: #1f2937;
+            --channel-bg: #e5e7eb;
+            --channel-text: #1f2937;
         }
+
         html, body {
-            height: 100%; width: 100%; margin: 0; padding: 0;
-            overflow: hidden; font-family: "Segoe UI", Roboto, sans-serif;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
             color: var(--text);
         }
-        body { background: var(--bg); display: flex; flex-direction: column; }
-        
-        /* Auth Styles */
-        #authDiv { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 40; }
-        .authCard { width: 360px; background: var(--auth-grad); border-radius: 14px; padding: 22px; box-shadow: 0 14px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 12px; }
-        .authTabs { display: flex; gap: 8px; }
-        .authTabs button { flex: 1; padding: 10px; border-radius: 10px; border: none; cursor: pointer; background: var(--accent); color: white; font-weight: 600; transition: all .18s; }
-        .authTabs button.active { opacity: 0.9; }
-        .authCard input { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--input-bg); color: var(--text); }
-        
-        /* Layout */
-        #app { flex: 1; min-height: 0; display: flex; }
-        #sidebar { width: 300px; background: var(--sidebar-grad); padding: 14px; display: flex; flex-direction: column; box-shadow: 2px 0 18px rgba(0,0,0,0.35); gap: 10px; }
-        #main { flex: 1; display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
-        #chatHeader { padding: 12px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.03); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Messages */
-        #messages { flex: 1; padding: 14px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
-        .message { display: flex; gap: 12px; align-items: flex-start; max-width: 980px; position: relative; opacity: 0; transform: translateY(10px); transition: all .28s; }
-        .message.show { opacity: 1; transform: translateY(0); }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; flex: 0 0 40px; }
-        .msgBody { background: var(--card); padding: 8px 12px; border-radius: 10px; min-width: 0; }
-        
-        /* Hover Menu */
-        .message-menu { position: absolute; top: -10px; right: 10px; background: var(--panel); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 4px; display: none; gap: 4px; z-index: 10; }
-        .message:hover .message-menu { display: flex; }
-        .menu-item { padding: 6px 8px; border-radius: 4px; font-size: 13px; cursor: pointer; }
-        .menu-item:hover { background: var(--accent); color: white; }
-        
-        /* Channels */
-        .channelRow { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; background: var(--channel-bg); color: var(--channel-text); font-weight: 700; cursor: pointer; transition: all .18s; }
-        .channelRow.active { background: var(--accent); color: white; transform: scale(1.02); }
-        .close-dm-btn, .deleteBtn { opacity: 0; transition: opacity 0.2s; cursor: pointer; }
-        .channelRow:hover .close-dm-btn, .channelRow:hover .deleteBtn { opacity: 0.7; }
-        
-        /* Buttons */
-        .tinyBtn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 6px 8px; border-radius: 8px; color: var(--muted); cursor: pointer; }
-        #scrollBtn { position: fixed; right: 26px; bottom: 96px; padding: 10px 12px; border-radius: 12px; border: none; background: var(--accent); color: white; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
-        #scrollBtn.show { opacity: 1; }
 
-        /* Modals & Helpers */
-        #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
-        .modalCard { background: var(--panel); padding: 18px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; gap: 10px; }
-        .requirement { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
-        .requirement.valid { color: #2ecc71; }
-        .badge { background: #ff5b5b; color: white; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
-        .statusDot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        body {
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #authDiv {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+        }
+
+        .authCard {
+            width: 360px;
+            background: var(--auth-grad);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .authTabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .authTabs button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            transition: all .18s;
+        }
+
+        .authTabs button.active { opacity: 0.9; }
+
+        .authCard input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+
+        #app {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+        }
+
+        #sidebar {
+            width: 300px;
+            background: var(--sidebar-grad);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0,0,0,0.35);
+            gap: 10px;
+        }
+
+        #sidebarHeader {
+            font-weight: 800;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #sidebarHeader .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+            min-width: 0;
+        }
+
+        #chatHeader {
+            padding: 12px 16px;
+            background: var(--panel);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chatHeader .meta {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        #bottomBar {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: var(--sidebar-grad);
+            align-items: center;
+        }
+
+        #msgInput {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .sidebarButtons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        #channelList {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .channelRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: var(--channel-bg);
+            color: var(--channel-text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .18s;
+        }
+
+        .channelRow:hover {
+            transform: scale(1.02);
+            background: var(--accent);
+            color: white;
+        }
+
+        .channelRow.active {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .badge {
+            background: #ff5b5b;
+            color: white;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        #rightbar {
+            width: 260px;
+            background: var(--panel);
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: -2px 0 18px rgba(0,0,0,0.18);
+        }
+
+        #usersHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+        }
+
+        .userRow {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 6px;
+            border-radius: 8px;
+            cursor: default;
+        }
+
+        .userRow:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .statusDot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
         .status-online { background: #2ecc71; }
         .status-away { background: #f1c40f; }
         .status-offline { background: #95a5a6; }
-        .reply-quote { background: var(--bg); border-left: 3px solid var(--accent); padding: 4px 8px; margin-bottom: 4px; font-size: 13px; border-radius: 4px; color: var(--muted); cursor: pointer; }
-        
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } }
+
+        #messages {
+            flex: 1;
+            padding: 14px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            max-width: 980px;
+            transition: all .28s;
+            opacity: 0;
+            transform: translateY(10px);
+            position: relative;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            background: #6b6f75;
+            flex: 0 0 40px;
+        }
+
+        .msgBody {
+            background: var(--card);
+            padding: 8px 12px;
+            border-radius: 10px;
+            min-width: 0;
+        }
+
+        .msgHeader {
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .timestamp {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .msgText {
+            margin-top: 4px;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Message Context Menu */
+        .message-menu {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--panel);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            padding: 4px;
+            display: none;
+            cursor: pointer;
+            z-index: 10;
+            gap: 4px;
+        }
+
+        .message:hover .message-menu { display: flex; }
+
+        .menu-item {
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .menu-item:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .edited-indicator {
+            font-size: 10px;
+            color: var(--muted);
+            margin-left: 8px;
+        }
+
+        textarea.edit-input {
+            width: 98%;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--accent);
+            border-radius: 5px;
+            font-family: inherit;
+            resize: none;
+        }
+
+        #scrollBtn {
+            position: fixed;
+            right: 26px;
+            bottom: 96px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .25s, transform .18s;
+        }
+
+        #scrollBtn.show { opacity: 1; }
+
+        /* Button Theming */
+        #submitBtn, .sidebarButtons button, #sendBtn, .modalActions button {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            background-image: linear-gradient(to top, var(--accent) 0%, #8ea4eb 100%);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        #submitBtn:hover, .sidebarButtons button:hover, #sendBtn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .tinyBtn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 8px;
+            border-radius: 8px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tinyBtn:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+        }
+
+        #modalOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modalCard {
+            background: var(--panel);
+            padding: 18px;
+            border-radius: 12px;
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .settings-section {
+            padding: 15px 0;
+            border-top: 1px solid var(--card);
+        }
+
+        .settings-section:first-of-type { border-top: none; }
+
+        .settings-section h4 { margin: 0 0 10px 0; color: var(--muted); }
+
+        .settings-section input {
+            width: 95%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+
+        .settings-section button {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important; }
+
+        #replyPreview {
+            display: none;
+            padding: 8px 12px;
+            background: var(--panel);
+            border-top: 1px solid var(--card);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .reply-quote {
+            background: var(--bg);
+            border-left: 3px solid var(--accent);
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            border-radius: 4px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .mention-highlight {
+            background-color: hsla(235, 85%, 65%, 0.3);
+            color: #c1cef8;
+            font-weight: 700;
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+
+        .mention-highlight.me {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
         .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @media (max-width:1000px){ #rightbar{display:none} #sidebar{width:220px} }
     </style>
 </head>
 <body>
 
-    <!-- Auth Layer -->
+    <!-- Auth Div -->
     <div id="authDiv">
         <div class="authCard">
             <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -100,65 +542,72 @@
             <input id="authUsername" placeholder="Username" />
             <input id="authPassword" placeholder="Password" type="password" />
             <input id="authConfirm" placeholder="Confirm Password" type="password" style="display:none" />
-            <div id="passwordRequirements" style="display: none;">
-                <div id="req-length" class="requirement">✖ 8+ chars</div>
-                <div id="req-upper" class="requirement">✖ 1 Uppercase</div>
-                <div id="req-num" class="requirement">✖ 1 Number</div>
+            <div id="passwordRequirements" style="display: none; flex-direction: column; gap: 6px; margin-top: 8px;">
+                <div id="req-length" class="requirement">✖ At least 8 characters</div>
+                <div id="req-upper" class="requirement">✖ One uppercase letter</div>
+                <div id="req-number" class="requirement">✖ One number</div>
             </div>
-            <button id="submitBtn" onclick="submitAuth()" style="background:var(--accent); color:white; padding:12px; border-radius:10px; border:none; cursor:pointer;">Enter</button>
-            <div id="authMessage"></div>
+            <button id="submitBtn" onclick="submitAuth()">Login</button>
+            <div id="authMessage" style="text-align: center; font-size: 14px; margin-top: 5px;"></div>
         </div>
     </div>
 
-    <!-- App Layer -->
+    <!-- App Main UI -->
     <div id="app" style="display: none;">
         <div id="sidebar">
             <div id="sidebarHeader">
-                <div>Chat 🗨️</div>
-                <div style="display:flex; gap:5px;">
-                    <button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()">🔔 <span id="notifBadge" class="badge" style="display:none;"></span></button>
+                <div>Channels 🗨️</div>
+                <div class="controls">
+                    <button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()">🔔 <div class="badge" id="notifBadge"></div></button>
                     <button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()">🟢</button>
                     <button class="tinyBtn" onclick="showSettingsModal()">⚙️</button>
                     <button class="tinyBtn" onclick="logout()">🚪</button>
+                    <div id="meLabel" style="font-size:12px;color:var(--muted)"></div>
                 </div>
             </div>
             <div id="channelList"></div>
-            <button onclick="showBrowseDialog()" style="padding:10px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; margin-top:10px;">Browse / Create</button>
+            <div class="sidebarButtons">
+                <button onclick="showBrowseDialog()">Browse / Create</button>
+            </div>
         </div>
 
         <div id="main">
             <div id="chatHeader">
-                <div id="chatTitle">Select a Channel</div>
+                <div id="chatTitle">No channel selected</div>
             </div>
-            <div id="messages"></div>
-            <div id="replyPreview" style="display:none; padding:8px 12px; background:var(--panel); border-top:1px solid var(--card);">
+            <div style="display:flex; flex:1; gap:12px; min-height:0;">
+                <div id="messages"></div>
+                <div id="rightbar">
+                    <div id="usersHeader">
+                        <div>Users 👥</div>
+                        <div style="font-size:12px;color:var(--muted)">Click to DM</div>
+                    </div>
+                    <div id="userList" style="overflow:auto; display:flex; flex-direction:column; gap:6px;"></div>
+                </div>
+            </div>
+            <div id="replyPreview">
                 <span onclick="cancelReply()" style="float:right; cursor:pointer;">✖️</span>
-                Replying to <strong id="replyUser"></strong>
+                Replying to <strong id="replyUser"></strong>: <span id="replyText"></span>
             </div>
             <div id="bottomBar">
-                <input id="msgInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }" />
-                <button id="sendBtn" onclick="sendMessage()" style="padding:10px 20px; background:var(--accent); color:white; border:none; border-radius:10px; cursor:pointer;">Send</button>
+                <input id="msgInput" placeholder="Type a message..." />
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
             </div>
-        </div>
-        
-        <div id="rightbar" style="width:240px; padding:14px; background:var(--panel); box-shadow:-2px 0 10px rgba(0,0,0,0.1);">
-            <div style="font-weight:800; margin-bottom:10px;">Users 👥</div>
-            <div id="userList"></div>
         </div>
     </div>
 
     <button id="scrollBtn">⬇️</button>
 
-    <!-- Modal System -->
+    <!-- Generic Modal -->
     <div id="modalOverlay">
         <div class="modalCard">
-            <h3 id="modalTitle"></h3>
-            <div id="modalSubtitle" style="font-size:14px; color:var(--muted); margin-bottom:10px;"></div>
+            <h3 id="modalTitle">Modal</h3>
+            <div id="modalSubtitle"></div>
             <div id="modalCustomContent"></div>
-            <input id="modalInput" style="display:none; width:90%; padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text); border:none;" />
-            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px;">
-                <button id="modalConfirmBtn" onclick="submitModal()" style="padding:8px 16px; background:var(--accent); color:white; border:none; border-radius:5px; cursor:pointer;">OK</button>
-                <button onclick="closeModal()" style="padding:8px 16px; background:var(--card); color:white; border:none; border-radius:5px; cursor:pointer;">Cancel</button>
+            <input id="modalInput" autocomplete="off" />
+            <div class="modalActions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+                <button id="modalConfirmBtn" onclick="submitModal()">OK</button>
+                <button id="modalCancelBtn" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -167,7 +616,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // --- CONFIG & GLOBALS ---
+        // --- FIREBASE & GLOBALS ---
         const firebaseConfig = {
             apiKey: "AIzaSyDbyrqzcZ4Wk57xBNVDzNuRerQaBx2p1L0",
             authDomain: "htmlchat-8b2c5.firebaseapp.com",
@@ -183,34 +632,36 @@
         let username = "";
         let currentChannel = "";
         let myStatus = "online";
-        let replyingToId = null;
         let lastMsgTime = 0;
+        let replyingToId = null;
         let modalCallback = null;
-        let userSettings = { desktopNotifications: true };
+        let lightTheme = false;
+        let compactView = false;
 
+        // --- AUTOMOD WORD LIST ---
         const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
 
-        // --- AUTOMOD ---
+        // --- AUTOMOD FILTER ---
         function autoMod(text) {
             let p = text;
             if (p.length > 500) p = p.substring(0, 500);
             if (/(.)\1{8,}/.test(p)) return "🤐 (AutoMod: Flooding)";
-            BLACKLIST.forEach(w => {
-                const r = new RegExp(`\\b${w}\\b`, 'gi');
-                p = p.replace(r, "🤐");
+            BLACKLIST.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                p = p.replace(regex, "🤐");
             });
-            const caps = (p.match(/[A-Z]/g) || []).length;
-            if (caps > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
+            const capsCount = (p.match(/[A-Z]/g) || []).length;
+            if (capsCount > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
             return p;
         }
 
-        // --- AUTH ---
-        function switchAuth(m) {
-            const isS = m === 'signup';
-            document.getElementById("authConfirm").style.display = isS ? "block" : "none";
-            document.getElementById("passwordRequirements").style.display = isS ? "block" : "none";
-            document.getElementById("loginTab").classList.toggle("active", m === 'login');
-            document.getElementById("signupTab").classList.toggle("active", isS);
+        // --- AUTH LOGIC ---
+        function switchAuth(mode) {
+            const isSignup = (mode === 'signup');
+            document.getElementById("authConfirm").style.display = isSignup ? "block" : "none";
+            document.getElementById("passwordRequirements").style.display = isSignup ? "block" : "none";
+            document.getElementById("loginTab").classList.toggle("active", mode === 'login');
+            document.getElementById("signupTab").classList.toggle("active", isSignup);
         }
 
         async function submitAuth() {
@@ -222,7 +673,7 @@
                 if (snap.val().password === p) { username = u; afterLogin(); }
                 else { alert("Wrong password!"); }
             } else {
-                await db.ref("users/" + u).set({ password: p, settings: { desktopNotifications: true } });
+                await db.ref("users/" + u).set({ password: p });
                 username = u; afterLogin();
             }
         }
@@ -230,18 +681,18 @@
         function afterLogin() {
             document.getElementById("authDiv").style.display = "none";
             document.getElementById("app").style.display = "flex";
-            loadChannels(); listenToNotifs(); startPresence();
+            document.getElementById("meLabel").textContent = "👤 " + username;
+            loadChannels(); startPresence(); listenToNotifs();
         }
 
         function logout() { location.reload(); }
 
-        // --- CORE FUNCTIONS ---
+        // --- CORE CHAT LOGIC ---
         function loadChannels() {
             db.ref("channels").on("value", snap => {
                 const list = document.getElementById("channelList");
                 list.innerHTML = "";
                 snap.forEach(ch => {
-                    const data = ch.val();
                     const div = document.createElement("div");
                     div.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
                     div.textContent = "# " + ch.key;
@@ -264,25 +715,29 @@
             const div = document.createElement("div");
             div.className = "message show";
             div.dataset.id = id;
-            
-            let replyHTML = "";
+
+            let replyQuote = "";
             if (m.replyTo) {
                 const rSnap = await db.ref(`messages/${currentChannel}/${m.replyTo}`).once('value');
                 if (rSnap.exists()) {
-                    replyHTML = `<div class="reply-quote">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0,30)}...</div>`;
+                    replyQuote = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text}</div>`;
                 }
             }
 
             div.innerHTML = `
                 <div class="avatar" style="background:${uidColor(m.user)}">${m.user[0].toUpperCase()}</div>
                 <div class="msgBody">
-                    ${replyHTML}
-                    <div style="font-weight:700; color:${uidColor(m.user)}; font-size:12px;">${m.user}</div>
+                    ${replyQuote}
+                    <div class="msgHeader">
+                        <span style="color:${uidColor(m.user)}">${m.user}</span>
+                        <span class="timestamp">${new Date(m.ts).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
                     <div class="msgText">${m.text}</div>
                 </div>
                 <div class="message-menu">
-                    <div class="menu-item" onclick="replyTo('${id}', '${m.user}')">↩️</div>
+                    <div class="menu-item" onclick="replyTo('${id}', '${m.user}', '${m.text}')">↩️</div>
                     <div class="menu-item" onclick="showForwardUI('${id}')">↪️</div>
+                    ${m.user === username ? `<div class="menu-item" onclick="showEditUI('${id}')">✏️</div>` : ""}
                     ${m.user === username ? `<div class="menu-item" onclick="deleteMsg('${id}')">🗑️</div>` : ""}
                 </div>
             `;
@@ -295,13 +750,13 @@
             let text = input.value.trim();
             if (!text || !currentChannel) return;
 
-            if (Date.now() - lastMsgTime < 1500) { alert("⏳ Slow down!"); return; }
+            if (Date.now() - lastMsgTime < 1500) { alert("⏳ Wait! Spaming is blocked."); return; }
             text = autoMod(text);
 
             const msgRef = db.ref("messages/" + currentChannel).push();
             await msgRef.set({ user: username, text: text, ts: Date.now(), replyTo: replyingToId });
 
-            // Mention check
+            // Notification check
             const mentions = text.match(/@(\w+)/g);
             if (mentions) {
                 mentions.forEach(m => {
@@ -313,42 +768,67 @@
             input.value = ""; lastMsgTime = Date.now(); cancelReply();
         }
 
-        // --- MODALS & UI ---
-        function showModal(title, sub, callback, options = {}) {
-            modalCallback = callback;
-            document.getElementById("modalTitle").textContent = title;
-            document.getElementById("modalSubtitle").textContent = sub;
-            document.getElementById("modalOverlay").style.display = "flex";
-            const input = document.getElementById("modalInput");
-            input.style.display = options.showInput ? "block" : "none";
-            if (options.showInput) input.focus();
+        // --- FEATURES ---
+        function replyTo(id, user, text) {
+            replyingToId = id;
+            document.getElementById("replyUser").textContent = user;
+            document.getElementById("replyText").textContent = text.substring(0, 30) + "...";
+            document.getElementById("replyPreview").style.display = "block";
+            document.getElementById("msgInput").focus();
         }
-        function closeModal() { document.getElementById("modalOverlay").style.display = "none"; document.getElementById("modalCustomContent").innerHTML = ""; }
-        function submitModal() { const val = document.getElementById("modalInput").value; if (modalCallback) modalCallback(val); closeModal(); }
+
+        function cancelReply() { replyingToId = null; document.getElementById("replyPreview").style.display = "none"; }
+
+        function deleteMsg(id) { if(confirm("Delete message?")) db.ref(`messages/${currentChannel}/${id}`).remove(); }
+
+        function showEditUI(id) {
+            const msgEl = document.querySelector(`.message[data-id="${id}"] .msgText`);
+            const oldText = msgEl.textContent;
+            showModal("Edit Message ✏️", "Update your message", (val) => {
+                if (val) db.ref(`messages/${currentChannel}/${id}`).update({ text: autoMod(val), edited: true });
+            }, { showInput: true, placeholder: oldText });
+        }
+
+        function showForwardUI(id) {
+            db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
+                const text = snap.val().text;
+                showModal("Forward ↪️", "Enter channel name to forward to", (target) => {
+                    if (target) db.ref(`messages/${target}`).push({ user: username, text: "[Forwarded]: " + text, ts: Date.now() });
+                }, { showInput: true, placeholder: "General" });
+            });
+        }
 
         function showSettingsModal() {
             const html = `
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="tinyBtn" onclick="toggleTheme()">🌓 Change Theme</button>
-                    <button class="tinyBtn" onclick="toggleView()">📏 Cozy/Compact</button>
-                    <button class="tinyBtn" onclick="changePassUI()">🔑 Change Password</button>
-                    <button style="background:#e74c3c; color:white; border:none; padding:8px; border-radius:5px;" onclick="deleteAccUI()">💀 Delete Account</button>
+                <div class="settings-section">
+                    <h4>Appearance</h4>
+                    <button onclick="toggleTheme()">🌓 Change Theme</button>
+                    <button onclick="toggleView()">📏 Cozy / Compact</button>
+                </div>
+                <div class="settings-section">
+                    <h4>Danger Zone</h4>
+                    <button class="btn-danger" onclick="deleteAccountUI()">💀 Delete Account</button>
                 </div>
             `;
             document.getElementById("modalCustomContent").innerHTML = html;
-            showModal("Settings ⚙️", "User preferences", null, { showInput: false });
+            showModal("Settings ⚙️", "Preferences for " + username, null, { showInput: false });
         }
 
-        function showBrowseDialog() {
-            showModal("New Channel 🗨️", "Enter channel name", (val) => {
-                if (val) db.ref("channels/" + val).set({ created: Date.now() });
+        async function deleteAccountUI() {
+            closeModal();
+            showModal("Delete Account", "Enter password to confirm irreversible deletion", async (pass) => {
+                const snap = await db.ref(`users/${username}`).once('value');
+                if (snap.val().password === pass) {
+                    await db.ref(`users/${username}`).remove();
+                    location.reload();
+                } else { alert("Wrong password!"); }
             }, { showInput: true });
         }
 
         // --- UTILS ---
         function uidColor(n) { const p = ["#e67e22","#e74c3c","#9b59b6","#3498db","#2ecc71"]; let h = 0; for(let i=0; i<n.length; i++) h=n.charCodeAt(i)+((h<<5)-h); return p[Math.abs(h)%p.length]; }
-        function toggleTheme() { document.documentElement.classList.toggle("light"); }
-        function toggleView() { document.body.classList.toggle("compact"); }
+        function toggleTheme() { lightTheme = !lightTheme; document.documentElement.classList.toggle("light", lightTheme); }
+        function toggleView() { compactView = !compactView; document.body.classList.toggle("compact", compactView); }
         function cycleStatus() {
             const map = { online: ["🟢", "away"], away: ["🟡", "offline"], offline: ["⚪", "online"] };
             const [icon, next] = map[myStatus]; myStatus = next;
@@ -361,32 +841,27 @@
             db.ref("presence").on("value", snap => {
                 const list = document.getElementById("userList"); list.innerHTML = "";
                 snap.forEach(u => {
-                    const d = document.createElement("div");
+                    const d = document.createElement("div"); d.className = "userRow";
                     d.innerHTML = `<span class="statusDot status-${u.val().status}"></span> ${u.key}`;
                     list.appendChild(d);
                 });
             });
         }
-        function replyTo(id, user) { replyingToId = id; document.getElementById("replyUser").textContent = "@"+user; document.getElementById("replyPreview").style.display = "block"; }
-        function cancelReply() { replyingToId = null; document.getElementById("replyPreview").style.display = "none"; }
-        function deleteMsg(id) { if(confirm("Delete message?")) db.ref(`messages/${currentChannel}/${id}`).remove(); }
-        function listenToNotifs() {
-            db.ref(`users/${username}/notifications`).on('value', snap => {
-                const b = document.getElementById("notifBadge");
-                b.style.display = snap.exists() ? "inline" : "none";
-                b.textContent = snap.numChildren();
-            });
+
+        function showModal(title, sub, callback, options = {}) {
+            modalCallback = callback;
+            document.getElementById("modalTitle").textContent = title;
+            document.getElementById("modalSubtitle").textContent = sub;
+            document.getElementById("modalOverlay").style.display = "flex";
+            const input = document.getElementById("modalInput");
+            input.style.display = options.showInput ? "block" : "none";
+            input.placeholder = options.placeholder || "";
+            if (options.showInput) input.focus();
         }
-        function showNotificationsModal() {
-            db.ref(`users/${username}/notifications`).once('value', snap => {
-                let list = "<div>";
-                snap.forEach(n => { list += `<div style="padding:5px; border-bottom:1px solid var(--card);">@${n.val().from} mentioned you in #${n.val().channel}</div>`; });
-                list += "</div>";
-                document.getElementById("modalCustomContent").innerHTML = list;
-                showModal("Mentions 🔔", "", null, { showInput: false });
-                db.ref(`users/${username}/notifications`).remove();
-            });
-        }
+        function closeModal() { document.getElementById("modalOverlay").style.display = "none"; document.getElementById("modalCustomContent").innerHTML = ""; }
+        function submitModal() { const val = document.getElementById("modalInput").value; if (modalCallback) modalCallback(val); closeModal(); }
+
+        document.getElementById("msgInput").onkeydown = (e) => { if (e.key === "Enter") sendMessage(); };
     </script>
 </body>
 </html>
