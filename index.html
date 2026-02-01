@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Chat</title>
+<title>Chat 💬</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
 :root {
@@ -253,10 +253,10 @@ opacity: 1; background-color: rgba(0,0,0, 0.2); transform: scale(1.15);
 <input id="authPassword" placeholder="Password" type="password" />
 <input id="authConfirm" placeholder="Confirm Password" type="password" style="display:none" />
 <div id="passwordRequirements" style="display: none;">
-<div id="req-length" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">At least 8 characters</span></div>
-<div id="req-uppercase" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">One uppercase letter</span></div>
-<div id="req-lowercase" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">One lowercase letter</span></div>
-<div id="req-number" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">One number</span></div>
+<div id="req-length" class="requirement"><span class="checkbox">✔</span> <span class="text">At least 8 characters</span></div>
+<div id="req-uppercase" class="requirement"><span class="checkbox">✔</span> <span class="text">One uppercase letter</span></div>
+<div id="req-lowercase" class="requirement"><span class="checkbox">✔</span> <span class="text">One lowercase letter</span></div>
+<div id="req-number" class="requirement"><span class="checkbox">✔</span> <span class="text">One number</span></div>
 </div>
 <button id="submitBtn" onclick="submitAuth()">Login</button>
 <div id="authMessage"></div>
@@ -265,12 +265,12 @@ opacity: 1; background-color: rgba(0,0,0, 0.2); transform: scale(1.15);
 <div id="app" style="display: none;">
 <div id="sidebar">
 <div id="sidebarHeader">
-<div>Channels</div>
+<div>Channels 🗨️</div>
 <div class="controls">
-<button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()" title="Notifications">Bell <div class="badge" id="notifBadge"></div></button>
-<button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()" title="Click to change your status">Circle</button>
-<button id="settingsBtn" class="tinyBtn" onclick="showSettingsModal()" title="Settings">Gear</button>
-<button id="logoutBtn" class="tinyBtn" onclick="logout()" title="Logout">Door</button>
+<button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()" title="Notifications">🔔 <div class="badge" id="notifBadge"></div></button>
+<button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()" title="Click to change your status">🟢</button>
+<button id="settingsBtn" class="tinyBtn" onclick="showSettingsModal()" title="Settings">⚙️</button>
+<button id="logoutBtn" class="tinyBtn" onclick="logout()" title="Logout">🚪</button>
 <div id="meLabel" style="font-size:12px;color:var(--muted)"></div>
 </div>
 </div>
@@ -291,14 +291,14 @@ opacity: 1; background-color: rgba(0,0,0, 0.2); transform: scale(1.15);
 <div id="messages" style="flex:1;"></div>
 <div id="rightbar">
 <div id="usersHeader">
-<div>Users</div>
+<div>Users 👥</div>
 <div style="font-size:12px;color:var(--muted)">Click to DM</div>
 </div>
 <div id="userList" style="overflow:auto; display:flex; flex-direction:column; gap:6px;"></div>
 </div>
 </div>
 <div id="replyPreview">
-<span id="cancelReplyBtn" onclick="cancelReply()">Times</span>
+<span id="cancelReplyBtn" onclick="cancelReply()">✖️</span>
 Replying to <strong id="replyUser"></strong>: <span id="replyText" class="reply-text"></span>
 </div>
 <div id="bottomBar">
@@ -307,7 +307,7 @@ Replying to <strong id="replyUser"></strong>: <span id="replyText" class="reply-
 </div>
 </div>
 </div>
-<button id="scrollBtn">Down Arrow</button>
+<button id="scrollBtn">⬇️</button>
 <div id="modalOverlay">
 <div class="modalCard">
 <h3 id="modalTitle">Modal</h3>
@@ -371,13 +371,13 @@ return canvas.toDataURL();
 function toggleTheme(){
 lightTheme = !lightTheme;
 document.documentElement.classList.toggle("light", lightTheme);
-document.getElementById("themeBtn").textContent = lightTheme ? "Sun" : "Moon";
+document.getElementById("themeBtn").textContent = lightTheme ? "☀️" : "🌙";
 }
 function toggleView(){
 compactView = !compactView;
 document.body.classList.toggle("compact", compactView);
 document.body.classList.toggle("cozy", !compactView);
-document.getElementById("viewBtn").textContent = compactView ? "Feather" : "Couch";
+document.getElementById("viewBtn").textContent = compactView ? "📏" : "🛋️";
 }
 function switchAuth(mode){
 authMode=mode;
@@ -471,9 +471,9 @@ updateStatusButton();
 }
 function updateStatusButton(){
 const btn=document.getElementById("myStatusBtn");
-if(myStatus==="online"){btn.style.color="#2ecc71";btn.textContent="Circle";}
-else if(myStatus==="away"){btn.style.color="#f1c40f";btn.textContent="Circle";}
-else{btn.style.color="#95a5a6";btn.textContent="Circle";}
+if(myStatus==="online"){btn.style.color="#2ecc71";btn.textContent="🟢";}
+else if(myStatus==="away"){btn.style.color="#f1c40f";btn.textContent="🟡";}
+else{btn.style.color="#95a5a6";btn.textContent="⚪";}
 }
 async function loadChannels(){
 const userSnap=await db.ref(`users/${username}`).once('value');
@@ -497,17 +497,17 @@ if(unread[name]&&unread[name]>0){const b=document.createElement("div");b.classNa
 row.appendChild(left);
 if(data.type==="dm"){
 const closeBtn=document.createElement("div");closeBtn.className="close-dm-btn";
-closeBtn.innerHTML="Cross";closeBtn.title="Close DM";
+closeBtn.innerHTML="✖️";closeBtn.title="Close DM";
 closeBtn.onclick=(e)=>{e.stopPropagation();closeDM(name);};
 row.appendChild(closeBtn);
 }else{
 if(createdBy===username||username==="admin"){
-const del=document.createElement("button");del.textContent="Trash";
+const del=document.createElement("button");del.textContent="🗑️";
 del.className="deleteBtn";del.onclick=(e)=>{e.stopPropagation();deleteChannel(name);};
 row.appendChild(del);
 }else{
 const hideBtn=document.createElement("div");hideBtn.className="close-dm-btn";
-hideBtn.innerHTML="Cross";hideBtn.title="Hide Channel";
+hideBtn.innerHTML="✖️";hideBtn.title="Hide Channel";
 hideBtn.onclick=(e)=>{e.stopPropagation();hideChannel(name);};
 row.appendChild(hideBtn);
 }
@@ -682,15 +682,15 @@ msg.appendChild(av);msg.appendChild(body);
 if(user==="System"||user==="admin")msg.classList.add("system");
 const menu=document.createElement("div");menu.className="message-menu";
 const replyItem=document.createElement("div");replyItem.className="menu-item";
-replyItem.textContent="Reply";replyItem.title="Reply";replyItem.onclick=()=>showReplyUI(id);
+replyItem.textContent="↩️";replyItem.title="Reply";replyItem.onclick=()=>showReplyUI(id);
 const forwardItem=document.createElement("div");forwardItem.className="menu-item";
-forwardItem.textContent="Forward";forwardItem.title="Forward";forwardItem.onclick=()=>showForwardUI(id);
+forwardItem.textContent="↪️";forwardItem.title="Forward";forwardItem.onclick=()=>showForwardUI(id);
 menu.appendChild(replyItem);menu.appendChild(forwardItem);
 if(user===username){
 const editItem=document.createElement("div");editItem.className="menu-item";
-editItem.textContent="Pencil";editItem.title="Edit";editItem.onclick=()=>showEditUI(id);
+editItem.textContent="✏️";editItem.title="Edit";editItem.onclick=()=>showEditUI(id);
 const deleteItem=document.createElement("div");deleteItem.className="menu-item";
-deleteItem.textContent="Trash";deleteItem.title="Delete";deleteItem.onclick=(event)=>deleteMessage(id,event);
+deleteItem.textContent="🗑️";deleteItem.title="Delete";deleteItem.onclick=(event)=>deleteMessage(id,event);
 menu.appendChild(editItem);menu.appendChild(deleteItem);
 }
 msg.appendChild(menu);
@@ -882,7 +882,7 @@ read:false,ts:Date.now()
 };
 db.ref(`users/${mentionedUser}/notifications`).push(notifPayload);
 if(userSettings.desktopNotifications&&document.hidden&&'Notification'in window&&Notification.permission==='granted'){
-const title=`New mention from @${username`;
+const title=`New mention from @${username}`;
 const options={body:text,icon:generateAvatarUrl(username),tag:messageId};
 const notification=new Notification(title,options);
 notification.onclick=()=>{window.focus();goToMention(currentChannel,messageId,null);};
@@ -1019,16 +1019,16 @@ Desktop Notifications: ${userSettings.desktopNotifications?'Enabled':'Disabled'}
 <input id="newPassword" type="password" placeholder="New Password">
 <input id="confirmPassword" type="password" placeholder="Confirm New Password">
 <div id="settings-passwordRequirements" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--input-bg);border-radius:8px;">
-<div id="settings-req-length" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">At least 8 characters</span></div>
-<div id="settings-req-uppercase" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">One uppercase letter</span></div>
-<div id="settings-req-lowercase" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">One lowercase letter</span></div>
-<div id="settings-req-number" class="requirement"><span class="checkbox">Checkmark</span> <span class="text">One number</span></div>
+<div id="settings-req-length" class="requirement"><span class="checkbox">✔</span> <span class="text">At least 8 characters</span></div>
+<div id="settings-req-uppercase" class="requirement"><span class="checkbox">✔</span> <span class="text">One uppercase letter</span></div>
+<div id="settings-req-lowercase" class="requirement"><span class="checkbox">✔</span> <span class="text">One lowercase letter</span></div>
+<div id="settings-req-number" class="requirement"><span class="checkbox">✔</span> <span class="text">One number</span></div>
 </div>
 <button onclick="changePassword()">Save Password</button>
 </div>
 <div class="settings-section"><h4>Credits & About</h4>
-<div class="credit-item"><strong>Developed by: hothost59</strong> <span>qwz</span></div>
-<div class="credit-item" style="margin-top:10px; font-style: italic;"><span>Beta Release: February 2026</span></div>
+<div class="credit-item"><strong>Developed by:</strong> <span>qwz</span></div>
+<div class="credit-item" style="margin-top:10px; font-style: italic;"><span>Final Release: October 2025</span></div>
 </div>
 <div class="settings-section"><h4>Danger Zone</h4>
 <button class="btn-danger" onclick="showDeleteAccountConfirmation()">Delete My Account</button>
