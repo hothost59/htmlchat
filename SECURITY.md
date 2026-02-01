@@ -18,8 +18,9 @@ DM me on Discord at @hothost. (the period is important)
   For this reason, do not put in important passwords and data.
 - Passwords are not hashed.
   Again, do not put in reused and important passwords.
-- No automod
-  This is not really a security bug, but it is nice to note.
+- Sometimes a ghost message appears from Unknown or something similar
+  I'm trying to fix this right now.
+
 
 ## Policy on Taking Notice of Security Bugs
 
