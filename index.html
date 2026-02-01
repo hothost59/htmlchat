@@ -6,12 +6,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
         :root {
-            --bg: #36393f;
-            --panel: #2f3136;
-            --muted: #b9bbbe;
-            --accent: #7289da;
-            --card: #4f545c;
-            --card-hover: #5b616b;
+            --bg: #36393f; --panel: #2f3136; --muted: #b9bbbe;
+            --accent: #7289da; --card: #4f545c; --card-hover: #5b616b;
             --sidebar-grad: linear-gradient(to bottom, #2f3136, #202225);
             --text: #e6e6e6;
             --input-bg: #202225;
@@ -19,634 +15,102 @@
             --channel-bg: #99aab5;
             --channel-text: #000000;
         }
-
         .light {
-            --bg: #f4f6f8;
-            --panel: #ffffff;
-            --muted: #6b7280;
-            --accent: #4f46e5;
-            --card: #f3f4f6;
-            --text: #111827;
+            --bg: #f4f6f8; --panel: #ffffff; --muted: #6b7280;
+            --accent: #4f46e5; --card: #f3f4f6; --text: #111827;
             --sidebar-grad: linear-gradient(to bottom, #ffffff, #f1f5f9);
             --input-bg: #e5e7eb;
             --auth-grad: linear-gradient(135deg, var(--panel), #f9fafb);
             --channel-bg: #e5e7eb;
             --channel-text: #1f2937;
         }
-
         html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
+            height: 100%; width: 100%; margin: 0; padding: 0;
             overflow: hidden;
-            font-family: "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+            font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
             color: var(--text);
         }
+        body { background: var(--bg); display: flex; flex-direction: column; align-items: stretch; }
 
-        body {
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        #authDiv {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 40;
-        }
-
-        .authCard {
-            width: 360px;
-            background: var(--auth-grad);
-            border-radius: 14px;
-            padding: 22px;
-            box-shadow: 0 14px 40px rgba(0,0,0,0.6);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .authTabs {
-            display: flex;
-            gap: 8px;
-        }
-
-        .authTabs button {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            background: var(--accent);
-            color: white;
-            font-weight: 600;
-            transition: all .18s;
-        }
-
+        /* --- AUTH DIV --- */
+        #authDiv { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 40; }
+        .authCard { width: 360px; background: var(--auth-grad); border-radius: 14px; padding: 22px; box-shadow: 0 14px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 12px; }
+        .authTabs { display: flex; gap: 8px; }
+        .authTabs button { flex: 1; padding: 10px; border-radius: 10px; border: none; cursor: pointer; background: var(--accent); color: white; font-weight: 600; transition: all .18s; }
         .authTabs button.active { opacity: 0.9; }
+        .authCard input { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--input-bg); color: var(--text); }
 
-        .authCard input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: var(--input-bg);
-            color: var(--text);
-        }
+        /* --- APP LAYOUT --- */
+        #app { flex: 1; min-height: 0; display: flex; gap: 0; align-items: stretch; }
+        #sidebar { width: 300px; background: var(--sidebar-grad); padding: 14px; display: flex; flex-direction: column; box-shadow: 2px 0 18px rgba(0,0,0,0.35); gap: 10px; }
+        #sidebarHeader { font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
+        #sidebarHeader .controls { display: flex; gap: 8px; align-items: center; }
+        #main { flex: 1; display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
+        #chatHeader { padding: 12px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.03); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+        #chatHeader .meta { display: flex; gap: 10px; align-items: center; color: var(--muted); font-weight: 600; font-size: 13px; }
+        #bottomBar { display: flex; gap: 12px; padding: 12px; background: var(--sidebar-grad); align-items: center; }
+        #msgInput { flex: 1; padding: 12px 14px; border-radius: 12px; border: none; background: var(--input-bg); color: var(--text); font-size: 15px; }
 
-        #app {
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            gap: 0;
-            align-items: stretch;
-        }
+        /* --- CHANNELS --- */
+        #channelList { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+        .channelRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; background: var(--channel-bg); color: var(--channel-text); font-weight: 700; cursor: pointer; transition: all .18s; }
+        .channelRow:hover { transform: scale(1.02); background: var(--accent); color: white; }
+        .channelRow.active { background: var(--accent); color: white; transform: scale(1.02); }
+        .badge { background: #ff5b5b; color: white; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+        .close-dm-btn, .deleteBtn { font-size: 14px; padding: 2px 4px; opacity: 0; cursor: pointer; transition: all 0.2s; }
+        .channelRow:hover .close-dm-btn, .channelRow:hover .deleteBtn { opacity: 0.7; }
 
-        #sidebar {
-            width: 300px;
-            background: var(--sidebar-grad);
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 18px rgba(0,0,0,0.35);
-            gap: 10px;
-        }
-
-        #sidebarHeader {
-            font-weight: 800;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        #sidebarHeader .controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        #main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg);
-            min-width: 0;
-        }
-
-        #chatHeader {
-            padding: 12px 16px;
-            background: var(--panel);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-weight: 800;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #chatHeader .meta {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            color: var(--muted);
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        #bottomBar {
-            display: flex;
-            gap: 12px;
-            padding: 12px;
-            background: var(--sidebar-grad);
-            align-items: center;
-        }
-
-        #msgInput {
-            flex: 1;
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: none;
-            background: var(--input-bg);
-            color: var(--text);
-            font-size: 15px;
-        }
-
-        .sidebarButtons {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        #channelList {
-            flex: 1;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 4px;
-        }
-
-        .channelRow {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 8px 10px;
-            border-radius: 10px;
-            background: var(--channel-bg);
-            color: var(--channel-text);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .18s;
-        }
-
-        .channelRow:hover {
-            transform: scale(1.02);
-            background: var(--accent);
-            color: white;
-        }
-
-        .channelRow.active {
-            background: var(--accent);
-            color: white;
-            transform: scale(1.02);
-        }
-
-        .channelLeft {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .badge {
-            background: #ff5b5b;
-            color: white;
-            border-radius: 999px;
-            padding: 2px 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        #rightbar {
-            width: 260px;
-            background: var(--panel);
-            padding: 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: -2px 0 18px rgba(0,0,0,0.18);
-        }
-
-        #usersHeader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 800;
-        }
-
-        .userRow {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 6px;
-            border-radius: 8px;
-            cursor: default;
-        }
-
+        /* --- USER LIST --- */
+        #rightbar { width: 260px; background: var(--panel); padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; box-shadow: -2px 0 18px rgba(0,0,0,0.18); }
+        .userRow { display: flex; gap: 10px; align-items: center; padding: 6px; border-radius: 8px; cursor: default; }
         .userRow:hover { background: rgba(255,255,255,0.02); }
-
-        .statusDot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
+        .statusDot { width: 10px; height: 10px; border-radius: 50%; }
         .status-online { background: #2ecc71; }
         .status-away { background: #f1c40f; }
         .status-offline { background: #95a5a6; }
 
-        #messages {
-            flex: 1;
-            padding: 14px;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        /* --- MESSAGES --- */
+        #messages { flex: 1; padding: 14px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+        .message { display: flex; gap: 12px; align-items: flex-start; max-width: 980px; transition: all .28s; opacity: 0; transform: translateY(10px); position: relative; }
+        .message.show { opacity: 1; transform: translateY(0); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; background: #6b6f75; flex: 0 0 40px; }
+        .msgBody { background: var(--card); padding: 8px 12px; border-radius: 10px; min-width: 0; }
+        .msgHeader { font-weight: 700; font-size: 14px; display: flex; gap: 8px; align-items: center; }
+        .timestamp { color: var(--muted); font-size: 12px; font-weight: 600; }
+        .msgText { margin-top: 4px; color: var(--text); white-space: pre-wrap; word-break: break-word; }
 
-        .message {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            max-width: 980px;
-            transition: all .28s;
-            opacity: 0;
-            transform: translateY(10px);
-            position: relative;
-        }
+        /* Grouping/Compact Styling */
+        .grouped .avatar, .grouped .msgHeader .username { visibility: hidden; width: 0; margin-right: 0; height: 0; }
+        .grouped { margin-top: -10px; }
+        .compact .msgBody { padding: 6px 8px; border-radius: 8px; }
+        .compact .avatar { width: 32px; height: 32px; flex: 0 0 32px; }
 
-        .message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            background: #6b6f75;
-            flex: 0 0 40px;
-        }
-
-        .msgBody {
-            background: var(--card);
-            padding: 8px 12px;
-            border-radius: 10px;
-            min-width: 0;
-        }
-
-        .msgHeader {
-            font-weight: 700;
-            font-size: 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .timestamp {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .msgText {
-            margin-top: 4px;
-            color: var(--text);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .message.system .msgBody {
-            background: var(--accent);
-            color: white;
-            font-weight: 700;
-        }
-
-        .grouped .avatar, .grouped .msgHeader .username {
-            visibility: hidden;
-            width: 0;
-            margin-right: 0;
-        }
-
-        .compact .msgBody {
-            padding: 6px 8px;
-            border-radius: 8px;
-        }
-
-        .compact .avatar {
-            width: 32px;
-            height: 32px;
-            flex: 0 0 32px;
-        }
-
-        .message-menu {
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: var(--panel);
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            padding: 4px;
-            display: none;
-            cursor: pointer;
-            z-index: 10;
-            gap: 4px;
-        }
-
+        /* Message Menu */
+        .message-menu { position: absolute; top: -10px; right: 10px; background: var(--panel); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 4px; display: none; cursor: pointer; z-index: 10; gap: 4px; }
         .message:hover .message-menu { display: flex; }
+        .menu-item { padding: 6px 8px; border-radius: 4px; font-size: 13px; font-weight: 600; }
+        .menu-item:hover { background: var(--accent); color: white; }
 
-        .menu-item {
-            padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .menu-item:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .edited-indicator {
-            font-size: 10px;
-            color: var(--muted);
-            margin-left: 8px;
-        }
-
-        textarea.edit-input {
-            width: 98%;
-            background: var(--bg);
-            color: var(--text);
-            border: 1px solid var(--accent);
-            border-radius: 5px;
-            font-family: inherit;
-            font-size: inherit;
-            resize: none;
-        }
-
-        .edit-helper-text {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        #scrollBtn {
-            position: fixed;
-            right: 26px;
-            bottom: 96px;
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: none;
-            background: var(--accent);
-            color: white;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity .25s, transform .18s;
-        }
-
-        #scrollBtn.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        #scrollBtn:hover { transform: translateY(-3px); }
-
-        #submitBtn, .sidebarButtons button, #sendBtn, .modalActions button {
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: none;
-            background-image: linear-gradient(to top, var(--accent) 0%, #8ea4eb 100%);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
-            transition: all 0.2s ease-in-out;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .tinyBtn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 8px;
-            border-radius: 8px;
-            color: var(--muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tinyBtn:hover {
-            background: rgba(255,255,255,0.1);
-            color: var(--text);
-            transform: translateY(-1px);
-        }
-
-        #modalOverlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-
-        .modalCard {
-            background: var(--panel);
-            padding: 18px;
-            border-radius: 12px;
-            width: 380px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .modalCard input {
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            background: var(--input-bg);
-            color: var(--text);
-        }
-
-        .modalActions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        .modal-subtitle {
-            font-size: 14px;
-            color: var(--muted);
-            margin-bottom: 10px;
-        }
-
-        #modalCustomContent .message {
-            background: var(--bg);
-            border-radius: 8px;
-            padding: 10px;
-            opacity: 1;
-            transform: none;
-            pointer-events: none;
-        }
-
-        .settings-section {
-            padding-top: 15px;
-            border-top: 1px solid var(--card);
-            margin-top: 15px;
-        }
-
-        .settings-section:first-of-type {
-            margin-top: 0;
-            padding-top: 0;
-            border-top: none;
-        }
-
+        /* --- MODALS & SETTINGS --- */
+        #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
+        .modalCard { background: var(--panel); padding: 18px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; gap: 10px; }
+        .modalCard input { padding: 10px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text); }
+        .settings-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--card); }
+        .settings-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
         .settings-section h4 { margin: 0 0 10px 0; color: var(--muted); }
+        .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important; color: white !important; }
 
-        .settings-section input {
-            width: 95%;
-            padding: 8px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            border: none;
-            background: var(--input-bg);
-            color: var(--text);
-        }
-
-        .settings-section button {
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: none;
-            background: var(--accent);
-            color: white;
-            cursor: pointer;
-        }
-
-        .settings-section .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%); }
-
-        #settingsStatus { font-weight: bold; font-size: 12px; transition: all 0.3s ease; }
-        #settingsStatus.success { color: #2ecc71; }
-        #settingsStatus.error { color: #e74c3c; }
-
-        #replyPreview {
-            display: none;
-            padding: 8px 12px;
-            background: var(--panel);
-            border-top: 1px solid var(--card);
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        #replyPreview .reply-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 80%;
-            display: inline-block;
-        }
-
-        #replyPreview strong { color: var(--text); }
-
-        #cancelReplyBtn { float: right; cursor: pointer; font-weight: bold; font-size: 16px; padding: 0 5px; }
-
-        .reply-quote {
-            background: var(--bg);
-            border-left: 3px solid var(--accent);
-            padding: 4px 8px;
-            margin-bottom: 4px;
-            font-size: 13px;
-            border-radius: 4px;
-            color: var(--muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-        }
-
-        .reply-quote:hover { background: var(--card); }
-
-        .forward-channel-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--card);
-            border-radius: 5px;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .forward-channel-item { display: block; padding: 8px; border-radius: 5px; cursor: pointer; }
-        .forward-channel-item:hover { background: var(--card-hover); }
-        .forward-channel-item input { margin-right: 8px; }
-
-        .mention-highlight {
-            background-color: hsla(235, 85%, 65%, 0.3);
-            color: #c1cef8;
-            font-weight: 700;
-            padding: 1px 3px;
-            border-radius: 3px;
-        }
-
-        .mention-highlight.me {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        #notifBtn { position: relative; }
-        #notifBtn .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            padding: 1px 5px;
-            font-size: 10px;
-            transform: scale(0);
-            transition: transform 0.2s ease-in-out;
-        }
-        #notifBtn .badge.show { transform: scale(1); }
-
-        .notification-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .notification-item { padding: 10px; background: var(--card); border-radius: 6px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s ease; }
-        .notification-item:hover { background: var(--card-hover); }
-        .notification-item.unread { border-left-color: var(--accent); }
-
+        /* --- COMPONENTS --- */
+        #scrollBtn { position: fixed; right: 26px; bottom: 96px; padding: 10px 12px; border-radius: 12px; border: none; background: var(--accent); color: white; cursor: pointer; opacity: 0; transition: opacity .25s, transform .18s; }
+        #scrollBtn.show { opacity: 1; transform: translateY(0); }
+        .tinyBtn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 6px 8px; border-radius: 8px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+        .reply-quote { background: var(--bg); border-left: 3px solid var(--accent); padding: 4px 8px; margin-bottom: 4px; font-size: 13px; border-radius: 4px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .mention-highlight { background-color: hsla(235, 85%, 65%, 0.3); color: #c1cef8; font-weight: 700; padding: 1px 3px; border-radius: 3px; }
         .requirement { display: flex; align-items: center; gap: 8px; color: var(--muted); transition: color 0.3s ease; font-size: 13px; }
         .requirement.valid { color: #2ecc71; }
-        .requirement .checkbox {
-            display: flex; align-items: center; justify-content: center; width: 16px; height: 16px;
-            border: 2px solid var(--muted); border-radius: 50%; font-weight: bold; color: white;
-            transition: all 0.3s ease; transform: scale(0);
-        }
-        .requirement.valid .checkbox { background-color: #2ecc71; border-color: #2ecc71; transform: scale(1); }
-
-        .close-dm-btn, .deleteBtn { font-size: 14px; opacity: 0; cursor: pointer; transition: all 0.2s ease; }
-        .channelRow:hover .close-dm-btn, .channelRow:hover .deleteBtn { opacity: 0.7; }
-        .close-dm-btn:hover, .deleteBtn:hover { transform: scale(1.15); opacity: 1; }
-
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } }
+        
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
         .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
-
         @media (max-width:1000px){ #rightbar{display:none} #sidebar{width:220px} }
     </style>
 </head>
@@ -662,24 +126,24 @@
                 </div>
                 <div style="display:flex; gap:8px;">
                     <button class="tinyBtn" id="themeBtn" title="Toggle theme" onclick="toggleTheme()">🌙</button>
-                    <button class="tinyBtn" id="viewBtn" title="Toggle view" onclick="toggleView()">🛋️</button>
+                    <button class="tinyBtn" id="viewBtn" title="Toggle compact/cozy" onclick="toggleView()">🛋️</button>
                 </div>
             </div>
             <input id="authUsername" placeholder="Username" />
             <input id="authPassword" placeholder="Password" type="password" />
             <input id="authConfirm" placeholder="Confirm Password" type="password" style="display:none" />
             <div id="passwordRequirements" style="display: none; flex-direction: column; gap: 6px; margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px;">
-                <div id="req-length" class="requirement"><span class="checkbox">✔</span> <span>At least 8 characters</span></div>
-                <div id="req-upper" class="requirement"><span class="checkbox">✔</span> <span>One uppercase letter</span></div>
-                <div id="req-lower" class="requirement"><span class="checkbox">✔</span> <span>One lowercase letter</span></div>
-                <div id="req-num" class="requirement"><span class="checkbox">✔</span> <span>One number</span></div>
+                <div id="req-length" class="requirement">✅ <span>8+ characters</span></div>
+                <div id="req-upper" class="requirement">✅ <span>One uppercase letter</span></div>
+                <div id="req-lower" class="requirement">✅ <span>One lowercase letter</span></div>
+                <div id="req-num" class="requirement">✅ <span>One number</span></div>
             </div>
-            <button id="submitBtn" onclick="submitAuth()">Login</button>
+            <button id="submitBtn" onclick="submitAuth()" style="background:var(--accent); color:white; padding:12px; border-radius:10px; border:none; cursor:pointer; font-weight:700;">Login</button>
             <div id="authMessage" style="text-align: center; font-size: 14px; margin-top: 5px; color:#e74c3c;"></div>
         </div>
     </div>
 
-    <!-- App Div -->
+    <!-- Application UI -->
     <div id="app" style="display: none;">
         <div id="sidebar">
             <div id="sidebarHeader">
@@ -693,35 +157,31 @@
             </div>
             <div id="channelList"></div>
             <div class="sidebarButtons">
-                <button onclick="showBrowseDialog()">Browse / Create</button>
+                <button onclick="showBrowseDialog()" style="width:100%; padding:12px; border-radius:8px; border:none; background:var(--accent); color:white; font-weight:700; cursor:pointer;">Browse / Create</button>
             </div>
         </div>
 
         <div id="main">
             <div id="chatHeader">
                 <div id="chatTitle">No channel selected</div>
-                <div class="meta">
-                    <div id="channelInfo"></div>
-                    <div id="meLabel" style="font-size:12px;color:var(--muted)"></div>
-                </div>
+                <div id="meLabel" style="font-size:12px;color:var(--muted)"></div>
             </div>
-            <div style="display:flex; flex:1; gap:12px; min-height:0;">
+            <div style="display:flex; flex:1; min-height:0;">
                 <div id="messages"></div>
                 <div id="rightbar">
                     <div id="usersHeader">
                         <div>Users 👥</div>
-                        <div style="font-size:12px;color:var(--muted)">Click to DM</div>
                     </div>
                     <div id="userList" style="overflow:auto; display:flex; flex-direction:column; gap:6px;"></div>
                 </div>
             </div>
-            <div id="replyPreview">
-                <span id="cancelReplyBtn" onclick="cancelReply()">✖️</span>
-                Replying to <strong id="replyUser"></strong>: <span id="replyText" class="reply-text"></span>
+            <div id="replyPreview" style="display:none; padding:8px 12px; background:var(--panel); border-top:1px solid var(--card);">
+                <span onclick="cancelReply()" style="float:right; cursor:pointer; font-weight:bold;">✖️</span>
+                Replying to <strong id="replyUser"></strong>: <span id="replyText" style="opacity:0.6;"></span>
             </div>
             <div id="bottomBar">
                 <input id="msgInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }" />
-                <button id="sendBtn" onclick="sendMessage()">Send</button>
+                <button id="sendBtn" onclick="sendMessage()" style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700;">Send</button>
             </div>
         </div>
     </div>
@@ -732,17 +192,16 @@
     <div id="modalOverlay">
         <div class="modalCard">
             <h3 id="modalTitle"></h3>
-            <div id="modalSubtitle" class="modal-subtitle"></div>
+            <div id="modalSubtitle" style="font-size:14px; color:var(--muted); margin-bottom:10px;"></div>
             <div id="modalCustomContent"></div>
-            <input id="modalInput" autocomplete="off" />
-            <div class="modalActions">
-                <button id="modalConfirmBtn" onclick="submitModal()">OK</button>
-                <button id="modalCancelBtn" onclick="closeModal()">Cancel</button>
+            <input id="modalInput" autocomplete="off" style="display:none; padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text); border:none;" />
+            <div class="modalActions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+                <button id="modalConfirmBtn" onclick="submitModal()" style="padding:8px 16px; background:var(--accent); color:white; border-radius:5px; border:none; cursor:pointer;">OK</button>
+                <button onclick="closeModal()" style="padding:8px 16px; background:var(--card); color:white; border-radius:5px; border:none; cursor:pointer;">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -764,31 +223,33 @@
         let username = "";
         let currentChannel = "";
         let myStatus = "online";
+        let lastMsgTime = 0;
         let replyingToId = null;
         let modalCallback = null;
         let lastMessageMeta = { user: null, ts: 0 };
-        let lastMessageTime = 0; // For Rate Limiting
-        let userSettings = { desktopNotifications: true };
+        let autoScroll = true;
         let compactView = false;
         let lightTheme = false;
+        let userSettings = { desktopNotifications: true };
 
+        // --- AUTOMOD WORD LIST ---
         const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
 
-        // --- AUTOMOD UTILS ---
+        // --- AUTOMOD ENGINE ---
         function autoMod(text) {
             let p = text;
-            if (p.length > 500) p = p.substring(0, 500);
-            if (/(.)\1{8,}/.test(p)) return "🤐 (AutoMod: Flooding)";
-            BLACKLIST.forEach(w => {
-                const r = new RegExp(`\\b${w}\\b`, 'gi');
-                p = p.replace(r, "🤐");
+            if (p.length > 500) p = p.substring(0, 500) + "...";
+            if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
+            BLACKLIST.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                p = p.replace(regex, "🤐");
             });
-            const caps = (p.match(/[A-Z]/g) || []).length;
-            if (caps > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
+            const capsCount = (p.match(/[A-Z]/g) || []).length;
+            if (capsCount > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
             return p;
         }
 
-        // --- GENERAL UTILS ---
+        // --- UTILS ---
         function uidColor(name) {
             if (!name) return "#7289da";
             const palette = ["#e67e22","#e74c3c","#9b59b6","#16a085","#f39c12","#3498db","#2ecc71","#d35400","#1abc9c","#8e44ad"];
@@ -803,6 +264,16 @@
             return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
         }
 
+        function generateAvatarUrl(user) {
+            const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = uidColor(user); ctx.fillRect(0,0,128,128);
+            ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 72px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(initials(user), 64, 64);
+            return canvas.toDataURL();
+        }
+
         function toggleTheme() {
             lightTheme = !lightTheme;
             document.documentElement.classList.toggle("light", lightTheme);
@@ -815,7 +286,7 @@
             document.getElementById("viewBtn").textContent = compactView ? "📏" : "🛋️";
         }
 
-        // --- AUTH ENGINE ---
+        // --- AUTH LOGIC ---
         function switchAuth(mode) {
             const isS = (mode === 'signup');
             document.getElementById("loginTab").classList.toggle("active", mode === 'login');
@@ -838,18 +309,15 @@
 
             if (document.getElementById("signupTab").classList.contains("active")) {
                 if (u.length < 3) return (msgEl.textContent = "Username too short");
-                if (p.length < 8 || !/[A-Z]/.test(p)) return (msgEl.textContent = "Weak password");
+                if (p.length < 8 || !/[A-Z]/.test(p)) return (msgEl.textContent = "Password too weak");
                 if (p !== c) return (msgEl.textContent = "Passwords don't match");
-                
                 const snap = await db.ref("users/" + u).once("value");
                 if (snap.exists()) return (msgEl.textContent = "Username taken");
-
                 await db.ref("users/" + u).set({ password: p, settings: { desktopNotifications: true } });
             } else {
                 const snap = await db.ref("users/" + u).once("value");
                 if (!snap.exists() || snap.val().password !== p) return (msgEl.textContent = "Invalid login");
             }
-
             username = u;
             afterLogin();
         }
@@ -857,65 +325,55 @@
         function afterLogin() {
             document.getElementById("authDiv").style.display = "none";
             document.getElementById("app").style.display = "flex";
-            document.getElementById("meLabel").textContent = username + " • " + myStatus;
+            document.getElementById("meLabel").textContent = "👤 " + username;
             loadChannels(); startPresence(); listenToNotifs(); attachScrollHandler();
         }
 
         function logout() { location.reload(); }
 
-        // --- PRESENCE ENGINE ---
-        function startPresence() {
-            const ref = db.ref("presence/" + username);
-            const write = (s) => {
-                ref.set({ status: s, lastSeen: Date.now() });
-                myStatus = s;
-                document.getElementById("meLabel").textContent = username + " • " + myStatus;
-                updateStatusIcon();
-            };
-            write("online");
-            ref.onDisconnect().remove();
-
-            db.ref("presence").on("value", snap => {
-                const list = document.getElementById("userList");
-                list.innerHTML = "";
-                snap.forEach(u => {
-                    const row = document.createElement("div"); row.className = "userRow";
-                    row.innerHTML = `<div class="avatar" style="background:${uidColor(u.key)}; width:30px; height:30px; font-size:12px;">${initials(u.key)}</div>
-                                     <div style="flex:1">${u.key}</div>
-                                     <div class="statusDot status-${u.val().status}"></div>`;
-                    row.onclick = () => createDMWith(u.key);
-                    list.appendChild(row);
-                });
-            });
+        // --- MODAL ENGINE ---
+        function showModal(title, sub, callback, options = {}) {
+            modalCallback = callback;
+            document.getElementById("modalTitle").textContent = title;
+            document.getElementById("modalSubtitle").textContent = sub;
+            document.getElementById("modalOverlay").style.display = "flex";
+            const input = document.getElementById("modalInput");
+            input.style.display = options.showInput ? "block" : "none";
+            input.value = "";
+            const content = document.getElementById("modalCustomContent");
+            content.innerHTML = "";
+            if (options.customHTML) content.appendChild(options.customHTML);
+            if (options.showInput) input.focus();
         }
 
-        function cycleStatus() {
-            const map = { online: "away", away: "offline", offline: "online" };
-            db.ref("presence/" + username).update({ status: map[myStatus], lastSeen: Date.now() });
-        }
+        function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
+        function submitModal() { const v = document.getElementById("modalInput").value; if (modalCallback) modalCallback(v || true); closeModal(); }
 
-        function updateStatusIcon() {
-            const icons = { online: "🟢", away: "🟡", offline: "⚪" };
-            document.getElementById("myStatusBtn").textContent = icons[myStatus];
-        }
-
-        // --- CHANNEL ENGINE ---
+        // --- CHANNEL LOGIC ---
         async function loadChannels() {
+            const uSnap = await db.ref(`users/${username}`).once('value');
+            const hidden = uSnap.val()?.hiddenChannels || {};
+
             db.ref("channels").on("value", snap => {
                 const list = document.getElementById("channelList");
                 list.innerHTML = "";
                 snap.forEach(ch => {
                     const data = ch.val();
                     if (data.type === "dm" && (!data.members || !data.members[username])) return;
+                    if (data.type !== "dm" && hidden[ch.key]) return;
 
                     const row = document.createElement("div");
                     row.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
-                    row.innerHTML = `<div># ${ch.key}</div>`;
-                    if (data.type === "dm") {
-                        const del = document.createElement("span"); del.innerHTML = "✖️";
-                        del.onclick = (e) => { e.stopPropagation(); closeDM(ch.key); };
-                        row.appendChild(del);
-                    }
+                    row.innerHTML = `<div class="channelLeft"># ${ch.key}</div>`;
+                    
+                    const controls = document.createElement("div");
+                    const btn = document.createElement("span"); btn.innerHTML = "✖️"; btn.className = "close-dm-btn";
+                    btn.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        data.type === "dm" ? closeDM(ch.key) : hideChannel(ch.key); 
+                    };
+                    controls.appendChild(btn);
+                    row.appendChild(controls);
                     row.onclick = () => joinChannel(ch.key);
                     list.appendChild(row);
                 });
@@ -931,15 +389,8 @@
             db.ref("messages/" + name).on("child_added", snap => appendMessage(snap.val(), snap.key));
         }
 
-        async function createDMWith(other) {
-            if (other === username) return;
-            const id = [username, other].sort().join("__");
-            const snap = await db.ref("channels/dm__" + id).once("value");
-            if (!snap.exists()) {
-                await db.ref("channels/dm__" + id).set({ type: "dm", members: { [username]: true, [other]: true } });
-            }
-            joinChannel("dm__" + id);
-        }
+        function closeDM(id) { db.ref(`channels/${id}/members/${username}`).update({ active: false }); if(currentChannel===id) currentChannel=""; }
+        async function hideChannel(id) { await db.ref(`users/${username}/hiddenChannels/${id}`).set(true); if(currentChannel===id) currentChannel=""; }
 
         // --- MESSAGE ENGINE ---
         async function appendMessage(m, id) {
@@ -955,7 +406,7 @@
             if (m.replyTo) {
                 const rSnap = await db.ref(`messages/${currentChannel}/${m.replyTo}`).once('value');
                 if (rSnap.exists()) {
-                    replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text}</div>`;
+                    replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0,40)}</div>`;
                 }
             }
 
@@ -964,20 +415,21 @@
                 <div class="msgBody">
                     ${replyHTML}
                     <div class="msgHeader">
-                        <span style="color:${uidColor(m.user)}">${m.user}</span>
+                        <span class="username" style="color:${uidColor(m.user)}">${m.user}</span>
                         <span class="timestamp">${nowHHMM(m.ts)}</span>
+                        ${m.edited ? '<span class="edited-indicator">(edited)</span>' : ''}
                     </div>
-                    <div class="msgText">${m.text}</div>
+                    <div class="msgText">${m.text.replace(/@(\w+)/g, '<span class="mention-highlight">@$1</span>')}</div>
                 </div>
                 <div class="message-menu">
-                    <div class="menu-item" onclick="replyToUI('${id}', '${m.user}', '${m.text}')">↩️</div>
+                    <div class="menu-item" onclick="replyToUI('${id}', '${m.user}', '${m.text.replace(/'/g, "\\'")}')">↩️</div>
                     <div class="menu-item" onclick="showForwardUI('${id}')">↪️</div>
                     ${m.user === username ? `<div class="menu-item" onclick="showEditUI('${id}')">✏️</div>` : ""}
-                    ${m.user === username ? `<div class="menu-item" onclick="deleteMsg('${id}')">🗑️</div>` : ""}
+                    ${m.user === username ? `<div class="menu-item" onclick="deleteMsgUI('${id}')">🗑️</div>` : ""}
                 </div>
             `;
             container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            if(autoScroll) container.scrollTop = container.scrollHeight;
             lastMessageMeta = { user: m.user, ts: m.ts };
         }
 
@@ -986,78 +438,39 @@
             let text = input.value.trim();
             if (!text || !currentChannel) return;
 
-            if (Date.now() - lastMsgTime < 1500) return alert("⏳ Rate limit active.");
+            const now = Date.now();
+            if (now - lastMsgTime < 1500) { alert("⏳ Rate limit! Wait 1.5s."); return; }
             text = autoMod(text);
 
             const msgRef = db.ref("messages/" + currentChannel).push();
-            await msgRef.set({ user: username, text: text, ts: Date.now(), replyTo: replyingToId });
+            await msgRef.set({ user: username, text: text, ts: now, replyTo: replyingToId });
 
             const mentions = text.match(/@(\w+)/g);
             if (mentions) {
-                mentions.forEach(m => {
+                mentions.forEach(async m => {
                     const target = m.substring(1);
-                    db.ref(`users/${target}/notifications`).push({ from: username, channel: currentChannel, text: text, ts: Date.now() });
+                    if (target === username) return;
+                    db.ref(`users/${target}/notifications`).push({ from: username, channel: currentChannel, text: text, ts: now, messageId: msgRef.key });
                 });
             }
 
-            input.value = ""; lastMsgTime = Date.now(); cancelReply();
+            input.value = ""; lastMsgTime = now; cancelReply();
         }
 
-        // --- MODAL & SETTINGS ---
-        function showModal(title, sub, callback, options = {}) {
-            modalCallback = callback;
-            document.getElementById("modalTitle").textContent = title;
-            document.getElementById("modalSubtitle").textContent = sub;
-            document.getElementById("modalOverlay").style.display = "flex";
-            const input = document.getElementById("modalInput");
-            input.style.display = options.showInput ? "block" : "none";
-            const content = document.getElementById("modalCustomContent");
-            content.innerHTML = "";
-            if (options.customHTML) content.appendChild(options.customHTML);
-            if (options.showInput) input.focus();
+        // --- LOGIC FEATURES ---
+        function deleteMsgUI(id) {
+            const original = document.querySelector(`.message[data-id="${id}"]`);
+            if (!original) return;
+            const preview = original.cloneNode(true);
+            preview.querySelector('.message-menu')?.remove();
+            showModal("Delete Message 🗑️", "Permanently remove this?", (conf) => {
+                if (conf) db.ref(`messages/${currentChannel}/${id}`).remove();
+            }, { customHTML: preview, showInput: false });
         }
-
-        function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
-        function submitModal() { const v = document.getElementById("modalInput").value; if (modalCallback) modalCallback(v || true); closeModal(); }
-
-        function showSettingsModal() {
-            const d = document.createElement('div');
-            d.innerHTML = `
-                <div class="settings-section">
-                    <h4>Appearance</h4>
-                    <button class="tinyBtn" onclick="toggleTheme()">🌓 Toggle Theme</button>
-                    <button class="tinyBtn" onclick="toggleView()">📏 Toggle View</button>
-                </div>
-                <div class="settings-section">
-                    <h4>Security</h4>
-                    <button class="btn-danger" onclick="deleteAccountUI()">💀 Delete Account</button>
-                </div>`;
-            showModal("Settings ⚙️", "", null, { customHTML: d, showInput: false });
-        }
-
-        async function deleteAccountUI() {
-            closeModal();
-            showModal("Confirm Password", "Enter password to delete account:", async (p) => {
-                const s = await db.ref(`users/${username}`).once('value');
-                if (s.val().password === p) {
-                    await db.ref(`users/${username}`).remove();
-                    await db.ref(`presence/${username}`).remove();
-                    location.reload();
-                } else { alert("Wrong password!"); }
-            }, { showInput: true });
-        }
-
-        function showBrowseDialog() {
-            showModal("New Channel 🗨️", "Enter channel name:", (v) => {
-                if (v) db.ref("channels/" + v).set({ created: Date.now(), type: "public", creator: username });
-            }, { showInput: true });
-        }
-
-        function deleteMsg(id) { if (confirm("Delete?")) db.ref(`messages/${currentChannel}/${id}`).remove(); }
 
         function showEditUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
-                showModal("Edit ✏️", "Update content:", (v) => {
+                showModal("Edit Message ✏️", "Modify content:", (v) => {
                     if (v) db.ref(`messages/${currentChannel}/${id}`).update({ text: autoMod(v), edited: true });
                 }, { showInput: true, placeholder: snap.val().text });
             });
@@ -1065,11 +478,51 @@
 
         function showForwardUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
-                const text = snap.val().text;
-                showModal("Forward ↪️", "Destination channel:", (target) => {
-                    if (target) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + text, ts: Date.now() });
+                const txt = snap.val().text;
+                showModal("Forward ↪️", "Enter channel name:", (target) => {
+                    if (target) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() });
                 }, { showInput: true });
             });
+        }
+
+        // --- ACCOUNT DELETION (Original Scrubber) ---
+        async function deleteAccountUI() {
+            closeModal();
+            showModal("Confirm Password", "Wipe account and all history?", async (p) => {
+                const s = await db.ref(`users/${username}`).once('value');
+                if (s.val().password === p) {
+                    const msgSnap = await db.ref('messages').once('value');
+                    const promises = [];
+                    msgSnap.forEach(ch => ch.forEach(m => {
+                        if(m.val().user === username) promises.push(db.ref(`messages/${ch.key}/${m.key}`).update({user: "[Deleted User]"}));
+                    }));
+                    await Promise.all(promises);
+                    await db.ref(`users/${username}`).remove();
+                    await db.ref(`presence/${username}`).remove();
+                    location.reload();
+                } else { alert("Incorrect password"); }
+            }, { showInput: true });
+        }
+
+        function showSettingsModal() {
+            const d = document.createElement('div');
+            d.innerHTML = `
+                <div class="settings-section">
+                    <h4>Appearance</h4>
+                    <button class="tinyBtn" onclick="toggleTheme()">🌓 Toggle Theme</button>
+                    <button class="tinyBtn" onclick="toggleView()">📏 Cozy/Compact</button>
+                </div>
+                <div class="settings-section">
+                    <h4>Security</h4>
+                    <button class="btn-danger" style="width:100%" onclick="deleteAccountUI()">💀 Delete My Account</button>
+                </div>`;
+            showModal("Settings ⚙️", "", null, { customHTML: d, showInput: false });
+        }
+
+        function showBrowseDialog() {
+            showModal("Create Channel 🗨️", "Enter name:", (v) => {
+                if (v) db.ref("channels/" + v).set({ created: Date.now(), type: "public", creator: username });
+            }, { showInput: true });
         }
 
         function replyToUI(id, user, text) {
@@ -1087,6 +540,28 @@
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
+        function startPresence() {
+            const ref = db.ref("presence/" + username);
+            ref.set({ status: "online", lastSeen: Date.now() });
+            ref.onDisconnect().remove();
+            db.ref("presence").on("value", snap => {
+                const list = document.getElementById("userList"); list.innerHTML = "";
+                snap.forEach(u => {
+                    const row = document.createElement("div"); row.className = "userRow";
+                    row.innerHTML = `<span class="statusDot status-${u.val().status}"></span> ${u.key}`;
+                    list.appendChild(row);
+                });
+            });
+        }
+
+        function cycleStatus() {
+            const map = { online: "away", away: "offline", offline: "online" };
+            myStatus = map[myStatus];
+            db.ref("presence/" + username).update({ status: myStatus });
+            const icons = { online: "🟢", away: "🟡", offline: "⚪" };
+            document.getElementById("myStatusBtn").textContent = icons[myStatus];
+        }
+
         function listenToNotifs() {
             db.ref(`users/${username}/notifications`).on('value', snap => {
                 const b = document.getElementById("notifBadge");
@@ -1100,8 +575,9 @@
                 const d = document.createElement('div');
                 snap.forEach(n => {
                     const i = document.createElement('div');
-                    i.style = "padding:8px; border-bottom:1px solid var(--card);";
+                    i.style = "padding:8px; border-bottom:1px solid var(--card); cursor:pointer;";
                     i.textContent = `@${n.val().from} mentioned you in #${n.val().channel}`;
+                    i.onclick = () => { joinChannel(n.val().channel); closeModal(); };
                     d.appendChild(i);
                 });
                 showModal("Mentions 🔔", "", null, { customHTML: d, showInput: false });
@@ -1112,11 +588,15 @@
         function attachScrollHandler() {
             const m = document.getElementById("messages");
             const s = document.getElementById("scrollBtn");
-            m.onscroll = () => { s.classList.toggle("show", (m.scrollHeight - m.scrollTop > 800)); };
-            s.onclick = () => { m.scrollTop = m.scrollHeight; };
+            m.onscroll = () => { 
+                const atBottom = (m.scrollHeight - m.scrollTop < 800);
+                autoScroll = atBottom;
+                s.classList.toggle("show", !atBottom); 
+            };
+            s.onclick = () => { m.scrollTop = m.scrollHeight; autoScroll = true; };
         }
 
-        // --- PASSWORD LIVE VALIDATION ---
+        // --- PASSWORD VALIDATION ---
         document.getElementById("authPassword").oninput = (e) => {
             const v = e.target.value;
             document.getElementById("req-length").classList.toggle("valid", v.length >= 8);
