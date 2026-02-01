@@ -15,11 +15,11 @@ DM me on Discord at @hothost. (the period is important)
 ## Known Security Bugs
 
 - All database information is readable and writable.
-  For this reason, do not put in important passwords and data.
+For this reason, do not put in important passwords and data.
 - Passwords are not hashed.
-  Again, do not put in reused and important passwords.
-- Sometimes a ghost message appears from Unknown or something similar
-  I'm trying to fix this right now.
+Again, do not put in reused and important passwords.
+- Sometimes a ghost message appears from Unknown or something similar.
+I'm trying to fix this right now.
 
 
 ## Policy on Taking Notice of Security Bugs
