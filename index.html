@@ -146,14 +146,10 @@
         }
 
         #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
-        .modalCard { background: var(--panel); padding: 18px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; gap: 10px; }
+        .modalCard { background: var(--panel); padding: 18px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; gap: 10px; max-height: 90vh; overflow-y: auto; }
         .modalCard input { padding: 10px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text); }
         .modalActions { display: flex; gap: 8px; justify-content: flex-end; }
         
-        .modal-preview .message {
-            background: var(--bg); border-radius: 8px; padding: 10px; opacity: 1; transform: none; pointer-events: none;
-        }
-
         .statusDot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 10px; }
         .status-online { background: #2ecc71; }
         .status-away { background: #f1c40f; }
@@ -162,12 +158,22 @@
         .reply-quote { background: var(--bg); border-left: 3px solid var(--accent); padding: 4px 8px; margin-bottom: 4px; font-size: 13px; border-radius: 4px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
         .mention-highlight { background-color: hsla(235, 85%, 65%, 0.3); color: #c1cef8; font-weight: 700; padding: 1px 3px; border-radius: 3px; }
 
+        .settings-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--card); }
+        .settings-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+        .settings-section h4 { margin: 0 0 10px 0; color: var(--muted); }
+        .settings-section input { width: 95%; padding: 8px; margin-bottom: 8px; border-radius: 5px; border: none; background: var(--input-bg); color: var(--text); }
+        .settings-section button { padding: 8px 12px; border-radius: 5px; border: none; background: var(--accent); color: white; cursor: pointer; }
+
+        .requirement { display: flex; align-items: center; gap: 8px; color: var(--muted); transition: color 0.3s ease; font-size: 13px; }
+        .requirement.valid { color: #2ecc71; }
+
         .close-dm-btn, .deleteBtn { font-size: 14px; opacity: 0; cursor: pointer; transition: all 0.2s ease; }
         .channelRow:hover .close-dm-btn, .channelRow:hover .deleteBtn { opacity: 0.7; }
 
         #submitBtn, .modalActions button {
             padding: 10px 16px; border-radius: 8px; border: none; background: var(--accent); color: white; font-weight: 700; cursor: pointer;
         }
+        .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important; }
 
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
         .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
@@ -193,9 +199,9 @@
             <input id="authPassword" placeholder="Password" type="password" />
             <input id="authConfirm" placeholder="Confirm Password" type="password" style="display:none" />
             <div id="passwordRequirements" style="display: none; flex-direction: column; gap: 6px; margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px;">
-                <div id="req-length" style="display:flex; gap:8px; font-size:13px;">✅ <span>8+ characters</span></div>
-                <div id="req-upper" style="display:flex; gap:8px; font-size:13px;">✅ <span>One uppercase</span></div>
-                <div id="req-num" style="display:flex; gap:8px; font-size:13px;">✅ <span>One number</span></div>
+                <div id="req-length" class="requirement">✅ <span>8+ characters</span></div>
+                <div id="req-upper" class="requirement">✅ <span>One uppercase</span></div>
+                <div id="req-num" class="requirement">✅ <span>One number</span></div>
             </div>
             <button id="submitBtn" onclick="submitAuth()">Login</button>
             <div id="authMessage" style="text-align: center; font-size: 14px; margin-top: 5px; color:#e74c3c;"></div>
@@ -243,7 +249,6 @@
 
     <button id="scrollBtn">⬇️</button>
 
-    <!-- Modal System -->
     <div id="modalOverlay">
         <div class="modalCard">
             <h3 id="modalTitle"></h3>
@@ -287,10 +292,9 @@
         let lightTheme = false;
         let userSettings = { desktopNotifications: true };
 
-        // AutoMod Blacklist
-        const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
+        const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "snowf", "snow-f", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
 
-        // --- AUTOMOD ENGINE ---
+        // --- AUTOMOD UTILS ---
         function autoMod(text) {
             let p = text;
             if (p.length > 500) p = p.substring(0, 500) + "...";
@@ -304,7 +308,7 @@
             return p;
         }
 
-        // --- UTILS ---
+        // --- GENERAL UTILS ---
         function uidColor(name) {
             if (!name) return "#7289da";
             const palette = ["#e67e22","#e74c3c","#9b59b6","#16a085","#f39c12","#3498db","#2ecc71","#d35400","#1abc9c","#8e44ad"];
@@ -322,16 +326,18 @@
         function toggleTheme() {
             lightTheme = !lightTheme;
             document.documentElement.classList.toggle("light", lightTheme);
-            document.getElementById("themeBtn").textContent = lightTheme ? "☀️" : "🌙";
+            const btn = document.getElementById("themeBtn");
+            if (btn) btn.textContent = lightTheme ? "☀️" : "🌙";
         }
 
         function toggleView() {
             compactView = !compactView;
             document.body.classList.toggle("compact", compactView);
-            document.getElementById("viewBtn").textContent = compactView ? "📏" : "🛋️";
+            const btn = document.getElementById("viewBtn");
+            if (btn) btn.textContent = compactView ? "📏" : "🛋️";
         }
 
-        // --- AUTH ---
+        // --- AUTH LOGIC ---
         function switchAuth(mode) {
             const isS = (mode === 'signup');
             document.getElementById("loginTab").classList.toggle("active", mode === 'login');
@@ -355,7 +361,7 @@
                 if (p !== c) return (document.getElementById("authMessage").textContent = "Passwords don't match");
                 const snap = await db.ref("users/" + u).once("value");
                 if (snap.exists()) return (document.getElementById("authMessage").textContent = "Username taken");
-                await db.ref("users/" + u).set({ password: p });
+                await db.ref("users/" + u).set({ password: p, settings: { desktopNotifications: true } });
             } else {
                 const snap = await db.ref("users/" + u).once("value");
                 if (!snap.exists() || snap.val().password !== p) return (document.getElementById("authMessage").textContent = "Invalid login");
@@ -392,24 +398,19 @@
         function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
         function submitModal() { const v = document.getElementById("modalInput").value; if (modalCallback) modalCallback(v || true); closeModal(); }
 
-        // --- SIDEBAR USER LIST ENGINE ---
+        // --- SIDEBAR USER LIST ---
         function loadUserList() {
             const list = document.getElementById("userList");
-            // Listen to users and presence together for robust updates
             db.ref("users").on("value", (uSnap) => {
                 db.ref("presence").on("value", (pSnap) => {
                     const presence = pSnap.val() || {};
                     const users = uSnap.val() || {};
-                    
                     const userArray = Object.keys(users).map(name => ({
                         name,
                         status: presence[name]?.status || "offline"
                     }));
-
-                    // Sort: Online (0) > Away (1) > Offline (2)
                     const statusOrder = { online: 0, away: 1, offline: 2 };
                     userArray.sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
-
                     list.innerHTML = "";
                     userArray.forEach(user => {
                         const row = document.createElement("div");
@@ -426,7 +427,7 @@
             });
         }
 
-        // --- CHANNEL ENGINE ---
+        // --- CHANNELS & MESSAGES ---
         function loadChannels() {
             db.ref("channels").on("value", snap => {
                 const list = document.getElementById("channelList");
@@ -447,39 +448,22 @@
             document.getElementById("chatTitle").textContent = "# " + name;
             document.getElementById("messages").innerHTML = "";
             lastMessageMeta = { user: null, ts: 0 };
-            
             const ref = db.ref("messages/" + name);
             ref.on("child_added", snap => appendMessage(snap.val(), snap.key));
-            
-            // Instant Deletion Listener
             ref.on("child_removed", snap => {
                 const el = document.querySelector(`.message[data-id="${snap.key}"]`);
                 if (el) el.remove();
             });
-
-            // Instant Edit Listener
             ref.on("child_changed", snap => {
                 const el = document.querySelector(`.message[data-id="${snap.key}"] .msgText`);
                 if (el) el.textContent = snap.val().text;
             });
         }
 
-        async function createDMWith(other) {
-            if (other === username) return;
-            const id = [username, other].sort().join("__");
-            const snap = await db.ref("channels/dm__" + id).once("value");
-            if (!snap.exists()) {
-                await db.ref("channels/dm__" + id).set({ type: "dm", members: { [username]: true, [other]: true } });
-            }
-            joinChannel("dm__" + id);
-        }
-
-        // --- MESSAGE ENGINE ---
         async function appendMessage(m, id) {
             const container = document.getElementById("messages");
             const within = (m.ts - lastMessageMeta.ts) < 300000;
             const isGrouped = lastMessageMeta.user === m.user && within && !m.replyTo;
-
             const div = document.createElement("div");
             div.className = "message show" + (isGrouped ? " grouped" : "");
             div.dataset.id = id;
@@ -487,9 +471,7 @@
             let replyHTML = "";
             if (m.replyTo) {
                 const rSnap = await db.ref(`messages/${currentChannel}/${m.replyTo}`).once('value');
-                if (rSnap.exists()) {
-                    replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0,40)}</div>`;
-                }
+                if (rSnap.exists()) replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0,40)}</div>`;
             }
 
             div.innerHTML = `
@@ -518,24 +500,100 @@
             const input = document.getElementById("msgInput");
             let text = input.value.trim();
             if (!text || !currentChannel) return;
-
             const now = Date.now();
             if (now - lastMsgTime < 1500) { 
-                showModal("⏳ Rate Limit", "Please wait 1.5 seconds between messages.", null, { showInput: false, hideCancel: true });
+                showModal("⏳ Wait!", "Please wait 1.5 seconds between messages.", null, { showInput: false, hideCancel: true });
                 return; 
             }
             text = autoMod(text);
-
             const msgRef = db.ref("messages/" + currentChannel).push();
             await msgRef.set({ user: username, text: text, ts: now, replyTo: replyingToId });
-
             input.value = ""; lastMsgTime = now; cancelReply();
         }
 
-        // --- ACCOUNT SCRUBBER ---
+        // --- FULL SETTINGS ENGINE ---
+        function showSettingsModal() {
+            const d = document.createElement('div');
+            d.innerHTML = `
+                <div id="settingsStatus" style="font-weight:bold; font-size:12px; margin-bottom:10px;"></div>
+                <div class="settings-section">
+                    <h4>Appearance</h4>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="toggleTheme()">🌓 Toggle Theme</button>
+                        <button onclick="toggleView()">📏 Toggle View</button>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h4>Notifications</h4>
+                    <button id="notifToggleBtn" onclick="toggleDesktopNotifications()">
+                        Desktop Notifications: ${userSettings.desktopNotifications ? 'Enabled ✅' : 'Disabled ✖'}
+                    </button>
+                </div>
+                <div class="settings-section">
+                    <h4>Change Password</h4>
+                    <input id="currentPassword" type="password" placeholder="Current Password">
+                    <input id="newPassword" type="password" placeholder="New Password">
+                    <input id="confirmPassword" type="password" placeholder="Confirm New Password">
+                    <div id="settings-passwordRequirements" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--input-bg);border-radius:8px;">
+                        <div id="settings-req-length" class="requirement">✅ At least 8 characters</div>
+                        <div id="settings-req-upper" class="requirement">✅ One uppercase letter</div>
+                        <div id="settings-req-num" class="requirement">✅ One number</div>
+                    </div>
+                    <button onclick="changePassword()" style="margin-top:10px;">Save Password</button>
+                </div>
+                <div class="settings-section">
+                    <h4>About</h4>
+                    <div style="font-size:13px; color:var(--muted)">Developed by: <strong>qwz</strong><br>Final Release: October 2025</div>
+                </div>
+                <div class="settings-section">
+                    <button class="btn-danger" style="width:100%" onclick="deleteAccountUI()">💀 Delete My Account</button>
+                </div>`;
+            showModal("Settings ⚙️", "", null, { customHTML: d, showInput: false });
+            
+            // Re-attach password requirement listeners for the modal content
+            const newPwdInput = document.getElementById("newPassword");
+            if(newPwdInput) {
+                newPwdInput.oninput = () => {
+                    const v = newPwdInput.value;
+                    document.getElementById("settings-req-length").classList.toggle("valid", v.length >= 8);
+                    document.getElementById("settings-req-upper").classList.toggle("valid", /[A-Z]/.test(v));
+                    document.getElementById("settings-req-num").classList.toggle("valid", /[0-9]/.test(v));
+                };
+            }
+        }
+
+        async function toggleDesktopNotifications() {
+            userSettings.desktopNotifications = !userSettings.desktopNotifications;
+            await db.ref(`users/${username}/settings/desktopNotifications`).set(userSettings.desktopNotifications);
+            const btn = document.getElementById('notifToggleBtn');
+            if(btn) btn.textContent = `Desktop Notifications: ${userSettings.desktopNotifications ? 'Enabled ✅' : 'Disabled ✖'}`;
+        }
+
+        function changePassword() {
+            const cur = document.getElementById("currentPassword").value;
+            const nP = document.getElementById("newPassword").value;
+            const cP = document.getElementById("confirmPassword").value;
+            const stat = document.getElementById("settingsStatus");
+            if (!cur || !nP || !cP) { stat.textContent = "Please fill all fields"; stat.style.color = "#e74c3c"; return; }
+            if (nP.length < 8 || !/[A-Z]/.test(nP)) { stat.textContent = "Requirements not met"; stat.style.color = "#e74c3c"; return; }
+            if (nP !== cP) { stat.textContent = "Passwords don't match"; stat.style.color = "#e74c3c"; return; }
+
+            db.ref(`users/${username}`).once('value').then(snap => {
+                if (snap.val().password === cur) {
+                    db.ref(`users/${username}`).update({ password: nP });
+                    stat.textContent = "Password updated successfully!";
+                    stat.style.color = "#2ecc71";
+                } else {
+                    stat.textContent = "Incorrect current password";
+                    stat.style.color = "#e74c3c";
+                }
+            });
+        }
+
+        // --- OTHER FEATURES ---
         async function deleteAccountUI() {
             closeModal();
-            showModal("Confirm Password", "Irreversible: replace name with [Deleted User] and wipe profile?", async (p) => {
+            showModal("Confirmirresponsible Action", "Enter password to scrub account:", async (p) => {
                 const s = await db.ref(`users/${username}`).once('value');
                 if (s.val().password === p) {
                     const msgSnap = await db.ref('messages').once('value');
@@ -572,24 +630,18 @@
         function showForwardUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
                 const txt = snap.val().text;
-                showModal("Forward ↪️", "Enter channel name:", (target) => {
+                showModal("Forward ↪️", "Target channel:", (target) => {
                     if (target) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() });
                 }, { showInput: true });
             });
         }
 
-        function showSettingsModal() {
-            const d = document.createElement('div');
-            d.innerHTML = `
-                <div class="settings-section">
-                    <h4>Appearance</h4>
-                    <button class="tinyBtn" onclick="toggleTheme()">🌓 Theme</button>
-                    <button class="tinyBtn" onclick="toggleView()">📏 View</button>
-                </div>
-                <div class="settings-section">
-                    <button class="btn-danger" style="width:100%; padding:10px; border:none; border-radius:5px; color:white; font-weight:700; cursor:pointer;" onclick="deleteAccountUI()">💀 Delete Account</button>
-                </div>`;
-            showModal("Settings ⚙️", "", null, { customHTML: d, showInput: false });
+        async function createDMWith(other) {
+            if (other === username) return;
+            const id = [username, other].sort().join("__");
+            const snap = await db.ref("channels/dm__" + id).once("value");
+            if (!snap.exists()) await db.ref("channels/dm__" + id).set({ type: "dm", members: { [username]: true, [other]: true } });
+            joinChannel("dm__" + id);
         }
 
         function replyToUI(id, user, text) {
@@ -601,11 +653,7 @@
         }
 
         function cancelReply() { replyingToId = null; document.getElementById("replyPreview").style.display = "none"; }
-
-        function jumpTo(id) {
-            const el = document.querySelector(`.message[data-id="${id}"]`);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        function jumpTo(id) { const el = document.querySelector(`.message[data-id="${id}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 
         function startPresence() {
             const ref = db.ref("presence/" + username);
@@ -646,7 +694,7 @@
 
         function showBrowseDialog() {
             showModal("Create Channel 🗨️", "Enter channel name:", (v) => {
-                if (v) db.ref("channels/" + v).set({ created: Date.now() });
+                if (v) db.ref("channels/" + v).set({ created: Date.now(), type: "public" });
             }, { showInput: true });
         }
 
@@ -660,6 +708,13 @@
             };
             s.onclick = () => { m.scrollTop = m.scrollHeight; autoScroll = true; };
         }
+
+        document.getElementById("authPassword").oninput = (e) => {
+            const v = e.target.value;
+            document.getElementById("req-length").classList.toggle("valid", v.length >= 8);
+            document.getElementById("req-upper").classList.toggle("valid", /[A-Z]/.test(v));
+            document.getElementById("req-num").classList.toggle("valid", /[0-9]/.test(v));
+        };
     </script>
 </body>
 </html>
