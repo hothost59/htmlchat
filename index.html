@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <title>Chat 💬</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
         :root {
-            --bg: #36393f; --panel: #2f3136; --muted: #b9bbbe;
-            --accent: #7289da; --card: #4f545c; --card-hover: #5b616b;
+            --bg: #36393f;
+            --panel: #2f3136;
+            --muted: #b9bbbe;
+            --accent: #7289da;
+            --card: #4f545c;
+            --card-hover: #5b616b;
             --sidebar-grad: linear-gradient(to bottom, #2f3136, #202225);
             --text: #e6e6e6;
             --input-bg: #202225;
@@ -17,8 +22,12 @@
         }
 
         .light {
-            --bg: #f4f6f8; --panel: #ffffff; --muted: #6b7280;
-            --accent: #4f46e5; --card: #f3f4f6; --text: #111827;
+            --bg: #f4f6f8;
+            --panel: #ffffff;
+            --muted: #6b7280;
+            --accent: #4f46e5;
+            --card: #f3f4f6;
+            --text: #111827;
             --sidebar-grad: linear-gradient(to bottom, #ffffff, #f1f5f9);
             --input-bg: #e5e7eb;
             --auth-grad: linear-gradient(135deg, var(--panel), #f9fafb);
@@ -26,163 +35,555 @@
             --channel-text: #1f2937;
         }
 
-        html, body {
-            height: 100%; width: 100%; margin: 0; padding: 0;
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
             font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
             color: var(--text);
         }
 
         body {
-            background: var(--bg); display: flex; flex-direction: column;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
             align-items: stretch;
         }
 
-        /* --- AUTH SCREEN --- */
+        /* --- AUTH UI --- */
         #authDiv {
-            position: absolute; inset: 0; display: flex; align-items: center;
-            justify-content: center; z-index: 40;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
         }
 
         .authCard {
-            width: 360px; background: var(--auth-grad);
-            border-radius: 14px; padding: 22px;
-            box-shadow: 0 14px 40px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; gap: 12px;
+            width: 360px;
+            background: var(--auth-grad);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .authTabs { display: flex; gap: 8px; }
+        .authTabs {
+            display: flex;
+            gap: 8px;
+        }
+
         .authTabs button {
-            flex: 1; padding: 10px; border-radius: 10px; border: none; cursor: pointer;
-            background: var(--accent); color: white; font-weight: 600; transition: all .18s;
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            transition: all .18s;
         }
 
-        .authTabs button.active { opacity: 0.9; }
+        .authTabs button.active {
+            opacity: 0.9;
+        }
 
         .authCard input {
-            width: 100%; padding: 12px; border-radius: 10px; border: none;
-            background: var(--input-bg); color: var(--text);
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text);
         }
 
         /* --- LAYOUT --- */
         #app {
-            flex: 1; min-height: 0; display: flex;
-            gap: 0; align-items: stretch;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            gap: 0;
+            align-items: stretch;
         }
 
         #sidebar {
-            width: 300px; background: var(--sidebar-grad); padding: 14px;
-            display: flex; flex-direction: column; box-shadow: 2px 0 18px rgba(0,0,0,0.35); gap: 10px;
+            width: 300px;
+            background: var(--sidebar-grad);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 18px rgba(0, 0, 0, 0.35);
+            gap: 10px;
         }
 
-        #sidebarHeader { font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
-        #sidebarHeader .controls { display: flex; gap: 8px; align-items: center; }
+        #sidebarHeader {
+            font-weight: 800;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        #main { flex: 1; display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
+        #sidebarHeader .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+            min-width: 0;
+        }
 
         #chatHeader {
-            padding: 12px 16px; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-weight: 800; display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px;
+            background: var(--panel);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        #chatHeader .meta { display: flex; gap: 10px; align-items: center; color: var(--muted); font-weight: 600; font-size: 13px; }
+        #bottomBar {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: var(--sidebar-grad);
+            align-items: center;
+        }
 
-        #bottomBar { display: flex; gap: 12px; padding: 12px; background: var(--sidebar-grad); align-items: center; }
-        #msgInput { flex: 1; padding: 12px 14px; border-radius: 12px; border: none; background: var(--input-bg); color: var(--text); font-size: 15px; }
+        #msgInput {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 15px;
+        }
 
         /* --- CHANNELS --- */
-        #channelList { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
-        .channelRow {
-            display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px;
-            border-radius: 10px; background: var(--channel-bg); color: var(--channel-text);
-            font-weight: 700; cursor: pointer; transition: all .18s;
+        #channelList {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
         }
-        .channelRow:hover { transform: scale(1.02); background: var(--accent); color: white; }
-        .channelRow.active { background: var(--accent); color: white; transform: scale(1.02); }
 
-        /* --- SIDEBAR USERS --- */
-        #rightbar { width: 260px; background: var(--panel); padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; box-shadow: -2px 0 18px rgba(0,0,0,0.18); }
-        #userList { overflow: auto; display: flex; flex-direction: column; gap: 6px; }
-        .userRow { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
-        .userRow:hover { background: rgba(255,255,255,0.05); }
-        .userRow .userName { font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .channelRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: var(--channel-bg);
+            color: var(--channel-text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .18s;
+        }
+
+        .channelRow:hover {
+            transform: scale(1.02);
+            background: var(--accent);
+            color: white;
+        }
+
+        .channelRow.active {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .close-dm-btn {
+            font-size: 14px;
+            opacity: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 2px 4px;
+            border-radius: 50%;
+        }
+
+        .channelRow:hover .close-dm-btn {
+            opacity: 0.7;
+        }
+
+        .close-dm-btn:hover {
+            background: rgba(0, 0, 0, 0.2);
+            opacity: 1;
+        }
+
+        /* --- BROWSE MENU --- */
+        .browse-channel-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--card);
+            border-radius: 5px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .browse-channel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .browse-channel-item:hover {
+            background: var(--card-hover);
+        }
+
+        .browse-channel-item button {
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            background: var(--accent);
+        }
+
+        .browse-channel-item button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* --- USER LIST --- */
+        #rightbar {
+            width: 260px;
+            background: var(--panel);
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: -2px 0 18px rgba(0, 0, 0, 0.18);
+        }
+
+        .userRow {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .userRow:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .userName {
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .statusDot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: 0 0 10px;
+        }
+
+        .status-online {
+            background: #2ecc71;
+        }
+
+        .status-away {
+            background: #f1c40f;
+        }
+
+        .status-offline {
+            background: #95a5a6;
+        }
 
         /* --- MESSAGES --- */
-        #messages { flex: 1; padding: 14px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
-        .message { display: flex; gap: 12px; align-items: flex-start; max-width: 980px; transition: all .28s; opacity: 0; transform: translateY(10px); position: relative; }
-        .message.show { opacity: 1; transform: translateY(0); }
+        #messages {
+            flex: 1;
+            padding: 14px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            max-width: 980px;
+            transition: all .28s;
+            opacity: 0;
+            transform: translateY(10px);
+            position: relative;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         .avatar {
-            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; font-weight: 700; color: white; background: #6b6f75; flex: 0 0 40px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            background: #6b6f75;
+            flex: 0 0 40px;
         }
 
-        .msgBody { background: var(--card); padding: 8px 12px; border-radius: 10px; min-width: 0; }
-        .msgHeader { font-weight: 700; font-size: 14px; display: flex; gap: 8px; align-items: center; }
-        .timestamp { color: var(--muted); font-size: 12px; }
+        .msgBody {
+            background: var(--card);
+            padding: 8px 12px;
+            border-radius: 10px;
+            min-width: 0;
+        }
 
-        /* Grouping Logic */
-        .grouped .avatar, .grouped .msgHeader .username { visibility: hidden; width: 0; margin-right: 0; height: 0; }
-        .grouped { margin-top: -10px; }
+        .msgHeader {
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .timestamp {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .grouped .avatar,
+        .grouped .msgHeader .username {
+            visibility: hidden;
+            width: 0;
+            margin-right: 0;
+            height: 0;
+        }
+
+        .grouped {
+            margin-top: -10px;
+        }
 
         .message-menu {
-            position: absolute; top: -10px; right: 10px; background: var(--panel); border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 4px; display: none; cursor: pointer; z-index: 10; gap: 4px;
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--panel);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            padding: 4px;
+            display: none;
+            cursor: pointer;
+            z-index: 10;
+            gap: 4px;
         }
-        .message:hover .message-menu { display: flex; }
 
-        .menu-item { padding: 6px 8px; border-radius: 4px; font-size: 13px; font-weight: 600; }
-        .menu-item:hover { background: var(--accent); color: white; }
+        .message:hover .message-menu {
+            display: flex;
+        }
 
+        .menu-item {
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .menu-item:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* --- UI COMPONENTS --- */
         #scrollBtn {
-            position: fixed; right: 26px; bottom: 96px; padding: 10px 12px; border-radius: 12px; border: none;
-            background: var(--accent); color: white; cursor: pointer; opacity: 0; transition: opacity .25s, transform .18s;
+            position: fixed;
+            right: 26px;
+            bottom: 96px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .25s, transform .18s;
         }
-        #scrollBtn.show { opacity: 1; transform: translateY(0); }
+
+        #scrollBtn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         .tinyBtn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 8px; border-radius: 8px; color: var(--muted); cursor: pointer; transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 8px;
+            border-radius: 8px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
-        .modalCard { background: var(--panel); padding: 18px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; gap: 10px; max-height: 90vh; overflow-y: auto; }
-        .modalCard input { padding: 10px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text); }
-        .modalActions { display: flex; gap: 8px; justify-content: flex-end; }
-        
-        .statusDot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 10px; }
-        .status-online { background: #2ecc71; }
-        .status-away { background: #f1c40f; }
-        .status-offline { background: #95a5a6; }
-
-        .reply-quote { background: var(--bg); border-left: 3px solid var(--accent); padding: 4px 8px; margin-bottom: 4px; font-size: 13px; border-radius: 4px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-        .mention-highlight { background-color: hsla(235, 85%, 65%, 0.3); color: #c1cef8; font-weight: 700; padding: 1px 3px; border-radius: 3px; }
-
-        .settings-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--card); }
-        .settings-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
-        .settings-section h4 { margin: 0 0 10px 0; color: var(--muted); }
-        .settings-section input { width: 95%; padding: 8px; margin-bottom: 8px; border-radius: 5px; border: none; background: var(--input-bg); color: var(--text); }
-        .settings-section button { padding: 8px 12px; border-radius: 5px; border: none; background: var(--accent); color: white; cursor: pointer; }
-
-        .requirement { display: flex; align-items: center; gap: 8px; color: var(--muted); transition: color 0.3s ease; font-size: 13px; }
-        .requirement.valid { color: #2ecc71; }
-
-        .close-dm-btn, .deleteBtn { font-size: 14px; opacity: 0; cursor: pointer; transition: all 0.2s ease; }
-        .channelRow:hover .close-dm-btn, .channelRow:hover .deleteBtn { opacity: 0.7; }
-
-        #submitBtn, .modalActions button {
-            padding: 10px 16px; border-radius: 8px; border: none; background: var(--accent); color: white; font-weight: 700; cursor: pointer;
+        .badge {
+            background: #ff5b5b;
+            color: white;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
         }
-        .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important; }
 
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
-        @media (max-width:1000px){ #rightbar{display:none} #sidebar{width:220px} }
+        .reply-quote {
+            background: var(--bg);
+            border-left: 3px solid var(--accent);
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            border-radius: 4px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .mention-highlight {
+            background-color: hsla(235, 85%, 65%, 0.3);
+            color: #c1cef8;
+            font-weight: 700;
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .requirement.valid {
+            color: #2ecc71;
+        }
+
+        #modalOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modalCard {
+            background: var(--panel);
+            padding: 18px;
+            border-radius: 12px;
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--card);
+        }
+
+        .settings-section:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .settings-section h4 {
+            margin: 0 0 10px 0;
+            color: var(--muted);
+        }
+
+        .btn-danger {
+            background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important;
+            color: white !important;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .shake {
+            animation: shake 0.6s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @media (max-width:1000px) {
+            #rightbar {
+                display: none
+            }
+
+            #sidebar {
+                width: 220px
+            }
+        }
     </style>
 </head>
+
 <body class="cozy">
 
-    <!-- Auth Div -->
+    <!-- Auth Layer -->
     <div id="authDiv">
         <div class="authCard">
             <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -198,30 +599,35 @@
             <input id="authUsername" placeholder="Username" />
             <input id="authPassword" placeholder="Password" type="password" />
             <input id="authConfirm" placeholder="Confirm Password" type="password" style="display:none" />
-            <div id="passwordRequirements" style="display: none; flex-direction: column; gap: 6px; margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px;">
+            <div id="passwordRequirements"
+                style="display: none; flex-direction: column; gap: 6px; margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px;">
                 <div id="req-length" class="requirement">✅ <span>8+ characters</span></div>
                 <div id="req-upper" class="requirement">✅ <span>One uppercase</span></div>
                 <div id="req-num" class="requirement">✅ <span>One number</span></div>
             </div>
-            <button id="submitBtn" onclick="submitAuth()">Login</button>
+            <button id="submitBtn" onclick="submitAuth()"
+                style="background:var(--accent); color:white; padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:700;">Login</button>
             <div id="authMessage" style="text-align: center; font-size: 14px; margin-top: 5px; color:#e74c3c;"></div>
         </div>
     </div>
 
-    <!-- App Div -->
+    <!-- App Layer -->
     <div id="app" style="display: none;">
         <div id="sidebar">
             <div id="sidebarHeader">
                 <div>Channels 🗨️</div>
                 <div class="controls">
-                    <button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()">🔔 <div class="badge" id="notifBadge"></div></button>
+                    <button id="notifBtn" class="tinyBtn" onclick="showNotificationsModal()">🔔 <div class="badge"
+                            id="notifBadge"></div></button>
                     <button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()">🟢</button>
                     <button class="tinyBtn" onclick="showSettingsModal()">⚙️</button>
                     <button class="tinyBtn" onclick="logout()">🚪</button>
                 </div>
             </div>
             <div id="channelList"></div>
-            <button onclick="showBrowseDialog()" style="width:100%; padding:12px; border-radius:8px; border:none; background:var(--accent); color:white; font-weight:700; cursor:pointer; margin-top:10px;">Browse / Create</button>
+            <button onclick="showBrowseDialog()"
+                style="width:100%; padding:12px; border-radius:8px; border:none; background:var(--accent); color:white; font-weight:700; cursor:pointer; margin-top:10px;">Browse
+                / Create</button>
         </div>
 
         <div id="main">
@@ -236,28 +642,35 @@
                     <div id="userList"></div>
                 </div>
             </div>
-            <div id="replyPreview" style="display:none; padding:8px 12px; background:var(--panel); border-top:1px solid var(--card);">
+            <div id="replyPreview"
+                style="display:none; padding:8px 12px; background:var(--panel); border-top:1px solid var(--card);">
                 <span onclick="cancelReply()" style="float:right; cursor:pointer; font-weight:bold;">✖️</span>
                 Replying to <strong id="replyUser"></strong>: <span id="replyText" style="opacity:0.6;"></span>
             </div>
             <div id="bottomBar">
-                <input id="msgInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }" />
-                <button id="sendBtn" onclick="sendMessage()" style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700;">Send</button>
+                <input id="msgInput" placeholder="Type a message..."
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }" />
+                <button id="sendBtn" onclick="sendMessage()"
+                    style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700;">Send</button>
             </div>
         </div>
     </div>
 
     <button id="scrollBtn">⬇️</button>
 
+    <!-- Modal System -->
     <div id="modalOverlay">
         <div class="modalCard">
             <h3 id="modalTitle"></h3>
-            <div id="modalSubtitle" style="font-size:14px; color:var(--muted); margin-bottom:10px;"></div>
+            <div id="modalSubtitle"></div>
             <div id="modalCustomContent"></div>
-            <input id="modalInput" autocomplete="off" style="display:none; padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text); border:none;" />
+            <input id="modalInput" autocomplete="off"
+                style="display:none; padding:10px; border-radius:8px; background:var(--input-bg); color:var(--text); border:none;" />
             <div class="modalActions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
-                <button id="modalConfirmBtn" onclick="submitModal()" style="padding:8px 16px; background:var(--accent); color:white; border-radius:5px; border:none; cursor:pointer;">OK</button>
-                <button id="modalCancelBtn" onclick="closeModal()" style="padding:8px 16px; background:var(--card); color:white; border-radius:5px; border:none; cursor:pointer;">Cancel</button>
+                <button id="modalConfirmBtn" onclick="submitModal()"
+                    style="padding:8px 16px; background:var(--accent); color:white; border-radius:5px; border:none; cursor:pointer;">OK</button>
+                <button onclick="closeModal()"
+                    style="padding:8px 16px; background:var(--card); color:white; border-radius:5px; border:none; cursor:pointer;">Cancel</button>
             </div>
         </div>
     </div>
@@ -292,9 +705,9 @@
         let lightTheme = false;
         let userSettings = { desktopNotifications: true };
 
-        const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "snowf", "snow-f", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
+        const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "snowf", "snow-f", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
 
-        // --- AUTOMOD UTILS ---
+        // --- AUTOMOD ---
         function autoMod(text) {
             let p = text;
             if (p.length > 500) p = p.substring(0, 500) + "...";
@@ -308,11 +721,11 @@
             return p;
         }
 
-        // --- GENERAL UTILS ---
+        // --- UTILS ---
         function uidColor(name) {
             if (!name) return "#7289da";
-            const palette = ["#e67e22","#e74c3c","#9b59b6","#16a085","#f39c12","#3498db","#2ecc71","#d35400","#1abc9c","#8e44ad"];
-            let h = 0; for(let i=0; i<name.length; i++) h = (h<<5)-h + name.charCodeAt(i); h = Math.abs(h);
+            const palette = ["#e67e22", "#e74c3c", "#9b59b6", "#16a085", "#f39c12", "#3498db", "#2ecc71", "#d35400", "#1abc9c", "#8e44ad"];
+            let h = 0; for (let i = 0; i < name.length; i++) h = (h << 5) - h + name.charCodeAt(i); h = Math.abs(h);
             return palette[h % palette.length];
         }
 
@@ -320,7 +733,7 @@
 
         function nowHHMM(ts) {
             const d = ts ? new Date(ts) : new Date();
-            return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+            return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
         }
 
         function toggleTheme() {
@@ -337,7 +750,7 @@
             if (btn) btn.textContent = compactView ? "📏" : "🛋️";
         }
 
-        // --- AUTH LOGIC ---
+        // --- AUTH ---
         function switchAuth(mode) {
             const isS = (mode === 'signup');
             document.getElementById("loginTab").classList.toggle("active", mode === 'login');
@@ -352,7 +765,6 @@
             const p = document.getElementById("authPassword").value;
             const c = document.getElementById("authConfirm").value;
             if (!u || !p) return;
-
             const isSignup = document.getElementById("signupTab").classList.contains("active");
 
             if (isSignup) {
@@ -361,7 +773,7 @@
                 if (p !== c) return (document.getElementById("authMessage").textContent = "Passwords don't match");
                 const snap = await db.ref("users/" + u).once("value");
                 if (snap.exists()) return (document.getElementById("authMessage").textContent = "Username taken");
-                await db.ref("users/" + u).set({ password: p, settings: { desktopNotifications: true } });
+                await db.ref("users/" + u).set({ password: p });
             } else {
                 const snap = await db.ref("users/" + u).once("value");
                 if (!snap.exists() || snap.val().password !== p) return (document.getElementById("authMessage").textContent = "Invalid login");
@@ -379,7 +791,7 @@
 
         function logout() { location.reload(); }
 
-        // --- MODAL ENGINE ---
+        // --- MODALS ---
         function showModal(title, sub, callback, options = {}) {
             modalCallback = callback;
             document.getElementById("modalTitle").textContent = title;
@@ -405,21 +817,18 @@
                 db.ref("presence").on("value", (pSnap) => {
                     const presence = pSnap.val() || {};
                     const users = uSnap.val() || {};
-                    const userArray = Object.keys(users).map(name => ({
-                        name,
-                        status: presence[name]?.status || "offline"
-                    }));
-                    const statusOrder = { online: 0, away: 1, offline: 2 };
-                    userArray.sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
+                    const userArray = Object.keys(users).map(name => ({ name, status: presence[name]?.status || "offline" }));
+                    userArray.sort((a, b) => {
+                        const order = { online: 0, away: 1, offline: 2 };
+                        return order[a.status] - order[b.status] || a.name.localeCompare(b.name);
+                    });
                     list.innerHTML = "";
                     userArray.forEach(user => {
                         const row = document.createElement("div");
                         row.className = "userRow";
-                        row.innerHTML = `
-                            <div class="avatar" style="background:${uidColor(user.name)}; width:34px; height:34px; font-size:14px;">${initials(user.name)}</div>
-                            <div class="userName">${user.name}</div>
-                            <div class="statusDot status-${user.status}"></div>
-                        `;
+                        row.innerHTML = `<div class="avatar" style="background:${uidColor(user.name)}; width:34px; height:34px; font-size:14px;">${initials(user.name)}</div>
+                                         <div class="userName">${user.name}</div>
+                                         <div class="statusDot status-${user.status}"></div>`;
                         row.onclick = () => createDMWith(user.name);
                         list.appendChild(row);
                     });
@@ -428,16 +837,24 @@
         }
 
         // --- CHANNELS & MESSAGES ---
-        function loadChannels() {
+        async function loadChannels() {
+            const uSnap = await db.ref(`users/${username}`).once('value');
+            const hidden = uSnap.val()?.hiddenChannels || {};
             db.ref("channels").on("value", snap => {
                 const list = document.getElementById("channelList");
                 list.innerHTML = "";
                 snap.forEach(ch => {
-                    const div = document.createElement("div");
-                    div.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
-                    div.textContent = "# " + ch.key;
-                    div.onclick = () => joinChannel(ch.key);
-                    list.appendChild(div);
+                    const data = ch.val();
+                    if (data.type === "dm" && (!data.members || !data.members[username])) return;
+                    if (data.type !== "dm" && hidden[ch.key]) return;
+                    const row = document.createElement("div");
+                    row.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
+                    row.innerHTML = `<div class="channelLeft"># ${ch.key}</div>`;
+                    const btn = document.createElement("span"); btn.innerHTML = "✖️"; btn.className = "close-dm-btn";
+                    btn.onclick = (e) => { e.stopPropagation(); data.type === "dm" ? closeDM(ch.key) : hideChannel(ch.key); };
+                    row.appendChild(btn);
+                    row.onclick = () => joinChannel(ch.key);
+                    list.appendChild(row);
                 });
             });
         }
@@ -450,14 +867,8 @@
             lastMessageMeta = { user: null, ts: 0 };
             const ref = db.ref("messages/" + name);
             ref.on("child_added", snap => appendMessage(snap.val(), snap.key));
-            ref.on("child_removed", snap => {
-                const el = document.querySelector(`.message[data-id="${snap.key}"]`);
-                if (el) el.remove();
-            });
-            ref.on("child_changed", snap => {
-                const el = document.querySelector(`.message[data-id="${snap.key}"] .msgText`);
-                if (el) el.textContent = snap.val().text;
-            });
+            ref.on("child_removed", snap => { const el = document.querySelector(`.message[data-id="${snap.key}"]`); if (el) el.remove(); });
+            ref.on("child_changed", snap => { const el = document.querySelector(`.message[data-id="${snap.key}"] .msgText`); if (el) el.textContent = snap.val().text; });
         }
 
         async function appendMessage(m, id) {
@@ -467,32 +878,23 @@
             const div = document.createElement("div");
             div.className = "message show" + (isGrouped ? " grouped" : "");
             div.dataset.id = id;
-
             let replyHTML = "";
             if (m.replyTo) {
                 const rSnap = await db.ref(`messages/${currentChannel}/${m.replyTo}`).once('value');
-                if (rSnap.exists()) replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0,40)}</div>`;
+                if (rSnap.exists()) replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0, 40)}</div>`;
             }
-
-            div.innerHTML = `
-                <div class="avatar" style="background:${uidColor(m.user)}">${initials(m.user)}</div>
-                <div class="msgBody">
-                    ${replyHTML}
-                    <div class="msgHeader">
-                        <span class="username" style="color:${uidColor(m.user)}">${m.user}</span>
-                        <span class="timestamp">${nowHHMM(m.ts)}</span>
-                    </div>
+            div.innerHTML = `<div class="avatar" style="background:${uidColor(m.user)}">${initials(m.user)}</div>
+                <div class="msgBody">${replyHTML}
+                    <div class="msgHeader"><span class="username" style="color:${uidColor(m.user)}">${m.user}</span><span class="timestamp">${nowHHMM(m.ts)}</span></div>
                     <div class="msgText">${m.text}</div>
                 </div>
                 <div class="message-menu">
                     <div class="menu-item" onclick="replyToUI('${id}', '${m.user}', '${m.text.replace(/'/g, "\\'")}')">↩️</div>
                     <div class="menu-item" onclick="showForwardUI('${id}')">↪️</div>
-                    ${m.user === username ? `<div class="menu-item" onclick="showEditUI('${id}')">✏️</div>` : ""}
-                    ${m.user === username ? `<div class="menu-item" onclick="deleteMsgUI('${id}')">🗑️</div>` : ""}
-                </div>
-            `;
+                    ${m.user === username ? `<div class="menu-item" onclick="showEditUI('${id}')">✏️</div><div class="menu-item" onclick="deleteMsgUI('${id}')">🗑️</div>` : ""}
+                </div>`;
             container.appendChild(div);
-            if(autoScroll) container.scrollTop = container.scrollHeight;
+            if (autoScroll) container.scrollTop = container.scrollHeight;
             lastMessageMeta = { user: m.user, ts: m.ts };
         }
 
@@ -501,138 +903,108 @@
             let text = input.value.trim();
             if (!text || !currentChannel) return;
             const now = Date.now();
-            if (now - lastMsgTime < 1500) { 
-                showModal("⏳ Wait!", "Please wait 1.5 seconds between messages.", null, { showInput: false, hideCancel: true });
-                return; 
-            }
+            if (now - lastMsgTime < 1500) { showModal("⏳ Wait!", "Please wait 1.5 seconds between messages.", null, { showInput: false, hideCancel: true }); return; }
             text = autoMod(text);
             const msgRef = db.ref("messages/" + currentChannel).push();
             await msgRef.set({ user: username, text: text, ts: now, replyTo: replyingToId });
             input.value = ""; lastMsgTime = now; cancelReply();
         }
 
-        // --- FULL SETTINGS ENGINE ---
+        // --- ORIGINAL BROWSE DIALOG ---
+        async function showBrowseDialog() {
+            const channelsSnap = await db.ref('channels').once('value');
+            const userSnap = await db.ref(`users/${username}`).once('value');
+            const hiddenChannels = userSnap.val()?.hiddenChannels || {};
+            const publicChannels = [];
+            channelsSnap.forEach(snap => { if (snap.val().type !== 'dm') publicChannels.push({ id: snap.key, data: snap.val() }); });
+
+            let listContentHTML = publicChannels.length === 0 ? `<div style="text-align: center; padding: 20px; color: var(--muted);">No public channels yet. Create the first one below!</div>` :
+                publicChannels.map(channel => {
+                    const isHidden = hiddenChannels[channel.id];
+                    return `<div class="browse-channel-item"><span># ${channel.id}</span>
+                            <button onclick="unhideChannel('${channel.id}', this)" ${!isHidden ? 'disabled' : ''}>${isHidden ? 'Show' : 'Joined'}</button></div>`;
+                }).join('');
+
+            const browserHTML = document.createElement('div');
+            browserHTML.innerHTML = `<div class="browse-channel-list">${listContentHTML}</div><hr style="border-color: var(--card); margin: 15px 0;"><p style="font-size: 14px; color: var(--muted);">Or, create a new one:</p>`;
+
+            showModal("Browse & Create Channels", "Join existing channels or start a new one.", (newChannelName) => {
+                if (newChannelName) {
+                    db.ref("channels/" + newChannelName).once("value").then(snap => {
+                        if (!snap.exists()) { db.ref("channels/" + newChannelName).set({ createdBy: username, type: "public" }); joinChannel(newChannelName); }
+                    });
+                }
+            }, { customHTML: browserHTML, showInput: true, placeholder: "new-channel-name" });
+        }
+
+        async function unhideChannel(id, btn) {
+            await db.ref(`users/${username}/hiddenChannels/${id}`).remove();
+            btn.textContent = "Joined"; btn.disabled = true;
+        }
+
+        function hideChannel(id) { db.ref(`users/${username}/hiddenChannels/${id}`).set(true); if (currentChannel === id) currentChannel = ""; }
+        function closeDM(id) { db.ref(`channels/${id}/members/${username}`).update({ active: false }); if (currentChannel === id) currentChannel = ""; }
+
+        // --- SETTINGS ---
         function showSettingsModal() {
             const d = document.createElement('div');
-            d.innerHTML = `
-                <div id="settingsStatus" style="font-weight:bold; font-size:12px; margin-bottom:10px;"></div>
-                <div class="settings-section">
-                    <h4>Appearance</h4>
-                    <div style="display:flex; gap:8px;">
-                        <button onclick="toggleTheme()">🌓 Toggle Theme</button>
-                        <button onclick="toggleView()">📏 Toggle View</button>
-                    </div>
-                </div>
-                <div class="settings-section">
-                    <h4>Notifications</h4>
-                    <button id="notifToggleBtn" onclick="toggleDesktopNotifications()">
-                        Desktop Notifications: ${userSettings.desktopNotifications ? 'Enabled ✅' : 'Disabled ✖'}
-                    </button>
-                </div>
-                <div class="settings-section">
-                    <h4>Change Password</h4>
-                    <input id="currentPassword" type="password" placeholder="Current Password">
-                    <input id="newPassword" type="password" placeholder="New Password">
-                    <input id="confirmPassword" type="password" placeholder="Confirm New Password">
-                    <div id="settings-passwordRequirements" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--input-bg);border-radius:8px;">
-                        <div id="settings-req-length" class="requirement">✅ At least 8 characters</div>
-                        <div id="settings-req-upper" class="requirement">✅ One uppercase letter</div>
-                        <div id="settings-req-num" class="requirement">✅ One number</div>
-                    </div>
-                    <button onclick="changePassword()" style="margin-top:10px;">Save Password</button>
-                </div>
-                <div class="settings-section">
-                    <h4>About</h4>
-                    <div style="font-size:13px; color:var(--muted)">Developed by: <strong>hothost59</strong><br>Final Release: February 2026</div>
-                </div>
-                <div class="settings-section">
-                    <button class="btn-danger" style="width:100%" onclick="deleteAccountUI()">💀 Delete My Account</button>
-                </div>`;
+            d.innerHTML = `<div id="settingsStatus" style="font-weight:bold; font-size:12px; margin-bottom:10px;"></div>
+                <div class="settings-section"><h4>Appearance</h4><div style="display:flex; gap:8px;"><button onclick="toggleTheme()">🌓 Theme</button><button onclick="toggleView()">📏 View</button></div></div>
+                <div class="settings-section"><h4>Notifications</h4><button id="notifToggleBtn" onclick="toggleDesktopNotifications()">Desktop Notifications: ${userSettings.desktopNotifications ? 'Enabled ✅' : 'Disabled ✖'}</button></div>
+                <div class="settings-section"><h4>Change Password</h4><input id="currentPassword" type="password" placeholder="Current Password"><input id="newPassword" type="password" placeholder="New Password"><input id="confirmPassword" type="password" placeholder="Confirm New Password"><div id="settings-passwordRequirements" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--input-bg);border-radius:8px;">
+                <div id="settings-req-length" class="requirement">✅ 8+ chars</div><div id="settings-req-upper" class="requirement">✅ One uppercase</div></div><button onclick="changePassword()" style="margin-top:10px;">Save Password</button></div>
+                <div class="settings-section"><h4>About</h4><div style="font-size:13px; color:var(--muted)">Developed by: <strong>hothost59</strong><br>Final Release: October 2025</div></div>
+                <div class="settings-section"><button class="btn-danger" style="width:100%" onclick="deleteAccountUI()">💀 Delete Account</button></div>`;
             showModal("Settings ⚙️", "", null, { customHTML: d, showInput: false });
-            
-            // Re-attach password requirement listeners for the modal content
-            const newPwdInput = document.getElementById("newPassword");
-            if(newPwdInput) {
-                newPwdInput.oninput = () => {
-                    const v = newPwdInput.value;
-                    document.getElementById("settings-req-length").classList.toggle("valid", v.length >= 8);
-                    document.getElementById("settings-req-upper").classList.toggle("valid", /[A-Z]/.test(v));
-                    document.getElementById("settings-req-num").classList.toggle("valid", /[0-9]/.test(v));
-                };
-            }
         }
 
         async function toggleDesktopNotifications() {
             userSettings.desktopNotifications = !userSettings.desktopNotifications;
             await db.ref(`users/${username}/settings/desktopNotifications`).set(userSettings.desktopNotifications);
             const btn = document.getElementById('notifToggleBtn');
-            if(btn) btn.textContent = `Desktop Notifications: ${userSettings.desktopNotifications ? 'Enabled ✅' : 'Disabled ✖'}`;
+            if (btn) btn.textContent = `Desktop Notifications: ${userSettings.desktopNotifications ? 'Enabled ✅' : 'Disabled ✖'}`;
         }
 
         function changePassword() {
-            const cur = document.getElementById("currentPassword").value;
-            const nP = document.getElementById("newPassword").value;
-            const cP = document.getElementById("confirmPassword").value;
-            const stat = document.getElementById("settingsStatus");
-            if (!cur || !nP || !cP) { stat.textContent = "Please fill all fields"; stat.style.color = "#e74c3c"; return; }
-            if (nP.length < 8 || !/[A-Z]/.test(nP)) { stat.textContent = "Requirements not met"; stat.style.color = "#e74c3c"; return; }
+            const cur = document.getElementById("currentPassword").value, nP = document.getElementById("newPassword").value, cP = document.getElementById("confirmPassword").value, stat = document.getElementById("settingsStatus");
+            if (!cur || !nP || !cP) { stat.textContent = "Fill all fields"; stat.style.color = "#e74c3c"; return; }
             if (nP !== cP) { stat.textContent = "Passwords don't match"; stat.style.color = "#e74c3c"; return; }
-
             db.ref(`users/${username}`).once('value').then(snap => {
-                if (snap.val().password === cur) {
-                    db.ref(`users/${username}`).update({ password: nP });
-                    stat.textContent = "Password updated successfully!";
-                    stat.style.color = "#2ecc71";
-                } else {
-                    stat.textContent = "Incorrect current password";
-                    stat.style.color = "#e74c3c";
-                }
+                if (snap.val().password === cur) { db.ref(`users/${username}`).update({ password: nP }); stat.textContent = "Success!"; stat.style.color = "#2ecc71"; }
+                else { stat.textContent = "Wrong current password"; stat.style.color = "#e74c3c"; }
             });
         }
 
-        // --- OTHER FEATURES ---
         async function deleteAccountUI() {
             closeModal();
-            showModal("Confirmirresponsible Action", "Enter password to scrub account:", async (p) => {
+            showModal("Irreversible Action", "Enter password to wipe account:", async (p) => {
                 const s = await db.ref(`users/${username}`).once('value');
                 if (s.val().password === p) {
                     const msgSnap = await db.ref('messages').once('value');
-                    const promises = [];
-                    msgSnap.forEach(ch => ch.forEach(m => {
-                        if(m.val().user === username) promises.push(db.ref(`messages/${ch.key}/${m.key}`).update({user: "[Deleted User]"}));
-                    }));
-                    await Promise.all(promises);
-                    await db.ref(`users/${username}`).remove();
-                    await db.ref(`presence/${username}`).remove();
-                    location.reload();
+                    msgSnap.forEach(ch => ch.forEach(m => { if (m.val().user === username) db.ref(`messages/${ch.key}/${m.key}`).update({ user: "[Deleted User]" }); }));
+                    await db.ref(`users/${username}`).remove(); await db.ref(`presence/${username}`).remove(); location.reload();
                 } else { alert("Incorrect password"); }
             }, { showInput: true });
         }
 
+        // --- FEATURES ---
         function deleteMsgUI(id) {
             const original = document.querySelector(`.message[data-id="${id}"]`);
             if (!original) return;
-            const preview = original.cloneNode(true);
-            preview.querySelector('.message-menu')?.remove();
-            showModal("Delete Message 🗑️", "Are you sure you want to delete this?", (conf) => {
-                if (conf) db.ref(`messages/${currentChannel}/${id}`).remove();
-            }, { customHTML: preview, showInput: false });
+            const preview = original.cloneNode(true); preview.querySelector('.message-menu')?.remove();
+            showModal("Delete Message 🗑️", "Permanently remove this?", (conf) => { if (conf) db.ref(`messages/${currentChannel}/${id}`).remove(); }, { customHTML: preview, showInput: false });
         }
 
         function showEditUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
-                showModal("Edit Message ✏️", "Update content:", (v) => {
-                    if (v) db.ref(`messages/${currentChannel}/${id}`).update({ text: autoMod(v), edited: true });
-                }, { showInput: true, placeholder: snap.val().text });
+                showModal("Edit Message ✏️", "Update content:", (v) => { if (v) db.ref(`messages/${currentChannel}/${id}`).update({ text: autoMod(v), edited: true }); }, { showInput: true, placeholder: snap.val().text });
             });
         }
 
         function showForwardUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
                 const txt = snap.val().text;
-                showModal("Forward ↪️", "Target channel:", (target) => {
-                    if (target) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() });
-                }, { showInput: true });
+                showModal("Forward ↪️", "Target channel:", (target) => { if (target) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() }); }, { showInput: true });
             });
         }
 
@@ -644,68 +1016,25 @@
             joinChannel("dm__" + id);
         }
 
-        function replyToUI(id, user, text) {
-            replyingToId = id;
-            document.getElementById("replyUser").textContent = user;
-            document.getElementById("replyText").textContent = text.substring(0, 30) + "...";
-            document.getElementById("replyPreview").style.display = "block";
-            document.getElementById("msgInput").focus();
-        }
-
+        function replyToUI(id, user, text) { replyingToId = id; document.getElementById("replyUser").textContent = user; document.getElementById("replyText").textContent = text.substring(0, 30) + "..."; document.getElementById("replyPreview").style.display = "block"; document.getElementById("msgInput").focus(); }
         function cancelReply() { replyingToId = null; document.getElementById("replyPreview").style.display = "none"; }
         function jumpTo(id) { const el = document.querySelector(`.message[data-id="${id}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-
-        function startPresence() {
-            const ref = db.ref("presence/" + username);
-            ref.set({ status: "online", lastSeen: Date.now() });
-            ref.onDisconnect().remove();
-        }
-
-        function cycleStatus() {
-            const map = { online: "away", away: "offline", offline: "online" };
-            myStatus = map[myStatus];
-            db.ref("presence/" + username).update({ status: myStatus });
-            const icons = { online: "🟢", away: "🟡", offline: "⚪" };
-            document.getElementById("myStatusBtn").textContent = icons[myStatus];
-        }
-
-        function listenToNotifs() {
-            db.ref(`users/${username}/notifications`).on('value', snap => {
-                const b = document.getElementById("notifBadge");
-                b.style.display = snap.exists() ? "inline" : "none";
-                b.textContent = snap.numChildren();
-            });
-        }
+        function startPresence() { const ref = db.ref("presence/" + username); ref.set({ status: "online", lastSeen: Date.now() }); ref.onDisconnect().remove(); }
+        function cycleStatus() { const map = { online: "away", away: "offline", offline: "online" }; myStatus = map[myStatus]; db.ref("presence/" + username).update({ status: myStatus }); document.getElementById("myStatusBtn").textContent = { online: "🟢", away: "🟡", offline: "⚪" }[myStatus]; }
+        function listenToNotifs() { db.ref(`users/${username}/notifications`).on('value', snap => { const b = document.getElementById("notifBadge"); b.style.display = snap.exists() ? "inline" : "none"; b.textContent = snap.numChildren(); }); }
 
         function showNotificationsModal() {
             db.ref(`users/${username}/notifications`).once('value', snap => {
                 const d = document.createElement('div');
-                snap.forEach(n => {
-                    const i = document.createElement('div');
-                    i.style = "padding:8px; border-bottom:1px solid var(--card); cursor:pointer;";
-                    i.textContent = `@${n.val().from} mentioned you in #${n.val().channel}`;
-                    i.onclick = () => { joinChannel(n.val().channel); closeModal(); };
-                    d.appendChild(i);
-                });
+                snap.forEach(n => { const i = document.createElement('div'); i.style = "padding:8px; border-bottom:1px solid var(--card); cursor:pointer;"; i.textContent = `@${n.val().from} mentioned you in #${n.val().channel}`; i.onclick = () => { joinChannel(n.val().channel); closeModal(); }; d.appendChild(i); });
                 showModal("Mentions 🔔", "", null, { customHTML: d, showInput: false });
                 db.ref(`users/${username}/notifications`).remove();
             });
         }
 
-        function showBrowseDialog() {
-            showModal("Create Channel 🗨️", "Enter channel name:", (v) => {
-                if (v) db.ref("channels/" + v).set({ created: Date.now(), type: "public" });
-            }, { showInput: true });
-        }
-
         function attachScrollHandler() {
-            const m = document.getElementById("messages");
-            const s = document.getElementById("scrollBtn");
-            m.onscroll = () => { 
-                const atBottom = (m.scrollHeight - m.scrollTop < 800);
-                autoScroll = atBottom;
-                s.classList.toggle("show", !atBottom); 
-            };
+            const m = document.getElementById("messages"), s = document.getElementById("scrollBtn");
+            m.onscroll = () => { const atBottom = (m.scrollHeight - m.scrollTop < 800); autoScroll = atBottom; s.classList.toggle("show", !atBottom); };
             s.onclick = () => { m.scrollTop = m.scrollHeight; autoScroll = true; };
         }
 
@@ -717,4 +1046,5 @@
         };
     </script>
 </body>
+
 </html>
