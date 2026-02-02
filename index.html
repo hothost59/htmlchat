@@ -43,7 +43,7 @@
         .authTabs button.active { opacity: 0.9; }
         .authCard input { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--input-bg); color: var(--text); }
 
-        /* --- LAYOUT --- */
+        /* --- APP LAYOUT --- */
         #app { flex: 1; min-height: 0; display: flex; gap: 0; align-items: stretch; }
         #sidebar { width: 300px; background: var(--sidebar-grad); padding: 14px; display: flex; flex-direction: column; box-shadow: 2px 0 18px rgba(0,0,0,0.35); gap: 10px; }
         #sidebarHeader { font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: space-between; }
@@ -54,19 +54,21 @@
         #bottomBar { display: flex; gap: 12px; padding: 12px; background: var(--sidebar-grad); align-items: center; }
         #msgInput { flex: 1; padding: 12px 14px; border-radius: 12px; border: none; background: var(--input-bg); color: var(--text); font-size: 15px; }
 
-        /* --- CHANNELS & USERS --- */
+        /* --- CHANNELS & SIDEBAR --- */
         #channelList { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
         .channelRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; background: var(--channel-bg); color: var(--channel-text); font-weight: 700; cursor: pointer; transition: all .18s; }
         .channelRow:hover { transform: scale(1.02); background: var(--accent); color: white; }
         .channelRow.active { background: var(--accent); color: white; transform: scale(1.02); }
-        .close-dm-btn, .deleteBtn { font-size: 14px; opacity: 0; cursor: pointer; transition: all 0.2s; padding: 2px 4px; border-radius: 50%; }
-        .channelRow:hover .close-dm-btn, .channelRow:hover .deleteBtn { opacity: 0.7; }
-        .close-dm-btn:hover, .deleteBtn:hover { background: rgba(0,0,0,0.2); opacity: 1; }
+        
+        .close-dm-btn { font-size: 14px; opacity: 0; cursor: pointer; transition: all 0.2s; padding: 2px 4px; border-radius: 50%; }
+        .channelRow:hover .close-dm-btn { opacity: 0.7; }
+        .close-dm-btn:hover { background: rgba(0,0,0,0.2); opacity: 1; }
 
         #rightbar { width: 260px; background: var(--panel); padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; box-shadow: -2px 0 18px rgba(0,0,0,0.18); }
-        .userRow { display: flex; gap: 10px; align-items: center; padding: 6px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        #userList { overflow: auto; display: flex; flex-direction: column; gap: 6px; }
+        .userRow { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 8px; cursor: pointer; transition: background 0.2s ease; }
         .userRow:hover { background: rgba(255,255,255,0.05); }
-        .userRow .userName { font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .userRow .userName { font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* --- MESSAGES --- */
         #messages { flex: 1; padding: 14px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
@@ -77,7 +79,7 @@
         .msgHeader { font-weight: 700; font-size: 14px; display: flex; gap: 8px; align-items: center; }
         .timestamp { color: var(--muted); font-size: 12px; }
 
-        /* discord-style grouping */
+        /* Grouping Logic */
         .grouped .avatar, .grouped .msgHeader .username { visibility: hidden; width: 0; margin-right: 0; height: 0; }
         .grouped { margin-top: -10px; }
 
@@ -94,13 +96,13 @@
         .credit-item { font-size: 14px; color: var(--muted); margin-bottom: 8px; }
         .credit-item strong { color: var(--text); }
 
-        /* --- MODALS & COMPONENTS --- */
+        /* --- MODALS & UI --- */
         #modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 50; }
         .modalCard { background: var(--panel); padding: 18px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; gap: 10px; max-height: 90vh; overflow-y: auto; }
         #modalCustomContent .message { background: var(--bg); border-radius: 8px; padding: 10px; opacity: 1; transform: none; pointer-events: none; }
         .modalActions { display: flex; gap: 8px; justify-content: flex-end; }
         
-        .statusDot { width: 10px; height: 10px; border-radius: 50%; }
+        .statusDot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 10px; }
         .status-online { background: #2ecc71; }
         .status-away { background: #f1c40f; }
         .status-offline { background: #95a5a6; }
@@ -112,8 +114,17 @@
         #scrollBtn { position: fixed; right: 26px; bottom: 96px; padding: 10px 12px; border-radius: 12px; border: none; background: var(--accent); color: white; cursor: pointer; opacity: 0; transition: opacity .25s, transform .18s; }
         #scrollBtn.show { opacity: 1; transform: translateY(0); }
         .tinyBtn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 6px 8px; border-radius: 8px; color: var(--muted); cursor: pointer; transition: all 0.2s ease; }
-        .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important; color: white; border: none; font-weight: 700; }
-        
+        #submitBtn, .modalActions button { padding: 10px 16px; border-radius: 8px; border: none; background: var(--accent); color: white; font-weight: 700; cursor: pointer; }
+        .btn-danger { background-image: linear-gradient(to top, #c0392b 0%, #e74c3c 100%) !important; color: white !important; }
+
+        .browse-channel-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--card); border-radius: 5px; padding: 5px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+        .browse-channel-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 5px; }
+        .browse-channel-item button { padding: 6px 10px; font-size: 12px; border: none; border-radius: 6px; color: white; cursor: pointer; background: var(--accent); }
+        .browse-channel-item button:disabled { opacity: 0.5; }
+
+        .reply-quote { background: var(--bg); border-left: 3px solid var(--accent); padding: 4px 8px; margin-bottom: 4px; font-size: 13px; border-radius: 4px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .mention-highlight { background-color: hsla(235, 85%, 65%, 0.3); color: #c1cef8; font-weight: 700; padding: 1px 3px; border-radius: 3px; }
+
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
         .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
         @media (max-width:1000px){ #rightbar{display:none} #sidebar{width:220px} }
@@ -121,17 +132,17 @@
 </head>
 <body class="cozy">
 
-    <!-- Auth Div -->
+    <!-- Auth UI -->
     <div id="authDiv">
         <div class="authCard">
             <div style="display:flex; align-items:center; justify-content:space-between;">
-                <div class="authTabs">
+                <div class="authTabs" role="tablist">
                     <button id="loginTab" class="active" onclick="switchAuth('login')">Login</button>
                     <button id="signupTab" onclick="switchAuth('signup')">Sign Up</button>
                 </div>
                 <div style="display:flex; gap:8px;">
-                    <button class="tinyBtn" id="themeBtn" onclick="toggleTheme()">🌙</button>
-                    <button class="tinyBtn" id="viewBtn" onclick="toggleView()">🛋️</button>
+                    <button class="tinyBtn" id="themeBtn" title="Toggle theme" onclick="toggleTheme()">🌙</button>
+                    <button class="tinyBtn" id="viewBtn" title="Toggle view" onclick="toggleView()">🛋️</button>
                 </div>
             </div>
             <input id="authUsername" placeholder="Username" />
@@ -142,12 +153,12 @@
                 <div id="req-upper" class="requirement">✅ <span>One uppercase</span></div>
                 <div id="req-num" class="requirement">✅ <span>One number</span></div>
             </div>
-            <button id="submitBtn" onclick="submitAuth()" style="background:var(--accent); color:white; padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:700;">Login</button>
+            <button id="submitBtn" onclick="submitAuth()">Login</button>
             <div id="authMessage" style="text-align: center; font-size: 14px; margin-top: 5px; color:#e74c3c;"></div>
         </div>
     </div>
 
-    <!-- App Div -->
+    <!-- App UI -->
     <div id="app" style="display: none;">
         <div id="sidebar">
             <div id="sidebarHeader">
@@ -202,10 +213,12 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyDbyrqzcZ4Wk57xBNVDzNuRerQaBx2p1L0",
             authDomain: "htmlchat-8b2c5.firebaseapp.com",
@@ -218,6 +231,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // --- GLOBALS ---
         let username = "";
         let currentChannel = "";
         let myStatus = "online";
@@ -230,7 +244,22 @@
         let lightTheme = false;
         let userSettings = { desktopNotifications: true };
 
+        // --- AUTOMOD BLACKLIST ---
         const BLACKLIST = ["assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "snowf", "snow-f", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
+
+        // --- AUTOMOD ENGINE ---
+        function autoMod(text) {
+            let p = text;
+            if (p.length > 500) p = p.substring(0, 500) + "...";
+            if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
+            BLACKLIST.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                p = p.replace(regex, "🤐");
+            });
+            const capsCount = (p.match(/[A-Z]/g) || []).length;
+            if (capsCount > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
+            return p;
+        }
 
         // --- UTILS ---
         function uidColor(name) {
@@ -271,20 +300,6 @@
             if (btn) btn.textContent = compactView ? "📏" : "🛋️";
         }
 
-        // --- AUTOMOD ENGINE ---
-        function autoMod(text) {
-            let p = text;
-            if (p.length > 500) p = p.substring(0, 500) + "...";
-            if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
-            BLACKLIST.forEach(word => {
-                const regex = new RegExp(`\\b${word}\\b`, 'gi');
-                p = p.replace(regex, "🤐");
-            });
-            const capsCount = (p.match(/[A-Z]/g) || []).length;
-            if (capsCount > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
-            return p;
-        }
-
         // --- AUTH ENGINE ---
         function switchAuth(mode) {
             const isS = (mode === 'signup');
@@ -308,7 +323,7 @@
                 if (p !== c) return (document.getElementById("authMessage").textContent = "Passwords don't match");
                 const snap = await db.ref("users/" + u).once("value");
                 if (snap.exists()) return (document.getElementById("authMessage").textContent = "Username taken");
-                await db.ref("users/" + u).set({ password: p });
+                await db.ref("users/" + u).set({ password: p, settings: { desktopNotifications: true } });
             } else {
                 const snap = await db.ref("users/" + u).once("value");
                 if (!snap.exists() || snap.val().password !== p) return (document.getElementById("authMessage").textContent = "Invalid login");
@@ -343,9 +358,15 @@
         }
 
         function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
-        function submitModal() { const v = document.getElementById("modalInput").value; if (modalCallback) modalCallback(v || true); closeModal(); }
+        
+        function submitModal() { 
+            const input = document.getElementById("modalInput");
+            const value = input.style.display !== 'none' ? input.value.trim() : null;
+            if (modalCallback) modalCallback(value !== null ? (value || true) : true); 
+            closeModal(); 
+        }
 
-        // --- SIDEBAR USER LIST ---
+        // --- SIDEBAR USER LIST ENGINE ---
         function loadUserList() {
             const list = document.getElementById("userList");
             db.ref("users").on("value", (uSnap) => {
@@ -353,10 +374,8 @@
                     const presence = pSnap.val() || {};
                     const users = uSnap.val() || {};
                     const userArray = Object.keys(users).map(name => ({ name, status: presence[name]?.status || "offline" }));
-                    userArray.sort((a, b) => {
-                        const order = { online: 0, away: 1, offline: 2 };
-                        return order[a.status] - order[b.status] || a.name.localeCompare(b.name);
-                    });
+                    const statusOrder = { online: 0, away: 1, offline: 2 };
+                    userArray.sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name));
                     list.innerHTML = "";
                     userArray.forEach(user => {
                         const row = document.createElement("div");
@@ -371,17 +390,31 @@
             });
         }
 
-        // --- CORE CHAT LOGIC ---
-        function loadChannels() {
+        // --- CHANNEL ENGINE ---
+        async function loadChannels() {
+            const uSnap = await db.ref(`users/${username}`).once('value');
+            const hidden = uSnap.val()?.hiddenChannels || {};
+
             db.ref("channels").on("value", snap => {
                 const list = document.getElementById("channelList");
                 list.innerHTML = "";
                 snap.forEach(ch => {
-                    const div = document.createElement("div");
-                    div.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
-                    div.textContent = "# " + ch.key;
-                    div.onclick = () => joinChannel(ch.key);
-                    list.appendChild(div);
+                    const data = ch.val();
+                    if (data.type === "dm" && (!data.members || !data.members[username] || data.members[username].active === false)) return;
+                    if (data.type !== "dm" && hidden[ch.key]) return;
+
+                    const row = document.createElement("div");
+                    row.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
+                    row.innerHTML = `<div class="channelLeft"># ${ch.key}</div>`;
+                    
+                    const btn = document.createElement("span"); btn.innerHTML = "✖️"; btn.className = "close-dm-btn";
+                    btn.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        data.type === "dm" ? closeDM(ch.key) : hideChannel(ch.key); 
+                    };
+                    row.appendChild(btn);
+                    row.onclick = () => joinChannel(ch.key);
+                    list.appendChild(row);
                 });
             });
         }
@@ -396,19 +429,34 @@
             const ref = db.ref("messages/" + name);
             ref.on("child_added", snap => appendMessage(snap.val(), snap.key));
             
-            // Instant UI Deletion Listener
             ref.on("child_removed", snap => {
                 const el = document.querySelector(`.message[data-id="${snap.key}"]`);
                 if (el) el.remove();
             });
 
-            // Instant UI Edit Listener
             ref.on("child_changed", snap => {
                 const el = document.querySelector(`.message[data-id="${snap.key}"] .msgText`);
                 if (el) el.textContent = snap.val().text;
             });
         }
 
+        async function createDMWith(other) {
+            if (other === username) return;
+            const id = [username, other].sort().join("__");
+            const snap = await db.ref("channels/dm__" + id).once("value");
+            if (!snap.exists()) {
+                const members = {}; members[username] = { active: true }; members[other] = { active: true };
+                await db.ref("channels/dm__" + id).set({ type: "dm", members: members });
+            } else {
+                db.ref(`channels/dm__${id}/members/${username}`).update({ active: true });
+            }
+            joinChannel("dm__" + id);
+        }
+
+        function closeDM(id) { db.ref(`channels/${id}/members/${username}`).update({ active: false }); if(currentChannel===id) currentChannel=""; loadChannels(); }
+        async function hideChannel(id) { await db.ref(`users/${username}/hiddenChannels/${id}`).set(true); if(currentChannel===id) currentChannel=""; loadChannels(); }
+
+        // --- MESSAGE ENGINE ---
         async function appendMessage(m, id) {
             const container = document.getElementById("messages");
             const within = (m.ts - lastMessageMeta.ts) < 300000;
@@ -444,7 +492,7 @@
             if (!text || !currentChannel) return;
             const now = Date.now();
             if (now - lastMsgTime < 1500) { 
-                showModal("⏳ Wait!", "Please wait 1.5 seconds between messages.", null, { showInput: false, hideCancel: true });
+                showModal("⏳ Rate Limit", "Please wait 1.5 seconds between messages.", null, { showInput: false, hideCancel: true });
                 return; 
             }
             text = autoMod(text);
@@ -453,7 +501,7 @@
             input.value = ""; lastMsgTime = now; cancelReply();
         }
 
-        // --- FULL SETTINGS LOGIC ---
+        // --- FULL SETTINGS ENGINE ---
         function showSettingsModal() {
             const d = document.createElement('div');
             d.innerHTML = `
@@ -519,10 +567,10 @@
             });
         }
 
-        // --- ACCOUNT SCRUBBER ---
+        // --- FEATURES ---
         async function deleteAccountUI() {
             closeModal();
-            showModal("Irreversible Action", "Confirm Irreversible: enter password to wipe account history:", async (p) => {
+            showModal("Confirm Password", "Irreversible: Enter password to wipe account history:", async (p) => {
                 const s = await db.ref(`users/${username}`).once('value');
                 if (s.val().password === p) {
                     const msgSnap = await db.ref('messages').once('value');
@@ -536,38 +584,6 @@
             }, { showInput: true });
         }
 
-        // --- ORIGINAL BROWSE DIALOG ---
-        async function showBrowseDialog() {
-            const channelsSnap = await db.ref('channels').once('value');
-            const userSnap = await db.ref(`users/${username}`).once('value');
-            const hiddenChannels = userSnap.val()?.hiddenChannels || {};
-            const publicChannels = [];
-            channelsSnap.forEach(snap => { if (snap.val().type !== 'dm') publicChannels.push({ id: snap.key, data: snap.val() }); });
-            
-            let listContentHTML = publicChannels.length === 0 ? `<div style="text-align: center; padding: 20px; color: var(--muted);">No public channels yet. Create one!</div>` : 
-                publicChannels.map(channel => {
-                    const isHidden = hiddenChannels[channel.id];
-                    return `<div class="browse-channel-item"><span># ${channel.id}</span>
-                            <button onclick="unhideChannel('${channel.id}', this)" ${!isHidden?'disabled':''}>${isHidden?'Show':'Joined'}</button></div>`;
-                }).join('');
-
-            const browserHTML = document.createElement('div');
-            browserHTML.innerHTML = `<div class="browse-channel-list">${listContentHTML}</div><hr style="border-color: var(--card); margin: 15px 0;"><p style="font-size: 14px; color: var(--muted);">Or, start a new channel:</p>`;
-            
-            showModal("Browse & Create Channels", "Manage your channels list.", (newChannelName) => {
-                if (newChannelName) {
-                    db.ref("channels/" + newChannelName).once("value").then(snap => {
-                        if (!snap.exists()) { db.ref("channels/" + newChannelName).set({ createdBy: username, type: "public" }); joinChannel(newChannelName); }
-                    });
-                }
-            }, { customHTML: browserHTML, showInput: true, placeholder: "new-channel-name" });
-        }
-
-        async function unhideChannel(id, btn) { await db.ref(`users/${username}/hiddenChannels/${id}`).remove(); btn.textContent = "Joined"; btn.disabled = true; loadChannels(); }
-        function hideChannel(id) { db.ref(`users/${username}/hiddenChannels/${id}`).set(true); if (currentChannel === id) currentChannel = ""; }
-        function closeDM(id) { db.ref(`channels/${id}/members/${username}`).update({ active: false }); if (currentChannel === id) currentChannel = ""; }
-
-        // --- FEATURE ENGINE ---
         function deleteMsgUI(id) {
             const original = document.querySelector(`.message[data-id="${id}"]`);
             if (!original) return;
@@ -584,17 +600,38 @@
         function showForwardUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
                 const txt = snap.val().text;
-                showModal("Forward ↪️", "Target channel:", (target) => { if (target) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() }); }, { showInput: true });
+                showModal("Forward ↪️", "Target channel name:", (target) => { if (typeof target === 'string' && target.length > 0) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() }); }, { showInput: true });
             });
         }
 
-        async function createDMWith(other) {
-            if (other === username) return;
-            const id = [username, other].sort().join("__");
-            const snap = await db.ref("channels/dm__" + id).once("value");
-            if (!snap.exists()) await db.ref("channels/dm__" + id).set({ type: "dm", members: { [username]: true, [other]: true } });
-            joinChannel("dm__" + id);
+        // --- ORIGINAL BROWSE DIALOG ---
+        async function showBrowseDialog() {
+            const channelsSnap = await db.ref('channels').once('value');
+            const userSnap = await db.ref(`users/${username}`).once('value');
+            const hiddenChannels = userSnap.val()?.hiddenChannels || {};
+            const publicChannels = [];
+            channelsSnap.forEach(snap => { if (snap.val().type !== 'dm') publicChannels.push({ id: snap.key, data: snap.val() }); });
+            
+            let listContentHTML = publicChannels.length === 0 ? `<div style="text-align: center; padding: 20px; color: var(--muted);">No channels yet. Start one!</div>` : 
+                publicChannels.map(channel => {
+                    const isHidden = hiddenChannels[channel.id];
+                    return `<div class="browse-channel-item"><span># ${channel.id}</span>
+                            <button onclick="unhideChannel('${channel.id}', this)" ${!isHidden?'disabled':''}>${isHidden?'Show':'Joined'}</button></div>`;
+                }).join('');
+
+            const browserHTML = document.createElement('div');
+            browserHTML.innerHTML = `<div class="browse-channel-list">${listContentHTML}</div><hr style="border-color: var(--card); margin: 15px 0;"><p style="font-size: 14px; color: var(--muted);">Or, create a new one:</p>`;
+            
+            showModal("Browse & Create Channels", "Manage your channels list.", (newChannelName) => {
+                if (typeof newChannelName === 'string' && newChannelName.length > 0) {
+                    db.ref("channels/" + newChannelName).once("value").then(snap => {
+                        if (!snap.exists()) { db.ref("channels/" + newChannelName).set({ createdBy: username, type: "public" }); joinChannel(newChannelName); }
+                    });
+                }
+            }, { customHTML: browserHTML, showInput: true, placeholder: "new-channel-name" });
         }
+
+        async function unhideChannel(id, btn) { await db.ref(`users/${username}/hiddenChannels/${id}`).remove(); btn.textContent = "Joined"; btn.disabled = true; loadChannels(); }
 
         function replyToUI(id, user, text) { replyingToId = id; document.getElementById("replyUser").textContent = user; document.getElementById("replyText").textContent = text.substring(0, 30) + "..."; document.getElementById("replyPreview").style.display = "block"; document.getElementById("msgInput").focus(); }
         function cancelReply() { replyingToId = null; document.getElementById("replyPreview").style.display = "none"; }
@@ -618,7 +655,6 @@
             s.onclick = () => { m.scrollTop = m.scrollHeight; autoScroll = true; };
         }
 
-        // Live Password Validation
         document.getElementById("authPassword").oninput = (e) => {
             const v = e.target.value;
             document.getElementById("req-length").classList.toggle("valid", v.length >= 8);
