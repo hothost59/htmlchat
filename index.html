@@ -400,17 +400,32 @@
                 list.innerHTML = "";
                 snap.forEach(ch => {
                     const data = ch.val();
-                    if (data.type === "dm" && (!data.members || !data.members[username] || data.members[username].active === false)) return;
-                    if (data.type !== "dm" && hidden[ch.key]) return;
+                    const isDM = ch.key.startsWith("dm__");
+
+                    if (isDM) {
+                        const parts = ch.key.replace("dm__", "").split("__");
+                        if (!parts.includes(username)) return;
+                        if (data.type === "dm" && data.members && data.members[username] && data.members[username].active === false) return;
+                    } else {
+                        if (hidden[ch.key]) return;
+                    }
 
                     const row = document.createElement("div");
                     row.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
-                    row.innerHTML = `<div class="channelLeft"># ${ch.key}</div>`;
+
+                    let displayTitle = ch.key;
+                    if (isDM) {
+                        const parts = ch.key.replace("dm__", "").split("__");
+                        displayTitle = "👤 " + (parts.find(p => p !== username) || parts[0]);
+                    } else {
+                        displayTitle = "# " + displayTitle;
+                    }
+                    row.innerHTML = `<div class="channelLeft">${displayTitle}</div>`;
                     
                     const btn = document.createElement("span"); btn.innerHTML = "✖️"; btn.className = "close-dm-btn";
                     btn.onclick = (e) => { 
                         e.stopPropagation(); 
-                        data.type === "dm" ? closeDM(ch.key) : hideChannel(ch.key); 
+                        isDM ? closeDM(ch.key) : hideChannel(ch.key);
                     };
                     row.appendChild(btn);
                     row.onclick = () => joinChannel(ch.key);
@@ -420,9 +435,26 @@
         }
 
         async function joinChannel(name) {
+            if (name.startsWith("dm__")) {
+                const parts = name.replace("dm__", "").split("__");
+                if (!parts.includes(username)) {
+                    alert("You are not authorized to view this DM.");
+                    return;
+                }
+            }
+
             if (currentChannel) db.ref("messages/" + currentChannel).off();
             currentChannel = name;
-            document.getElementById("chatTitle").textContent = "# " + name;
+
+            let displayTitle = name;
+            if (name.startsWith("dm__")) {
+                const parts = name.replace("dm__", "").split("__");
+                displayTitle = "👤 " + (parts.find(p => p !== username) || parts[0]);
+            } else {
+                displayTitle = "# " + displayTitle;
+            }
+            document.getElementById("chatTitle").textContent = displayTitle;
+
             document.getElementById("messages").innerHTML = "";
             lastMessageMeta = { user: null, ts: 0 };
             
@@ -600,7 +632,18 @@
         function showForwardUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
                 const txt = snap.val().text;
-                showModal("Forward ↪️", "Target channel name:", (target) => { if (typeof target === 'string' && target.length > 0) db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() }); }, { showInput: true });
+                showModal("Forward ↪️", "Target channel name:", (target) => {
+                    if (typeof target === 'string' && target.length > 0) {
+                        if (target.startsWith("dm__")) {
+                            const parts = target.replace("dm__", "").split("__");
+                            if (!parts.includes(username)) {
+                                alert("Cannot forward to a DM you are not part of.");
+                                return;
+                            }
+                        }
+                        db.ref(`messages/${target}`).push({ user: username, text: "[FWD]: " + txt, ts: Date.now() });
+                    }
+                }, { showInput: true });
             });
         }
 
@@ -610,7 +653,15 @@
             const userSnap = await db.ref(`users/${username}`).once('value');
             const hiddenChannels = userSnap.val()?.hiddenChannels || {};
             const publicChannels = [];
-            channelsSnap.forEach(snap => { if (snap.val().type !== 'dm') publicChannels.push({ id: snap.key, data: snap.val() }); });
+            channelsSnap.forEach(snap => {
+                const data = snap.val();
+                if (data.type === 'dm') return;
+                if (snap.key.startsWith("dm__")) {
+                    const parts = snap.key.replace("dm__", "").split("__");
+                    if (!parts.includes(username)) return;
+                }
+                publicChannels.push({ id: snap.key, data: data });
+            });
             
             let listContentHTML = publicChannels.length === 0 ? `<div style="text-align: center; padding: 20px; color: var(--muted);">No channels yet. Start one!</div>` : 
                 publicChannels.map(channel => {
@@ -643,7 +694,22 @@
         function showNotificationsModal() {
             db.ref(`users/${username}/notifications`).once('value', snap => {
                 const d = document.createElement('div');
-                snap.forEach(n => { const i = document.createElement('div'); i.style = "padding:8px; border-bottom:1px solid var(--card); cursor:pointer;"; i.textContent = `@${n.val().from} mentioned you in #${n.val().channel}`; i.onclick = () => { joinChannel(n.val().channel); closeModal(); }; d.appendChild(i); });
+                snap.forEach(n => {
+                    const i = document.createElement('div');
+                    i.style = "padding:8px; border-bottom:1px solid var(--card); cursor:pointer;";
+
+                    let chanName = n.val().channel;
+                    if (chanName.startsWith("dm__")) {
+                        const parts = chanName.replace("dm__", "").split("__");
+                        chanName = "👤 " + (parts.find(p => p !== username) || parts[0]);
+                    } else {
+                        chanName = "#" + chanName;
+                    }
+
+                    i.textContent = `@${n.val().from} mentioned you in ${chanName}`;
+                    i.onclick = () => { joinChannel(n.val().channel); closeModal(); };
+                    d.appendChild(i);
+                });
                 showModal("Mentions 🔔", "", null, { customHTML: d, showInput: false });
                 db.ref(`users/${username}/notifications`).remove();
             });
