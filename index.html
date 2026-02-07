@@ -243,6 +243,9 @@
         let compactView = false;
         let lightTheme = false;
         let userSettings = { desktopNotifications: true };
+        let loginTime = Date.now();
+        let mentionCounts = {};
+        let channelsData = [];
 
         // --- AUTOMOD BLACKLIST ---
         const BLACKLIST = ["nga", "ngas", "fk", "ngga", "assfuck", "cuntfucker", "niggers", "niggerhole", "nigger", "balllicker", "nlgger", "porchmonkey", "Porch-monkey", "cunt", "asswhore", "fuck", "assjockey", "Dothead", "blacks", "cumqueen", "fatfucker", "Jigaboo", "jiggabo", "nlggor", "snownigger", "Spearchucker", "Timber-nigger", "shitnigger", "asslick", "shithead", "asshole", "cuntlicker", "kunt", "spaghettinigger", "Towel-head", "Chernozhopy", "asslicker", "Bluegum", "twat", "ABCD", "bitchslap", "bulldyke", "choad", "cumshot", "fatass", "jigger", "kyke", "cumskin", "asian", "asscowboy", "assmuncher", "banging", "Burrhead", "Camel-Jockey", "coon", "crotchrot", "cumfest", "dicklicker", "fag", "fagot", "felatio", "fatfuck", "goldenshower", "hore", "jackoff", "jigg", "jigga", "jizjuice", "jizm", "jiz", "jigger", "jizzim", "kumming", "kunilingus", "Moolinyan", "motherfucking", "motherfuckings", "phuk", "Sheboon", "shitforbrains", "slanteye", "spick", "fuuck", "antinigger", "aperest", "Americoon", "ABC", "Aunt-Jemima", "queer", "anal", "asspirate", "addict", "bitch", "ass", "Buddhahead", "chode", "phuking", "phukking", "bastard", "bulldike", "dripdick", "assassination", "A-rab", "Buckra", "bootycall", "assholes", "assbagger", "cheesedick", "cooter", "cum", "cumquat", "cunnilingus", "datnigga", "deepthroat", "dick", "dickforbrains", "dickbrain", "dickless", "dike", "diddle", "dixiedyke", "Eskimo", "fannyfucker", "fatso", "fckcum", "Golliwog", "Goyim", "homobangers", "hooters", "Indognesial", "Indonesial", "jew", "jijjiboo", "knockers", "kummer", "mothafucka", "mooncricket", "Moon-Cricket", "Oven-Dodger", "Peckerwood", "phuked", "piccaninny", "picaninny", "phuq", "Polock", "poorwhitetrash", "prick", "pu55y", "Pshek", "slut", "jizzum", "cunteyed", "Spic", "Swamp-Guinea", "stupidfucker", "stupidfuck", "titfuck", "Twinkie", "cock", "Abeed", "analannie", "asshore", "Beaner", "Bootlip", "Burr-head", "buttfucker", "butt-fucker", "Uncle-Tom", "cocksmoker", "Africoon", "AmeriKKKunt", "antifaggot", "assklown", "asspuppies", "blackman", "jism", "blumpkin", "retard", "Gringo", "douchebag", "Piefke", "areola", "backdoorman", "Abbie", "bigbutt", "buttface", "cumbubble", "cumming", "Dego", "dong", "doggystyle", "doggiestyle", "erection", "feces", "goddamned", "gonzagas", "Greaser", "Greaseball", "handjob", "Half-breed", "horney", "jihad", "kumquat", "Lebo", "Moskal", "Mountain-Turk", "nofuckingway", "orgies", "orgy", "pecker", "poontang", "poon", "Polentone", "pu55i", "shitfuck", "shiteater", "shitdick", "sluts", "slutt", "Mangal", "Hymie", "stiffy", "titfucker", "twink", "asspacker", "barelylegal", "beaner", "Bozgor", "bumfuck", "shit for brains", "butchdyke", "butt-fuckers", "buttpirate", "cameljockey", "Carcamano", "Chankoro", "Choc-ice", "Chug", "Ciapaty-or-ciapak", "Cina", "cocksucer", "crackwhore", "Bougnoule", "unfuckable", "Africoon-Americoon", "Africoonia", "Americunt", "apesault", "Assburgers", "fucktardedness", "sheepfucker", "Wuhan-virus", "Wetback", "Aseng", "bumblefuck", "fastfuck", "itch", "nizzle", "Oriental", "cisgender", "ballsack", "penis", "zigabo", "Bule", "breastman", "bountybar", "Bounty-bar", "bondage", "bombing", "bullshit", "asses", "cancer", "cunilingus", "cummer", "dicklick", "ejaculation", "faeces", "fairy", "hoes", "idiot", "Laowai", "Leb", "muff", "muffdive", "Oreo", "orgasm", "orgasim", "osama", "peepshow", "Petrol-sniffer", "perv", "prickhead", "shitfit", "spermbag", "suckmytit", "suckmydick", "suckmyass", "suckme", "suckdick", "Yuon", "motherfucker", "groe", "Ali Baba", "retarded", "assfucker", "assmunch", "assranger", "Ayrab", "assclown", "buttfuck", "butt-fuck", "buttman", "Chink", "cocksucker", "cooly", "Coon-ass", "crotchmonkey", "Bohunk", "cockcowboy", "cocksmith", "catfucker", "fucktardedly", "trans-testicle", "Wigger", "whiskeydick", "aboriginal", "asskisser", "whitelist", "Latinx", "yambag", "boob", "beef curtains", "clunge", "af", "wokeness", "bitchez", "Iceberg Fuckers", "Zhyd", "bellend", "arsehole", "tatas", "assassinate", "boonga", "booby", "bullcrap", "defecate", "Dhoti", "dope", "hobo", "bigass", "hussy", "illegal", "ky", "moneyshot", "molestor", "nooner", "nookie", "nookey", "Paleface", "pansy", "peehole", "phonesex", "period", "pornking", "pornflick", "porn", "pooper", "sexwhore", "shitface", "shit", "slav", "slimeball", "sniggers", "snowback", "snowf", "snow-f", "spermherder", "spankthemonkey", "spitter", "strapon", "Tacohead", "suckoff", "titbitnipply", "Turco-Albanian", "tranny", "trannie", "zhidovka", "zhid", "Bakra", "Afro engineering", "Ah Chah", "alligatorbait", "arabs", "Arabush", "Ashke-Nazi", "assblaster", "assmonkey", "badfuck", "bazongas", "beatoff", "bazooms", "Balija", "bunghole", "butchdike", "buttfuckers", "Boche", "buttbang", "butt-bang", "buttmunch", "Charlie", "chav", "Chinaman", "coloured", "boong", "butchbabes", "clit", "cockknob", "cocksucking", "cocktease", "Cokin", "anchor-baby", "cumsock", "fisting", "fuck-you", "Fritzie", "transgendered", "White-trash", "whitetrash", "whop", "wtf", "Vatnik", "welfare queen", "assman", "black", "Gyopo", "goddam", "minge", "punani", "douche", "doofus", "munter", "moron", "ballgag", "femsplaining", "asslover", "looney", "Boonga", "fat", "homosexual", "turd", "zhydovka", "effing", "minger", "dullard", "buggery", "brea5t", "boong", "addicted", "demon", "devilworshipper", "deth", "destroy", "doo-doo", "doodoo", "escort", "farting", "fairies", "husky", "incest", "Hunky", "jiggy", "laid", "molester", "Mzungu", "nigglings", "niggling", "niggles", "pee-pee", "pi55", "phungky", "porno", "pooping", "prostitute", "pros", "sexslave", "sextogo", "shag", "shithappens", "shithapens", "shitfull", "shitcan", "shinola", "slavedriver", "sleezeball", "spermhearder", "swastika", "shits", "trots", "trisexual", "twobitwhore", "Munt", "gangsta", "Abo", "addicts", "Alligator bait", "analsex", "Redskin", "Gypsy", "Ang mo", "Ape", "arab", "Aravush", "Armo", "arse", "assclown", "asswipe", "Beaney", "beatyourmeat", "bigbastard", "bitches", "Bogtrotter", "bung", "beaver", "bestial", "bogan", "Cabbage-Eater", "carpetmuncher", "carruth", "cocklover", "cockrider", "cornhole", "bollock", "Bog-Irish", "chinamen", "clamdigger", "clamdiver", "dwarf", "cakewalk", "ftw", "fml", "handicapped", "cawk", "carpet-muncher", "fuzzy-headed", "full-blood", "fuckity-bye", "frogess", "Norte", "troid", "willy", "pud", "pubiclice", "whitewashing", "Brit\b"];
@@ -261,12 +264,27 @@
             return p;
         }
 
+        function parseMentions(text) {
+            if (!text) return "";
+            let safeText = escapeHTML(text);
+            safeText = safeText.replace(/@([a-zA-Z0-9_]+)/g, (match, mentionedUser) => {
+                const isMe = mentionedUser === username;
+                return `<span class="mention-highlight ${isMe ? 'me' : ''}" data-user="${mentionedUser}">${match}</span>`;
+            });
+            return safeText;
+        }
+
         // --- UTILS ---
         function uidColor(name) {
             if (!name) return "#7289da";
             const palette = ["#e67e22","#e74c3c","#9b59b6","#16a085","#f39c12","#3498db","#2ecc71","#d35400","#1abc9c","#8e44ad"];
             let h = 0; for(let i=0; i<name.length; i++) h = (h<<5)-h + name.charCodeAt(i); h = Math.abs(h);
             return palette[h % palette.length];
+        }
+
+        function escapeHTML(t) {
+            if (!t) return "";
+            return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         function initials(name) { return name ? name.trim().charAt(0).toUpperCase() : "?"; }
@@ -336,6 +354,7 @@
             document.getElementById("authDiv").style.display = "none";
             document.getElementById("app").style.display = "flex";
             document.getElementById("meLabel").textContent = "👤 " + username;
+            if ("Notification" in window) Notification.requestPermission();
             loadChannels(); startPresence(); listenToNotifs(); attachScrollHandler(); loadUserList();
         }
 
@@ -396,12 +415,10 @@
             const hidden = uSnap.val()?.hiddenChannels || {};
 
             db.ref("channels").on("value", snap => {
-                const list = document.getElementById("channelList");
-                list.innerHTML = "";
+                channelsData = [];
                 snap.forEach(ch => {
                     const data = ch.val();
                     const isDM = ch.key.startsWith("dm__");
-
                     if (isDM) {
                         const parts = ch.key.replace("dm__", "").split("__");
                         if (!parts.includes(username)) return;
@@ -409,28 +426,45 @@
                     } else {
                         if (hidden[ch.key]) return;
                     }
-
-                    const row = document.createElement("div");
-                    row.className = "channelRow" + (ch.key === currentChannel ? " active" : "");
-
-                    let displayTitle = ch.key;
-                    if (isDM) {
-                        const parts = ch.key.replace("dm__", "").split("__");
-                        displayTitle = "👤 " + (parts.find(p => p !== username) || parts[0]);
-                    } else {
-                        displayTitle = "# " + displayTitle;
-                    }
-                    row.innerHTML = `<div class="channelLeft">${displayTitle}</div>`;
-                    
-                    const btn = document.createElement("span"); btn.innerHTML = "✖️"; btn.className = "close-dm-btn";
-                    btn.onclick = (e) => { 
-                        e.stopPropagation(); 
-                        isDM ? closeDM(ch.key) : hideChannel(ch.key);
-                    };
-                    row.appendChild(btn);
-                    row.onclick = () => joinChannel(ch.key);
-                    list.appendChild(row);
+                    channelsData.push({ id: ch.key, ...data });
                 });
+                renderChannels();
+            });
+        }
+
+        function renderChannels() {
+            const list = document.getElementById("channelList");
+            list.innerHTML = "";
+            channelsData.forEach(ch => {
+                const isDM = ch.id.startsWith("dm__");
+                const row = document.createElement("div");
+                row.className = "channelRow" + (ch.id === currentChannel ? " active" : "");
+                row.dataset.id = ch.id;
+
+                let displayTitle = ch.id;
+                if (isDM) {
+                    const parts = ch.id.replace("dm__", "").split("__");
+                    displayTitle = "👤 " + (parts.find(p => p !== username) || parts[0]);
+                } else {
+                    displayTitle = "# " + displayTitle;
+                }
+
+                const mentionCount = mentionCounts[ch.id] || 0;
+                const badgeHTML = mentionCount > 0 ? `<div class="badge">${mentionCount}</div>` : "";
+
+                row.innerHTML = `<div class="channelLeft" style="display:flex; align-items:center; gap:8px;">
+                                    <span>${escapeHTML(displayTitle)}</span>
+                                    ${badgeHTML}
+                                 </div>`;
+
+                const btn = document.createElement("span"); btn.innerHTML = "✖️"; btn.className = "close-dm-btn";
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    isDM ? closeDM(ch.id) : hideChannel(ch.id);
+                };
+                row.appendChild(btn);
+                row.onclick = () => joinChannel(ch.id);
+                list.appendChild(row);
             });
         }
 
@@ -445,6 +479,11 @@
 
             if (currentChannel) db.ref("messages/" + currentChannel).off();
             currentChannel = name;
+            renderChannels();
+
+            db.ref(`users/${username}/notifications`).once('value', snap => {
+                snap.forEach(n => { if (n.val().channel === name) n.ref.remove(); });
+            });
 
             let displayTitle = name;
             if (name.startsWith("dm__")) {
@@ -468,7 +507,7 @@
 
             ref.on("child_changed", snap => {
                 const el = document.querySelector(`.message[data-id="${snap.key}"] .msgText`);
-                if (el) el.textContent = snap.val().text;
+                if (el) el.innerHTML = parseMentions(snap.val().text);
             });
         }
 
@@ -506,7 +545,7 @@
             div.innerHTML = `<div class="avatar" style="background:${uidColor(m.user)}">${initials(m.user)}</div>
                 <div class="msgBody">${replyHTML}
                     <div class="msgHeader"><span class="username" style="color:${uidColor(m.user)}">${m.user}</span><span class="timestamp">${nowHHMM(m.ts)}</span></div>
-                    <div class="msgText">${m.text}</div>
+                    <div class="msgText">${parseMentions(m.text)}</div>
                 </div>
                 <div class="message-menu">
                     <div class="menu-item" onclick="replyToUI('${id}', '${m.user}', '${m.text.replace(/'/g, "\\'")}')">↩️</div>
@@ -530,6 +569,26 @@
             text = autoMod(text);
             const msgRef = db.ref("messages/" + currentChannel).push();
             await msgRef.set({ user: username, text: text, ts: now, replyTo: replyingToId });
+
+            const mentions = text.match(/@([a-zA-Z0-9_]+)/g);
+            if (mentions) {
+                const uniqueMentions = [...new Set(mentions.map(m => m.substring(1)))];
+                uniqueMentions.forEach(async (mentionedUser) => {
+                    if (mentionedUser === username) return;
+                    const userSnap = await db.ref(`users/${mentionedUser}`).once('value');
+                    if (userSnap.exists()) {
+                        const notifPayload = {
+                            from: username,
+                            channel: currentChannel,
+                            messageId: msgRef.key,
+                            text: text.substring(0, 100),
+                            ts: now
+                        };
+                        db.ref(`users/${mentionedUser}/notifications`).push(notifPayload);
+                    }
+                });
+            }
+
             input.value = ""; lastMsgTime = now; cancelReply();
         }
 
@@ -689,7 +748,40 @@
         function jumpTo(id) { const el = document.querySelector(`.message[data-id="${id}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
         function startPresence() { const ref = db.ref("presence/" + username); ref.set({ status: "online", lastSeen: Date.now() }); ref.onDisconnect().remove(); }
         function cycleStatus() { const map = { online: "away", away: "offline", offline: "online" }; myStatus = map[myStatus]; db.ref("presence/" + username).update({ status: myStatus }); document.getElementById("myStatusBtn").textContent = { online: "🟢", away: "🟡", offline: "⚪" }[myStatus]; }
-        function listenToNotifs() { db.ref(`users/${username}/notifications`).on('value', snap => { const b = document.getElementById("notifBadge"); b.style.display = snap.exists() ? "inline" : "none"; b.textContent = snap.numChildren(); }); }
+        function listenToNotifs() {
+            const ref = db.ref(`users/${username}/notifications`);
+            ref.on('value', snap => {
+                const b = document.getElementById("notifBadge");
+                b.style.display = snap.exists() ? "inline" : "none";
+                b.textContent = snap.numChildren();
+
+                mentionCounts = {};
+                snap.forEach(n => {
+                    const ch = n.val().channel;
+                    mentionCounts[ch] = (mentionCounts[ch] || 0) + 1;
+                });
+                renderChannels();
+            });
+
+            ref.limitToLast(1).on('child_added', snap => {
+                const n = snap.val();
+                if (n && n.ts > loginTime && userSettings.desktopNotifications) {
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        let chanName = n.channel;
+                        if (chanName.startsWith("dm__")) {
+                            const parts = chanName.replace("dm__", "").split("__");
+                            chanName = "👤 " + (parts.find(p => p !== username) || parts[0]);
+                        } else {
+                            chanName = "#" + chanName;
+                        }
+                        new Notification(`Mention in ${chanName}`, {
+                            body: `@${n.from}: ${n.text}`,
+                            icon: generateAvatarUrl(n.from)
+                        }).onclick = () => { window.focus(); joinChannel(n.channel); };
+                    }
+                }
+            });
+        }
 
         function showNotificationsModal() {
             db.ref(`users/${username}/notifications`).once('value', snap => {
