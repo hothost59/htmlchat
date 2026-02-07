@@ -182,9 +182,11 @@
             font-size: 15px;
             font-family: inherit;
             resize: none;
-            max-height: 150px;
-            overflow-y: auto;
+            max-height: 200px;
+            min-height: 44px;
+            overflow-y: hidden;
             line-height: 1.4;
+            box-sizing: border-box;
         }
 
         /* --- CHANNELS & SIDEBAR --- */
@@ -368,6 +370,12 @@
 
         .message:hover .message-menu {
             display: flex;
+        }
+
+        .msgText {
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.4;
         }
 
         .menu-item {
@@ -709,8 +717,7 @@
                 Replying to <strong id="replyUser"></strong>: <span id="replyText" style="opacity:0.6;"></span>
             </div>
             <div id="bottomBar">
-                <textarea id="msgInput" placeholder="Type a message..." rows="1"
-                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                <textarea id="msgInput" placeholder="Type a message..." rows="1" oninput="autoExpand(this)"
                     onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
                 <button id="sendBtn" onclick="sendMessage()"
                     style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700; align-self: flex-end;">Send</button>
@@ -991,7 +998,16 @@
                 list.appendChild(row);
             });
         }
+        function autoExpand(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
 
+            if (el.scrollHeight > 200) {
+                el.style.overflowY = 'auto';
+            } else {
+                el.style.overflowY = 'hidden';
+            }
+        }
         async function joinChannel(name) {
             if (name.startsWith("dm__")) {
                 const parts = name.replace("dm__", "").split("__");
@@ -1114,7 +1130,7 @@
             }
 
             input.value = "";
-            input.style.height = "";
+            autoExpand(input);
             lastMsgTime = now;
             cancelReply();
         }
