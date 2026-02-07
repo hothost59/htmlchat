@@ -180,6 +180,11 @@
             background: var(--input-bg);
             color: var(--text);
             font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 150px;
+            overflow-y: auto;
+            line-height: 1.4;
         }
 
         /* --- CHANNELS & SIDEBAR --- */
@@ -704,10 +709,11 @@
                 Replying to <strong id="replyUser"></strong>: <span id="replyText" style="opacity:0.6;"></span>
             </div>
             <div id="bottomBar">
-                <input id="msgInput" placeholder="Type a message..."
-                    onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }" />
+                <textarea id="msgInput" placeholder="Type a message..." rows="1"
+                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
                 <button id="sendBtn" onclick="sendMessage()"
-                    style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700;">Send</button>
+                    style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700; align-self: flex-end;">Send</button>
             </div>
         </div>
     </div>
@@ -1107,7 +1113,10 @@
                 });
             }
 
-            input.value = ""; lastMsgTime = now; cancelReply();
+            input.value = "";
+            input.style.height = "";
+            lastMsgTime = now;
+            cancelReply();
         }
 
         // --- FULL SETTINGS ENGINE ---
@@ -1202,7 +1211,66 @@
 
         function showEditUI(id) {
             db.ref(`messages/${currentChannel}/${id}`).once('value', snap => {
-                showModal("Edit Message ✏️", "Update content:", (v) => { if (v) db.ref(`messages/${currentChannel}/${id}`).update({ text: autoMod(v), edited: true }); }, { showInput: true, placeholder: snap.val().text });
+                const originalText = snap.val().text;
+
+                const editContainer = document.createElement('div');
+                editContainer.style.display = "flex";
+                editContainer.style.flexDirection = "column";
+                editContainer.style.gap = "12px";
+
+                const reference = document.createElement('div');
+                reference.innerHTML = `
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.5px;">Original Message</div>
+            <div style="background: var(--bg); padding: 10px; border-radius: 8px; border-left: 3px solid var(--card); font-size: 14px; opacity: 0.8; font-style: italic;">
+                ${escapeHTML(originalText)}
+            </div>
+        `;
+                editContainer.appendChild(reference);
+
+                const textarea = document.createElement('textarea');
+                textarea.id = "nicerEditArea";
+                textarea.value = originalText;
+                textarea.style = `
+            width: 100%; 
+            min-height: 120px; 
+            padding: 12px; 
+            border-radius: 10px; 
+            background: var(--input-bg); 
+            color: var(--text); 
+            border: 2px solid var(--card); 
+            font-family: inherit; 
+            font-size: 15px; 
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        `;
+                textarea.onfocus = () => textarea.style.borderColor = "var(--accent)";
+                textarea.onblur = () => textarea.style.borderColor = "var(--card)";
+
+                editContainer.appendChild(textarea);
+
+                // 3. Show the modal
+                showModal("Edit Message ✏️", "Refine your thoughts:", (confirmed) => {
+                    if (confirmed) {
+                        const newText = document.getElementById("nicerEditArea").value.trim();
+                        if (newText && newText !== originalText) {
+                            db.ref(`messages/${currentChannel}/${id}`).update({
+                                text: autoMod(newText),
+                                edited: true,
+                                lastEdited: Date.now()
+                            });
+                        }
+                    }
+                }, {
+                    customHTML: editContainer,
+                    showInput: false
+                });
+
+                setTimeout(() => {
+                    textarea.focus();
+                    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+                }, 100);
             });
         }
 
