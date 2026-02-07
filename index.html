@@ -61,6 +61,9 @@
             align-items: center;
             justify-content: center;
             z-index: 40;
+            background: linear-gradient(-45deg, #2f3136, #202225, #7289da, #2f3136);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
 
         .authCard {
@@ -72,6 +75,9 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .authTabs {
@@ -210,19 +216,21 @@
             color: var(--channel-text);
             font-weight: 700;
             cursor: pointer;
-            transition: all .18s;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .channelRow:hover {
-            transform: scale(1.02);
+            transform: scale(1.03) translateY(-2px);
             background: var(--accent);
             color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .channelRow.active {
             background: var(--accent);
             color: white;
-            transform: scale(1.02);
+            transform: scale(1.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .close-dm-btn {
@@ -267,11 +275,12 @@
             padding: 8px;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .userRow:hover {
             background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
         }
 
         .userRow .userName {
@@ -306,6 +315,7 @@
         .message.show {
             opacity: 1;
             transform: translateY(0);
+            animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .avatar {
@@ -452,6 +462,9 @@
             gap: 10px;
             max-height: 90vh;
             overflow-y: auto;
+            animation: springIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         #modalCustomContent .message {
@@ -478,6 +491,7 @@
 
         .status-online {
             background: #2ecc71;
+            animation: pulse 2s infinite;
         }
 
         .status-away {
@@ -540,6 +554,7 @@
         }
 
         #submitBtn,
+        #sendBtn,
         .modalActions button {
             padding: 10px 16px;
             border-radius: 8px;
@@ -548,6 +563,21 @@
             color: white;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #submitBtn:hover,
+        #sendBtn:hover,
+        .modalActions button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 12px rgba(114, 137, 218, 0.4);
+        }
+
+        #submitBtn:active,
+        #sendBtn:active,
+        .modalActions button:active {
+            transform: translateY(0);
         }
 
         .btn-danger {
@@ -639,6 +669,35 @@
             animation: shake 0.6s cubic-bezier(.36, .07, .19, .97) both;
         }
 
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes springIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
         @media (max-width:1000px) {
             #rightbar {
                 display: none
@@ -719,8 +778,7 @@
             <div id="bottomBar">
                 <textarea id="msgInput" placeholder="Type a message..." rows="1" oninput="autoExpand(this)"
                     onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
-                <button id="sendBtn" onclick="sendMessage()"
-                    style="padding:10px 20px; background:var(--accent); color:white; border-radius:10px; border:none; cursor:pointer; font-weight:700; align-self: flex-end;">Send</button>
+                <button id="sendBtn" onclick="sendMessage()" style="align-self: flex-end;">Send</button>
             </div>
         </div>
     </div>
