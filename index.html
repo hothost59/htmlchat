@@ -1267,7 +1267,7 @@
                 editContainer.appendChild(textarea);
 
                 // 3. Show the modal
-                showModal("Edit Message ✏️", "Refine your thoughts:", (confirmed) => {
+                showModal("Edit Message ✏️", "Edit your message:", (confirmed) => {
                     if (confirmed) {
                         const newText = document.getElementById("nicerEditArea").value.trim();
                         if (newText && newText !== originalText) {
