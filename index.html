@@ -4,6 +4,20 @@
     <meta charset="utf-8" />
     <title>Chat 💬</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-5XKHS5WN");
+    </script>
+    <!-- End Google Tag Manager -->
     <style>
       :root {
         --bg: #36393f;
@@ -856,6 +870,16 @@
   </head>
 
   <body class="cozy">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-5XKHS5WN"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <!-- Auth UI -->
     <div id="authDiv">
       <div class="authCard">
@@ -879,8 +903,18 @@
           </button>
         </div>
 
-        <h3 id="authTitle" style="text-align: center; margin-top: 0; font-size: 24px;">Welcome back!</h3>
-        <div id="authSubtext" style="text-align: center; color: var(--muted); margin-bottom: 20px;">We're so excited to see you again!</div>
+        <h3
+          id="authTitle"
+          style="text-align: center; margin-top: 0; font-size: 24px"
+        >
+          Welcome back!
+        </h3>
+        <div
+          id="authSubtext"
+          style="text-align: center; color: var(--muted); margin-bottom: 20px"
+        >
+          We're so excited to see you again!
+        </div>
 
         <div style="display: none" id="authTabs">
           <button id="loginTab" class="active"></button>
@@ -899,11 +933,7 @@
 
         <div id="authConfirmContainer" style="display: none">
           <label class="auth-label">Confirm Password</label>
-          <input
-            id="authConfirm"
-            placeholder=""
-            type="password"
-          />
+          <input id="authConfirm" placeholder="" type="password" />
         </div>
         <div
           id="passwordRequirements"
@@ -925,9 +955,23 @@
           </div>
           <div id="req-num" class="requirement">✅ <span>One number</span></div>
         </div>
-        <button id="submitBtn" style="width: 100%;" onclick="submitAuth()">Login</button>
-        <div id="authFooter" style="margin-top: 10px; font-size: 14px; color: var(--muted);">
-          Need an account? <a href="#" onclick="switchAuth('signup'); return false;" style="color: var(--accent); text-decoration: none;">Register</a>
+        <button id="submitBtn" style="width: 100%" onclick="submitAuth()">
+          Login
+        </button>
+        <div
+          id="authFooter"
+          style="margin-top: 10px; font-size: 14px; color: var(--muted)"
+        >
+          Need an account?
+          <a
+            href="#"
+            onclick="
+              switchAuth('signup');
+              return false;
+            "
+            style="color: var(--accent); text-decoration: none"
+            >Register</a
+          >
         </div>
         <div
           id="authMessage"
@@ -1247,20 +1291,32 @@
           .classList.toggle("active", mode === "login");
         document.getElementById("signupTab").classList.toggle("active", isS);
 
-        document.getElementById("authTitle").textContent = isS ? "Create an account" : "Welcome back!";
-        document.getElementById("authSubtext").textContent = isS ? "Join our community today!" : "We're so excited to see you again!";
+        document.getElementById("authTitle").textContent = isS
+          ? "Create an account"
+          : "Welcome back!";
+        document.getElementById("authSubtext").textContent = isS
+          ? "Join our community today!"
+          : "We're so excited to see you again!";
 
-        document.getElementById("authConfirmContainer").style.display = isS ? "block" : "none";
-        document.getElementById("passwordRequirements").style.display = isS ? "flex" : "none";
+        document.getElementById("authConfirmContainer").style.display = isS
+          ? "block"
+          : "none";
+        document.getElementById("passwordRequirements").style.display = isS
+          ? "flex"
+          : "none";
 
         const footer = document.getElementById("authFooter");
         if (isS) {
-          footer.innerHTML = 'Already have an account? <a href="#" onclick="switchAuth(\'login\'); return false;" style="color: var(--accent); text-decoration: none;">Login</a>';
+          footer.innerHTML =
+            'Already have an account? <a href="#" onclick="switchAuth(\'login\'); return false;" style="color: var(--accent); text-decoration: none;">Login</a>';
         } else {
-          footer.innerHTML = 'Need an account? <a href="#" onclick="switchAuth(\'signup\'); return false;" style="color: var(--accent); text-decoration: none;">Register</a>';
+          footer.innerHTML =
+            'Need an account? <a href="#" onclick="switchAuth(\'signup\'); return false;" style="color: var(--accent); text-decoration: none;">Register</a>';
         }
 
-        document.getElementById("submitBtn").textContent = isS ? "Continue" : "Login";
+        document.getElementById("submitBtn").textContent = isS
+          ? "Continue"
+          : "Login";
         document.getElementById("authMessage").textContent = "";
       }
 
