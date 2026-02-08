@@ -18,6 +18,9 @@
         --auth-grad: linear-gradient(135deg, var(--panel), #202225);
         --channel-bg: #99aab5;
         --channel-text: #000000;
+        --bg-secondary: #2b2d31;
+        --bg-tertiary: #1e1f22;
+        --text-muted: #b5bac1;
       }
 
       .light {
@@ -32,6 +35,9 @@
         --auth-grad: linear-gradient(135deg, var(--panel), #f9fafb);
         --channel-bg: #e5e7eb;
         --channel-text: #1f2937;
+        --bg-secondary: #f2f3f5;
+        --bg-tertiary: #ebedef;
+        --text-muted: #5c6370;
       }
 
       html,
@@ -71,10 +77,10 @@
       }
 
       .authCard {
-        width: 360px;
-        background: var(--auth-grad);
+        width: 412px;
+        background: var(--panel);
         border-radius: 14px;
-        padding: 22px;
+        padding: 32px;
         box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
         display: flex;
         flex-direction: column;
@@ -82,6 +88,15 @@
         animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .auth-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
       }
 
       .authTabs {
@@ -416,7 +431,7 @@
       }
 
       .settings-label {
-        color: #8e9297; /* Discord muted text */
+        color: var(--text-muted);
         text-transform: uppercase;
         font-size: 12px;
         font-weight: 700;
@@ -432,7 +447,7 @@
         width: 100%;
         box-sizing: border-box;
         padding: 10px;
-        background-color: #1e1f22; /* Discord input black */
+        background-color: var(--bg-tertiary);
         border: none;
         border-radius: 4px;
         color: var(--text);
@@ -451,7 +466,7 @@
         transition: background 0.2s;
       }
       .discord-btn:hover {
-        background-color: #5b6eae;
+        filter: brightness(1.1);
       }
 
       .danger-zone {
@@ -462,7 +477,7 @@
       }
 
       .settings-req-box {
-        background: #2b2d31;
+        background: var(--bg-secondary);
         padding: 10px;
         border-radius: 4px;
         margin: 10px 0;
@@ -849,43 +864,47 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: absolute;
+            top: 20px;
+            right: 20px;
           "
         >
-          <div class="authTabs" role="tablist">
-            <button id="loginTab" class="active" onclick="switchAuth('login')">
-              Login
-            </button>
-            <button id="signupTab" onclick="switchAuth('signup')">
-              Sign Up
-            </button>
-          </div>
-          <div style="display: flex; gap: 8px">
-            <button
-              class="tinyBtn"
-              id="themeBtn"
-              title="Toggle theme"
-              onclick="toggleTheme()"
-            >
-              🌙
-            </button>
-            <button
-              class="tinyBtn"
-              id="viewBtn"
-              title="Toggle view"
-              onclick="toggleView()"
-            >
-              🛋️
-            </button>
-          </div>
+          <button
+            class="tinyBtn"
+            id="themeBtn"
+            title="Toggle theme"
+            onclick="toggleTheme()"
+          >
+            🌙
+          </button>
         </div>
-        <input id="authUsername" placeholder="Username" />
-        <input id="authPassword" placeholder="Password" type="password" />
-        <input
-          id="authConfirm"
-          placeholder="Confirm Password"
-          type="password"
-          style="display: none"
-        />
+
+        <h3 id="authTitle" style="text-align: center; margin-top: 0; font-size: 24px;">Welcome back!</h3>
+        <div id="authSubtext" style="text-align: center; color: var(--muted); margin-bottom: 20px;">We're so excited to see you again!</div>
+
+        <div style="display: none" id="authTabs">
+          <button id="loginTab" class="active"></button>
+          <button id="signupTab"></button>
+        </div>
+
+        <div>
+          <label class="auth-label">Username</label>
+          <input id="authUsername" placeholder="" />
+        </div>
+
+        <div>
+          <label class="auth-label">Password</label>
+          <input id="authPassword" placeholder="" type="password" />
+        </div>
+
+        <div id="authConfirmContainer" style="display: none">
+          <label class="auth-label">Confirm Password</label>
+          <input
+            id="authConfirm"
+            placeholder=""
+            type="password"
+          />
+        </div>
         <div
           id="passwordRequirements"
           style="
@@ -906,7 +925,10 @@
           </div>
           <div id="req-num" class="requirement">✅ <span>One number</span></div>
         </div>
-        <button id="submitBtn" onclick="submitAuth()">Login</button>
+        <button id="submitBtn" style="width: 100%;" onclick="submitAuth()">Login</button>
+        <div id="authFooter" style="margin-top: 10px; font-size: 14px; color: var(--muted);">
+          Need an account? <a href="#" onclick="switchAuth('signup'); return false;" style="color: var(--accent); text-decoration: none;">Register</a>
+        </div>
         <div
           id="authMessage"
           style="
@@ -1224,12 +1246,21 @@
           .getElementById("loginTab")
           .classList.toggle("active", mode === "login");
         document.getElementById("signupTab").classList.toggle("active", isS);
-        document.getElementById("authConfirm").style.display = isS
-          ? "block"
-          : "none";
-        document.getElementById("passwordRequirements").style.display = isS
-          ? "flex"
-          : "none";
+
+        document.getElementById("authTitle").textContent = isS ? "Create an account" : "Welcome back!";
+        document.getElementById("authSubtext").textContent = isS ? "Join our community today!" : "We're so excited to see you again!";
+
+        document.getElementById("authConfirmContainer").style.display = isS ? "block" : "none";
+        document.getElementById("passwordRequirements").style.display = isS ? "flex" : "none";
+
+        const footer = document.getElementById("authFooter");
+        if (isS) {
+          footer.innerHTML = 'Already have an account? <a href="#" onclick="switchAuth(\'login\'); return false;" style="color: var(--accent); text-decoration: none;">Login</a>';
+        } else {
+          footer.innerHTML = 'Need an account? <a href="#" onclick="switchAuth(\'signup\'); return false;" style="color: var(--accent); text-decoration: none;">Register</a>';
+        }
+
+        document.getElementById("submitBtn").textContent = isS ? "Continue" : "Login";
         document.getElementById("authMessage").textContent = "";
       }
 
@@ -1617,24 +1648,24 @@
         <!-- USER PROFILE / APPEARANCE -->
         <div class="settings-section">
             <span class="settings-label">App Settings</span>
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#2b2d31; padding:12px; border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background: var(--bg-secondary); padding:12px; border-radius:8px;">
                 <div>
                     <div style="font-weight:600;">Theme Mode</div>
-                    <div style="font-size:12px; color:#8e9297;">Switch between light and dark appearance</div>
+                    <div style="font-size:12px; color: var(--text-muted);">Switch between light and dark appearance</div>
                 </div>
-                <button class="discord-btn" onclick="toggleTheme()" style="background:#4e5058;">🌓 Toggle</button>
+                <button class="discord-btn" onclick="toggleTheme()" style="background: var(--card);">🌓 Toggle</button>
             </div>
         </div>
 
         <!-- NOTIFICATIONS -->
         <div class="settings-section">
             <span class="settings-label">Notifications</span>
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#2b2d31; padding:12px; border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background: var(--bg-secondary); padding:12px; border-radius:8px;">
                 <div>
                     <div style="font-weight:600;">Desktop Notifications</div>
-                    <div style="font-size:12px; color:#8e9297;">Get notified of mentions on your desktop</div>
+                    <div style="font-size:12px; color: var(--text-muted);">Get notified of mentions on your desktop</div>
                 </div>
-                <button class="discord-btn" id="notifToggleBtn" onclick="toggleDesktopNotifications()" style="background:${userSettings.desktopNotifications ? "#248046" : "#4e5058"};">
+                <button class="discord-btn" id="notifToggleBtn" onclick="toggleDesktopNotifications()" style="background:${userSettings.desktopNotifications ? "var(--accent)" : "var(--card)"};">
                     ${userSettings.desktopNotifications ? "Enabled" : "Disabled"}
                 </button>
             </div>
@@ -1665,13 +1696,13 @@
         <div class="settings-section">
             <span class="settings-label">About</span>
             <div style="font-size:14px;">Developed by <strong style="color:var(--accent)">hothost59</strong></div>
-            <div style="font-size:12px; color:#8e9297; margin-top:4px;">Version 1.0.0 • Final Release Feb 2026</div>
+            <div style="font-size:12px; color: var(--text-muted); margin-top:4px;">Version 1.0.0 • Final Release Feb 2026</div>
         </div>
 
         <!-- DANGER ZONE -->
-        <div class="danger-zone">
+        <div class="danger-zone" style="border-color: #ed4245;">
             <span class="settings-label" style="color:#ed4245;">Delete Account</span>
-            <p style="font-size:12px; color:#8e9297; margin: 8px 0;">Once you delete your account, there is no going back. Please be certain.</p>
+            <p style="font-size:12px; color: var(--text-muted); margin: 8px 0;">Once you delete your account, there is no going back. Please be certain.</p>
             <button class="discord-btn" style="background:#ed4245;" onclick="deleteAccountUI()">Delete Account</button>
         </div>
     `;
@@ -1709,8 +1740,8 @@
             ? "Enabled"
             : "Disabled";
           btn.style.background = userSettings.desktopNotifications
-            ? "#248046"
-            : "#4e5058";
+            ? "var(--accent)"
+            : "var(--card)";
         }
       }
 
