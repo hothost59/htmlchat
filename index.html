@@ -406,15 +406,67 @@
 
       /* --- SETTINGS STYLING --- */
       .settings-section {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid var(--card);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 20px 0;
+        margin: 0;
+      }
+      .settings-section:first-child {
+        border-top: none;
+        padding-top: 10px;
       }
 
-      .settings-section:first-child {
-        margin-top: 0;
-        padding-top: 0;
-        border-top: none;
+      .settings-label {
+        color: #8e9297; /* Discord muted text */
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .settings-input-group {
+        margin-bottom: 20px;
+      }
+
+      .settings-input-group input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        background-color: #1e1f22; /* Discord input black */
+        border: none;
+        border-radius: 4px;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .discord-btn {
+        background-color: var(--accent);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 3px;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .discord-btn:hover {
+        background-color: #5b6eae;
+      }
+
+      .danger-zone {
+        margin-top: 10px;
+        padding: 15px;
+        border: 1px solid #ed4245;
+        border-radius: 8px;
+      }
+
+      .settings-req-box {
+        background: #2b2d31;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-size: 13px;
       }
 
       .settings-section h4 {
@@ -1558,53 +1610,78 @@
 
       function showSettingsModal() {
         const d = document.createElement("div");
+        d.style.textAlign = "left";
         d.innerHTML = `
         <div id="settingsStatus" style="font-weight:bold; font-size:12px; margin-bottom:10px;"></div>
         
+        <!-- USER PROFILE / APPEARANCE -->
         <div class="settings-section">
-            <h4>Appearance</h4>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button onclick="toggleTheme()">🌓 Theme</button>
-                <button onclick="toggleView()">📏 View</button>
+            <span class="settings-label">App Settings</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#2b2d31; padding:12px; border-radius:8px;">
+                <div>
+                    <div style="font-weight:600;">Theme Mode</div>
+                    <div style="font-size:12px; color:#8e9297;">Switch between light and dark appearance</div>
+                </div>
+                <button class="discord-btn" onclick="toggleTheme()" style="background:#4e5058;">🌓 Toggle</button>
             </div>
         </div>
 
+        <!-- NOTIFICATIONS -->
         <div class="settings-section">
-            <h4>Notifications</h4>
-            <button id="notifToggleBtn" onclick="toggleDesktopNotifications()">
-                Desktop Notifications: ${userSettings.desktopNotifications ? "Enabled ✅" : "Disabled ✖"}
-            </button>
+            <span class="settings-label">Notifications</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#2b2d31; padding:12px; border-radius:8px;">
+                <div>
+                    <div style="font-weight:600;">Desktop Notifications</div>
+                    <div style="font-size:12px; color:#8e9297;">Get notified of mentions on your desktop</div>
+                </div>
+                <button class="discord-btn" id="notifToggleBtn" onclick="toggleDesktopNotifications()" style="background:${userSettings.desktopNotifications ? "#248046" : "#4e5058"};">
+                    ${userSettings.desktopNotifications ? "Enabled" : "Disabled"}
+                </button>
+            </div>
         </div>
 
+        <!-- PASSWORD -->
         <div class="settings-section">
-            <h4>Change Password</h4>
-            <input id="currentPassword" type="password" placeholder="Current Password">
-            <input id="newPassword" type="password" placeholder="New Password">
-            <input id="confirmPassword" type="password" placeholder="Confirm New Password">
+            <span class="settings-label">Password and Authentication</span>
+            <div class="settings-input-group">
+                <input id="currentPassword" type="password" placeholder="Current Password">
+            </div>
+            <div class="settings-input-group">
+                <input id="newPassword" type="password" placeholder="New Password">
+            </div>
+            <div class="settings-input-group" style="margin-bottom:10px;">
+                <input id="confirmPassword" type="password" placeholder="Confirm New Password">
+            </div>
             
-            <div id="settings-passwordRequirements" style="display:flex; flex-direction:column; gap:6px; margin: 10px 0; padding:12px; background:rgba(0,0,0,0.2); border-radius:8px;">
+            <div class="settings-req-box">
                 <div id="settings-req-length" class="requirement">✅ 8+ characters</div>
-                <div id="settings-req-upper" class="requirement">✅ One uppercase</div>
+                <div id="settings-req-upper" class="requirement">✅ One uppercase letter</div>
                 <div id="settings-req-num" class="requirement">✅ One number</div>
             </div>
-            <button class="btn-save" onclick="changePassword()">Update Password</button>
+            <button class="discord-btn" onclick="changePassword()">Change Password</button>
         </div>
 
-        <div class="settings-section" style="background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px;">
-            <h4>Credits</h4>
-            <div class="credit-item" style="margin:0"><strong>By:</strong> hothost59</div>
-            <div class="credit-item" style="font-size:11px; opacity:0.6">Final Release: Feb 2026</div>
+        <!-- CREDITS -->
+        <div class="settings-section">
+            <span class="settings-label">About</span>
+            <div style="font-size:14px;">Developed by <strong style="color:var(--accent)">hothost59</strong></div>
+            <div style="font-size:12px; color:#8e9297; margin-top:4px;">Version 1.0.0 • Final Release Feb 2026</div>
         </div>
 
-        <div style="margin-top:20px;">
-            <button class="btn-danger" onclick="deleteAccountUI()">💀 Delete Account</button>
-        </div>`;
+        <!-- DANGER ZONE -->
+        <div class="danger-zone">
+            <span class="settings-label" style="color:#ed4245;">Delete Account</span>
+            <p style="font-size:12px; color:#8e9297; margin: 8px 0;">Once you delete your account, there is no going back. Please be certain.</p>
+            <button class="discord-btn" style="background:#ed4245;" onclick="deleteAccountUI()">Delete Account</button>
+        </div>
+    `;
 
-        showModal("User Settings ⚙️", `Preferences for ${username}`, null, {
+        showModal("User Settings", "", null, {
           customHTML: d,
           showInput: false,
         });
 
+        // Requirements logic
         const nP = document.getElementById("newPassword");
         if (nP)
           nP.oninput = () => {
@@ -1627,8 +1704,14 @@
           .ref(`users/${username}/settings/desktopNotifications`)
           .set(userSettings.desktopNotifications);
         const btn = document.getElementById("notifToggleBtn");
-        if (btn)
-          btn.textContent = `Desktop Notifications: ${userSettings.desktopNotifications ? "Enabled ✅" : "Disabled ✖"}`;
+        if (btn) {
+          btn.textContent = userSettings.desktopNotifications
+            ? "Enabled"
+            : "Disabled";
+          btn.style.background = userSettings.desktopNotifications
+            ? "#248046"
+            : "#4e5058";
+        }
       }
 
       function changePassword() {
