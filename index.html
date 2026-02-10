@@ -1200,6 +1200,20 @@
         return p;
       }
 
+      function isBanned(text) {
+        if (!text) return false;
+        let p = text.toLowerCase();
+        if (/(.)\1{8,}/.test(p)) return true;
+
+        if (BLACKLIST.length === 0) return false;
+
+        return BLACKLIST.some((word) => {
+          const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp(`\\b${safeWord}\\b`, "i");
+          return regex.test(p);
+        });
+      }
+
       function parseMentions(text) {
         if (!text) return "";
         let safeText = escapeHTML(text);
@@ -1333,6 +1347,12 @@
           if (u.length < 3)
             return (document.getElementById("authMessage").textContent =
               "Username too short");
+          if (isBanned(u))
+            return (document.getElementById("authMessage").textContent =
+              "Username not allowed");
+          if (u.toLowerCase().startsWith("dm__") || u.includes("__"))
+            return (document.getElementById("authMessage").textContent =
+              "Username cannot start with 'dm__' or contain '__'");
           if (p.length < 8)
             return (document.getElementById("authMessage").textContent =
               "Password too weak");
@@ -2047,6 +2067,14 @@
               typeof newChannelName === "string" &&
               newChannelName.length > 0
             ) {
+              if (isBanned(newChannelName)) {
+                alert("Channel name not allowed");
+                return;
+              }
+              if (newChannelName.toLowerCase().startsWith("dm__")) {
+                alert("Channel name cannot start with 'dm__'");
+                return;
+              }
               db.ref("channels/" + newChannelName)
                 .once("value")
                 .then((snap) => {
