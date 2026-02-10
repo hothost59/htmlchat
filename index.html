@@ -35,6 +35,8 @@
         --bg-secondary: #2b2d31;
         --bg-tertiary: #1e1f22;
         --text-muted: #b5bac1;
+        --accent-faint: hsla(235, 85%, 65%, 0.3);
+        --accent-bright: #c1cef8;
       }
 
       .light {
@@ -52,6 +54,8 @@
         --bg-secondary: #f2f3f5;
         --bg-tertiary: #ebedef;
         --text-muted: #5c6370;
+        --accent-faint: rgba(79, 70, 229, 0.1);
+        --accent-bright: #4f46e5;
       }
 
       html,
@@ -75,6 +79,21 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
+      }
+
+      /* Custom Scrollbars */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+      .light ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
       }
 
       /* --- AUTHENTICATION --- */
@@ -231,7 +250,8 @@
       /* --- CHANNELS & SIDEBAR --- */
       #channelList {
         flex: 1;
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -295,7 +315,8 @@
       }
 
       #userList {
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -748,8 +769,8 @@
       }
 
       .mention-highlight {
-        background-color: hsla(235, 85%, 65%, 0.3);
-        color: #c1cef8;
+        background-color: var(--accent-faint);
+        color: var(--accent-bright);
         font-weight: 700;
         padding: 1px 3px;
         border-radius: 3px;
@@ -1555,7 +1576,7 @@
         if (name.startsWith("dm__")) {
           const parts = name.replace("dm__", "").split("__");
           if (!parts.includes(username)) {
-            alert("You are not authorized to view this DM.");
+            showModal("Unauthorized", "You are not authorized to view this DM.", null, { hideCancel: true });
             return;
           }
         }
@@ -1876,7 +1897,7 @@
               await db.ref(`presence/${username}`).remove();
               location.reload();
             } else {
-              alert("Incorrect password");
+              showModal("Error", "Incorrect password", null, { hideCancel: true });
             }
           },
           { showInput: true },
@@ -2068,11 +2089,11 @@
               newChannelName.length > 0
             ) {
               if (isBanned(newChannelName)) {
-                alert("Channel name not allowed");
+                showModal("Error", "Channel name not allowed", null, { hideCancel: true });
                 return;
               }
               if (newChannelName.toLowerCase().startsWith("dm__")) {
-                alert("Channel name cannot start with 'dm__'");
+                showModal("Error", "Channel name cannot start with 'dm__'", null, { hideCancel: true });
                 return;
               }
               db.ref("channels/" + newChannelName)
