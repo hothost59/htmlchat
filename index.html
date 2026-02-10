@@ -35,6 +35,8 @@
         --bg-secondary: #2b2d31;
         --bg-tertiary: #1e1f22;
         --text-muted: #b5bac1;
+        --accent-faint: hsla(235, 85%, 65%, 0.3);
+        --accent-bright: #c1cef8;
       }
 
       .light {
@@ -52,6 +54,8 @@
         --bg-secondary: #f2f3f5;
         --bg-tertiary: #ebedef;
         --text-muted: #5c6370;
+        --accent-faint: rgba(79, 70, 229, 0.1);
+        --accent-bright: #4f46e5;
       }
 
       html,
@@ -75,6 +79,21 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
+      }
+
+      /* Custom Scrollbars */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+      .light ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
       }
 
       /* --- AUTHENTICATION --- */
@@ -231,7 +250,8 @@
       /* --- CHANNELS & SIDEBAR --- */
       #channelList {
         flex: 1;
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -295,7 +315,8 @@
       }
 
       #userList {
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -748,8 +769,8 @@
       }
 
       .mention-highlight {
-        background-color: hsla(235, 85%, 65%, 0.3);
-        color: #c1cef8;
+        background-color: var(--accent-faint);
+        color: var(--accent-bright);
         font-weight: 700;
         padding: 1px 3px;
         border-radius: 3px;
@@ -1200,6 +1221,20 @@
         return p;
       }
 
+      function isBanned(text) {
+        if (!text) return false;
+        let p = text.toLowerCase();
+        if (/(.)\1{8,}/.test(p)) return true;
+
+        if (BLACKLIST.length === 0) return false;
+
+        return BLACKLIST.some((word) => {
+          const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp(`\\b${safeWord}\\b`, "i");
+          return regex.test(p);
+        });
+      }
+
       function parseMentions(text) {
         if (!text) return "";
         let safeText = escapeHTML(text);
@@ -1333,6 +1368,12 @@
           if (u.length < 3)
             return (document.getElementById("authMessage").textContent =
               "Username too short");
+          if (isBanned(u))
+            return (document.getElementById("authMessage").textContent =
+              "Username not allowed");
+          if (u.toLowerCase().startsWith("dm__") || u.includes("__"))
+            return (document.getElementById("authMessage").textContent =
+              "Username cannot start with 'dm__' or contain '__'");
           if (p.length < 8)
             return (document.getElementById("authMessage").textContent =
               "Password too weak");
@@ -1535,7 +1576,7 @@
         if (name.startsWith("dm__")) {
           const parts = name.replace("dm__", "").split("__");
           if (!parts.includes(username)) {
-            alert("You are not authorized to view this DM.");
+            showModal("Unauthorized", "You are not authorized to view this DM.", null, { hideCancel: true });
             return;
           }
         }
@@ -1856,7 +1897,7 @@
               await db.ref(`presence/${username}`).remove();
               location.reload();
             } else {
-              alert("Incorrect password");
+              showModal("Error", "Incorrect password", null, { hideCancel: true });
             }
           },
           { showInput: true },
@@ -2047,6 +2088,14 @@
               typeof newChannelName === "string" &&
               newChannelName.length > 0
             ) {
+              if (isBanned(newChannelName)) {
+                showModal("Error", "Channel name not allowed", null, { hideCancel: true });
+                return;
+              }
+              if (newChannelName.toLowerCase().startsWith("dm__")) {
+                showModal("Error", "Channel name cannot start with 'dm__'", null, { hideCancel: true });
+                return;
+              }
               db.ref("channels/" + newChannelName)
                 .once("value")
                 .then((snap) => {
