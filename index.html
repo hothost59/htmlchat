@@ -81,7 +81,6 @@
         align-items: stretch;
       }
 
-      /* Custom Scrollbars */
       ::-webkit-scrollbar {
         width: 4px;
       }
@@ -96,7 +95,6 @@
         background: rgba(0, 0, 0, 0.1);
       }
 
-      /* --- AUTHENTICATION --- */
       #authDiv {
         position: absolute;
         inset: 0;
@@ -162,7 +160,6 @@
         color: var(--text);
       }
 
-      /* --- APP LAYOUT --- */
       #app {
         flex: 1;
         min-height: 0;
@@ -247,7 +244,6 @@
         box-sizing: border-box;
       }
 
-      /* --- CHANNELS & SIDEBAR --- */
       #channelList {
         flex: 1;
         overflow-y: auto;
@@ -345,15 +341,15 @@
         text-overflow: ellipsis;
       }
 
-      /* --- MESSAGES --- */
       #messages {
-        flex: 1;
-        padding: 14px;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-anchor: none;
+}
 
       .message {
         display: flex;
@@ -405,7 +401,6 @@
         font-size: 12px;
       }
 
-      /* Grouping Logic */
       .grouped .avatar,
       .grouped .msgHeader .username {
         visibility: hidden;
@@ -454,7 +449,6 @@
         color: white;
       }
 
-      /* --- SETTINGS STYLING --- */
       .settings-section {
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         padding: 20px 0;
@@ -570,7 +564,6 @@
         color: var(--text);
       }
 
-      /* --- MODALS & UI --- */
       #modalOverlay {
         position: fixed;
         inset: 0;
@@ -901,7 +894,6 @@
       ></iframe
     ></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <!-- Auth UI -->
     <div id="authDiv">
       <div class="authCard">
         <div
@@ -1006,7 +998,6 @@
       </div>
     </div>
 
-    <!-- App UI -->
     <div id="app" style="display: none">
       <div id="sidebar">
         <div id="sidebarHeader">
@@ -1023,8 +1014,16 @@
             <button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()">
               🟢
             </button>
-            <button id="settingsBtn" class="tinyBtn" onclick="showSettingsModal()">⚙️</button>
-            <button id="logoutBtn" class="tinyBtn" onclick="logout()">🚪</button>
+            <button
+              id="settingsBtn"
+              class="tinyBtn"
+              onclick="showSettingsModal()"
+            >
+              ⚙️
+            </button>
+            <button id="logoutBtn" class="tinyBtn" onclick="logout()">
+              🚪
+            </button>
           </div>
         </div>
         <div id="channelList"></div>
@@ -1101,7 +1100,6 @@
 
     <button id="scrollBtn">⬇️</button>
 
-    <!-- Modal Engine -->
     <div id="modalOverlay">
       <div class="modalCard">
         <h3 id="modalTitle"></h3>
@@ -1170,19 +1168,23 @@
 
     <!-- Obscenity Library -->
     <script type="module">
-      import { RegExpMatcher, TextCensor, englishDataset, englishRecommendedTransformers } from 'https://esm.sh/obscenity@0.4.6';
-      
+      import {
+        RegExpMatcher,
+        TextCensor,
+        englishDataset,
+        englishRecommendedTransformers,
+      } from "https://esm.sh/obscenity@0.4.6";
+
       const matcher = new RegExpMatcher({
         ...englishDataset.build(),
         ...englishRecommendedTransformers,
       });
       const censor = new TextCensor();
-      
+
       window.obscenity = { matcher, censor };
     </script>
 
     <script>
-      // --- FIREBASE CONFIG ---
       const firebaseConfig = {
         apiKey: "AIzaSyDbyrqzcZ4Wk57xBNVDzNuRerQaBx2p1L0",
         authDomain: "htmlchat-8b2c5.firebaseapp.com",
@@ -1195,7 +1197,7 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
 
-      // --- GLOBALS ---
+      // global config
       let username = "";
       let currentChannel = "";
       let myStatus = "online";
@@ -1210,27 +1212,25 @@
       let loginTime = Date.now();
       let mentionCounts = {};
       let channelsData = [];
-
-      // --- AUTOMOD BLACKLIST ---
       let BLACKLIST = [];
 
-      // --- AUTOMOD ENGINE ---
       function autoMod(text) {
         let p = text;
         if (p.length > 500) p = p.substring(0, 500) + "...";
         if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
 
-        // Obscenity filter
-        if (window.obscenity && window.obscenity.matcher && window.obscenity.censor) {
+        if (
+          window.obscenity &&
+          window.obscenity.matcher &&
+          window.obscenity.censor
+        ) {
           const matches = window.obscenity.matcher.getAllMatches(p);
           p = window.obscenity.censor.applyTo(p, matches);
         }
 
-        // If the blacklist hasn't finished downloading yet, skip filtering
         if (BLACKLIST.length === 0) return p;
 
         BLACKLIST.forEach((word) => {
-          // We escape the word to prevent issues with special characters in regex
           const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
           const regex = new RegExp(`\\b${safeWord}\\b`, "gi");
           p = p.replace(regex, "🤐");
@@ -1246,8 +1246,11 @@
         let p = text.toLowerCase();
         if (/(.)\1{8,}/.test(p)) return true;
 
-        // Obscenity check
-        if (window.obscenity && window.obscenity.matcher && window.obscenity.matcher.hasMatch(text)) {
+        if (
+          window.obscenity &&
+          window.obscenity.matcher &&
+          window.obscenity.matcher.hasMatch(text)
+        ) {
           return true;
         }
 
@@ -1273,7 +1276,6 @@
         return safeText;
       }
 
-      // --- UTILS ---
       function uidColor(name) {
         if (!name) return "#7289da";
         const palette = [
@@ -1343,7 +1345,6 @@
         if (btn) btn.textContent = compactView ? "📏" : "🛋️";
       }
 
-      // --- AUTH ENGINE ---
       function switchAuth(mode) {
         const isS = mode === "signup";
         document
@@ -1379,7 +1380,6 @@
           : "Login";
         document.getElementById("authMessage").textContent = "";
       }
-
 
       function userToEmail(u) {
         return u.toLowerCase() + "@chat.com";
@@ -1459,7 +1459,6 @@
         loadUserList();
       }
 
-      // Check for existing session
       firebase.auth().onAuthStateChanged(async (user) => {
         if (user && !username) {
           const email = user.email;
@@ -1505,7 +1504,6 @@
         }
       }
 
-      // --- MODAL ENGINE ---
       function showModal(title, sub, callback, options = {}) {
         modalCallback = callback;
         document.getElementById("modalTitle").textContent = title;
@@ -1534,7 +1532,6 @@
         closeModal();
       }
 
-      // --- SIDEBAR USER LIST ENGINE ---
       function loadUserList() {
         const list = document.getElementById("userList");
         db.ref("users").on("value", (uSnap) => {
@@ -1565,7 +1562,6 @@
         });
       }
 
-      // --- CHANNEL ENGINE ---
       async function loadChannels() {
         const uSnap = await db.ref(`users/${username}`).once("value");
         const hidden = uSnap.val()?.hiddenChannels || {};
@@ -1648,7 +1644,12 @@
         if (name.startsWith("dm__")) {
           const parts = name.replace("dm__", "").split("__");
           if (!parts.includes(username)) {
-            showModal("Unauthorized", "You are not authorized to view this DM.", null, { hideCancel: true });
+            showModal(
+              "Unauthorized",
+              "You are not authorized to view this DM.",
+              null,
+              { hideCancel: true },
+            );
             return;
           }
         }
@@ -1722,38 +1723,53 @@
         loadChannels();
       }
 
-      // --- MESSAGE ENGINE ---
       async function appendMessage(m, id) {
         const container = document.getElementById("messages");
+
         const within = m.ts - lastMessageMeta.ts < 300000;
         const isGrouped =
           lastMessageMeta.user === m.user && within && !m.replyTo;
+
+        lastMessageMeta = { user: m.user, ts: m.ts };
+
         const div = document.createElement("div");
         div.className = "message show" + (isGrouped ? " grouped" : "");
         div.dataset.id = id;
 
-        let replyHTML = "";
-        if (m.replyTo) {
-          const rSnap = await db
-            .ref(`messages/${currentChannel}/${m.replyTo}`)
-            .once("value");
-          if (rSnap.exists())
-            replyHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rSnap.val().user}: ${rSnap.val().text.substring(0, 40)}</div>`;
-        }
+        div.innerHTML = `
+        <div class="avatar" style="background:${uidColor(m.user)}">${initials(m.user)}</div>
+        <div class="msgBody">
+            <div class="reply-placeholder" style="display:none"></div>
+            <div class="msgHeader">
+                <span class="username" style="color:${uidColor(m.user)}">${m.user}</span>
+                <span class="timestamp">${nowHHMM(m.ts)}</span>
+            </div>
+            <div class="msgText">${parseMentions(m.text)}</div>
+        </div>
+        <div class="message-menu">
+            <div class="menu-item" onclick="replyToUI('${id}', '${m.user}', '${m.text.replace(/'/g, "\\'")}')">↩️</div>
+            <div class="menu-item" onclick="showForwardUI('${id}')">↪️</div>
+            ${m.user === username ? `<div class="menu-item" onclick="showEditUI('${id}')">✏️</div><div class="menu-item" onclick="deleteMsgUI('${id}')">🗑️</div>` : ""}
+        </div>`;
 
-        div.innerHTML = `<div class="avatar" style="background:${uidColor(m.user)}">${initials(m.user)}</div>
-                <div class="msgBody">${replyHTML}
-                    <div class="msgHeader"><span class="username" style="color:${uidColor(m.user)}">${m.user}</span><span class="timestamp">${nowHHMM(m.ts)}</span></div>
-                    <div class="msgText">${parseMentions(m.text)}</div>
-                </div>
-                <div class="message-menu">
-                    <div class="menu-item" onclick="replyToUI('${id}', '${m.user}', '${m.text.replace(/'/g, "\\'")}')">↩️</div>
-                    <div class="menu-item" onclick="showForwardUI('${id}')">↪️</div>
-                    ${m.user === username ? `<div class="menu-item" onclick="showEditUI('${id}')">✏️</div><div class="menu-item" onclick="deleteMsgUI('${id}')">🗑️</div>` : ""}
-                </div>`;
         container.appendChild(div);
+
         if (autoScroll) container.scrollTop = container.scrollHeight;
-        lastMessageMeta = { user: m.user, ts: m.ts };
+
+        if (m.replyTo) {
+          const placeholder = div.querySelector(".reply-placeholder");
+          db.ref(`messages/${currentChannel}/${m.replyTo}`).once(
+            "value",
+            (rSnap) => {
+              if (rSnap.exists()) {
+                const rData = rSnap.val();
+                placeholder.innerHTML = `<div class="reply-quote" onclick="jumpTo('${m.replyTo}')">↩️ @${rData.user}: ${escapeHTML(rData.text).substring(0, 40)}...</div>`;
+                placeholder.style.display = "block";
+                if (autoScroll) container.scrollTop = container.scrollHeight;
+              }
+            },
+          );
+        }
       }
 
       async function sendMessage() {
@@ -1881,7 +1897,7 @@
           showInput: false,
         });
 
-        // Requirements logic
+        // req logic
         const nP = document.getElementById("newPassword");
         if (nP)
           nP.oninput = () => {
@@ -1956,7 +1972,6 @@
           });
       }
 
-      // --- FEATURES ---
       async function deleteAccountUI() {
         closeModal();
         showModal(
@@ -2144,7 +2159,6 @@
         });
       }
 
-      // --- BROWSE DIALOG ---
       async function showBrowseDialog() {
         const channelsSnap = await db.ref("channels").once("value");
         const userSnap = await db.ref(`users/${username}`).once("value");
@@ -2183,11 +2197,18 @@
               newChannelName.length > 0
             ) {
               if (isBanned(newChannelName)) {
-                showModal("Error", "Channel name not allowed", null, { hideCancel: true });
+                showModal("Error", "Channel name not allowed", null, {
+                  hideCancel: true,
+                });
                 return;
               }
               if (newChannelName.toLowerCase().startsWith("dm__")) {
-                showModal("Error", "Channel name cannot start with 'dm__'", null, { hideCancel: true });
+                showModal(
+                  "Error",
+                  "Channel name cannot start with 'dm__'",
+                  null,
+                  { hideCancel: true },
+                );
                 return;
               }
               db.ref("channels/" + newChannelName)
