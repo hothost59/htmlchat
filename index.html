@@ -686,6 +686,7 @@
 
       #submitBtn,
       #sendBtn,
+      #anonBtn,
       .modalActions button {
         padding: 10px 16px;
         border-radius: 8px;
@@ -699,14 +700,25 @@
 
       #submitBtn:hover,
       #sendBtn:hover,
+      #anonBtn:hover,
       .modalActions button:hover {
         transform: translateY(-2px);
         filter: brightness(1.1);
         box-shadow: 0 4px 12px rgba(114, 137, 218, 0.4);
       }
 
+      #anonBtn {
+        background: var(--card) !important;
+        margin-top: 8px;
+      }
+
+      #anonBtn:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+      }
+
       #submitBtn:active,
       #sendBtn:active,
+      #anonBtn:active,
       .modalActions button:active {
         transform: translateY(0);
       }
@@ -979,6 +991,9 @@
         <button id="submitBtn" style="width: 100%" onclick="submitAuth()">
           Login
         </button>
+        <button id="anonBtn" style="width: 100%" onclick="loginAnonymously()">
+          Login Anonymously
+        </button>
         <div
           id="authFooter"
           style="margin-top: 10px; font-size: 14px; color: var(--muted)"
@@ -1166,6 +1181,20 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <!-- Obscenity Library -->
+    <script type="module">
+      import { RegExpMatcher, TextCensor, englishDataset, englishRecommendedTransformers } from 'https://esm.sh/obscenity@0.4.6';
+
+      const matcher = new RegExpMatcher({
+        ...englishDataset.build(),
+        ...englishRecommendedTransformers,
+      });
+      const censor = new TextCensor();
+
+      window.obscenity = { matcher, censor };
+    </script>
 
     <script>
       // --- FIREBASE CONFIG ---
@@ -1206,6 +1235,12 @@
         if (p.length > 500) p = p.substring(0, 500) + "...";
         if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
 
+        // Obscenity filter
+        if (window.obscenity && window.obscenity.matcher && window.obscenity.censor) {
+          const matches = window.obscenity.matcher.getAllMatches(p);
+          p = window.obscenity.censor.applyTo(p, matches);
+        }
+
         // If the blacklist hasn't finished downloading yet, skip filtering
         if (BLACKLIST.length === 0) return p;
 
@@ -1225,6 +1260,11 @@
         if (!text) return false;
         let p = text.toLowerCase();
         if (/(.)\1{8,}/.test(p)) return true;
+
+        // Obscenity check
+        if (window.obscenity && window.obscenity.matcher && window.obscenity.matcher.hasMatch(text)) {
+          return true;
+        }
 
         if (BLACKLIST.length === 0) return false;
 
@@ -1355,6 +1395,27 @@
         document.getElementById("authMessage").textContent = "";
       }
 
+      async function loginAnonymously() {
+        try {
+          const result = await firebase.auth().signInAnonymously();
+          const user = result.user;
+          username = "Guest_" + user.uid.substring(0, 5);
+
+          const snap = await db.ref("users/" + username).once("value");
+          if (!snap.exists()) {
+            await db.ref("users/" + username).set({
+              isAnonymous: true,
+              settings: { desktopNotifications: true },
+            });
+          }
+          afterLogin();
+        } catch (error) {
+          console.error("Anonymous auth failed", error);
+          document.getElementById("authMessage").textContent =
+            "Anonymous Login failed: " + error.message;
+        }
+      }
+
       async function submitAuth() {
         const u = document.getElementById("authUsername").value.trim();
         const p = document.getElementById("authPassword").value;
@@ -1409,8 +1470,24 @@
         loadUserList();
       }
 
+      // Check for existing session
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (user && user.isAnonymous && !username) {
+          username = "Guest_" + user.uid.substring(0, 5);
+          const snap = await db.ref("users/" + username).once("value");
+          if (snap.exists()) {
+            afterLogin();
+          }
+        }
+      });
+
       function logout() {
-        location.reload();
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            location.reload();
+          });
       }
 
       async function loadExternalBlacklist() {
@@ -1422,7 +1499,8 @@
 
           const decodedText = atob(base64String.trim());
 
-          BLACKLIST = JSON.parse("[" + decodedText + "]");
+          const newList = JSON.parse("[" + decodedText + "]");
+          BLACKLIST = [...new Set([...BLACKLIST, ...newList])];
 
           console.log(
             "Automod: Blacklist loaded successfully. Word count:",
