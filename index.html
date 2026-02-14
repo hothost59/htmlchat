@@ -1023,8 +1023,8 @@
             <button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()">
               🟢
             </button>
-            <button class="tinyBtn" onclick="showSettingsModal()">⚙️</button>
-            <button class="tinyBtn" onclick="logout()">🚪</button>
+            <button id="settingsBtn" class="tinyBtn" onclick="showSettingsModal()">⚙️</button>
+            <button id="logoutBtn" class="tinyBtn" onclick="logout()">🚪</button>
           </div>
         </div>
         <div id="channelList"></div>
@@ -1166,6 +1166,20 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <!-- Obscenity Library -->
+    <script type="module">
+      import { RegExpMatcher, TextCensor, englishDataset, englishRecommendedTransformers } from 'https://esm.sh/obscenity@0.4.6';
+      
+      const matcher = new RegExpMatcher({
+        ...englishDataset.build(),
+        ...englishRecommendedTransformers,
+      });
+      const censor = new TextCensor();
+      
+      window.obscenity = { matcher, censor };
+    </script>
 
     <script>
       // --- FIREBASE CONFIG ---
@@ -1206,6 +1220,12 @@
         if (p.length > 500) p = p.substring(0, 500) + "...";
         if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
 
+        // Obscenity filter
+        if (window.obscenity && window.obscenity.matcher && window.obscenity.censor) {
+          const matches = window.obscenity.matcher.getAllMatches(p);
+          p = window.obscenity.censor.applyTo(p, matches);
+        }
+
         // If the blacklist hasn't finished downloading yet, skip filtering
         if (BLACKLIST.length === 0) return p;
 
@@ -1225,6 +1245,11 @@
         if (!text) return false;
         let p = text.toLowerCase();
         if (/(.)\1{8,}/.test(p)) return true;
+
+        // Obscenity check
+        if (window.obscenity && window.obscenity.matcher && window.obscenity.matcher.hasMatch(text)) {
+          return true;
+        }
 
         if (BLACKLIST.length === 0) return false;
 
@@ -1355,46 +1380,71 @@
         document.getElementById("authMessage").textContent = "";
       }
 
+
+      function userToEmail(u) {
+        return u.toLowerCase() + "@chat.com";
+      }
+
       async function submitAuth() {
         const u = document.getElementById("authUsername").value.trim();
         const p = document.getElementById("authPassword").value;
         const c = document.getElementById("authConfirm").value;
         if (!u || !p) return;
+
+        if (/\s/.test(u)) {
+          return (document.getElementById("authMessage").textContent =
+            "Username cannot contain spaces");
+        }
+
         const isSignup = document
           .getElementById("signupTab")
           .classList.contains("active");
 
-        if (isSignup) {
-          if (u.length < 3)
-            return (document.getElementById("authMessage").textContent =
-              "Username too short");
-          if (isBanned(u))
-            return (document.getElementById("authMessage").textContent =
-              "Username not allowed");
-          if (u.toLowerCase().startsWith("dm__") || u.includes("__"))
-            return (document.getElementById("authMessage").textContent =
-              "Username cannot start with 'dm__' or contain '__'");
-          if (p.length < 8)
-            return (document.getElementById("authMessage").textContent =
-              "Password too weak");
-          if (p !== c)
-            return (document.getElementById("authMessage").textContent =
-              "Passwords don't match");
-          const snap = await db.ref("users/" + u).once("value");
-          if (snap.exists())
-            return (document.getElementById("authMessage").textContent =
-              "Username taken");
-          await db
-            .ref("users/" + u)
-            .set({ password: p, settings: { desktopNotifications: true } });
-        } else {
-          const snap = await db.ref("users/" + u).once("value");
-          if (!snap.exists() || snap.val().password !== p)
-            return (document.getElementById("authMessage").textContent =
-              "Invalid login");
+        const authEmail = userToEmail(u);
+
+        try {
+          if (isSignup) {
+            if (u.length < 3)
+              return (document.getElementById("authMessage").textContent =
+                "Username too short");
+            if (isBanned(u))
+              return (document.getElementById("authMessage").textContent =
+                "Username not allowed");
+            if (u.toLowerCase().startsWith("dm__") || u.includes("__"))
+              return (document.getElementById("authMessage").textContent =
+                "Username cannot start with 'dm__' or contain '__'");
+            if (p.length < 8)
+              return (document.getElementById("authMessage").textContent =
+                "Password too weak");
+            if (p !== c)
+              return (document.getElementById("authMessage").textContent =
+                "Passwords don't match");
+
+            await firebase.auth().createUserWithEmailAndPassword(authEmail, p);
+            await db.ref("users/" + u).set({
+              settings: { desktopNotifications: true },
+              createdAt: Date.now(),
+            });
+          } else {
+            await firebase.auth().signInWithEmailAndPassword(authEmail, p);
+          }
+          username = u;
+          afterLogin();
+        } catch (error) {
+          console.error("Auth error", error);
+          let msg = "Authentication failed";
+          if (
+            error.code === "auth/user-not-found" ||
+            error.code === "auth/wrong-password"
+          ) {
+            msg = "Invalid login";
+          } else if (error.code === "auth/email-already-in-use") {
+            msg = "Username taken";
+          } else {
+            msg = error.message;
+          }
+          document.getElementById("authMessage").textContent = msg;
         }
-        username = u;
-        afterLogin();
       }
 
       function afterLogin() {
@@ -1409,8 +1459,29 @@
         loadUserList();
       }
 
+      // Check for existing session
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (user && !username) {
+          const email = user.email;
+          if (email && email.endsWith("@chat.com")) {
+            username = email.split("@")[0];
+            const snap = await db.ref("users/" + username).once("value");
+            if (snap.exists()) {
+              afterLogin();
+            } else {
+              firebase.auth().signOut();
+            }
+          }
+        }
+      });
+
       function logout() {
-        location.reload();
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            location.reload();
+          });
       }
 
       async function loadExternalBlacklist() {
@@ -1422,7 +1493,8 @@
 
           const decodedText = atob(base64String.trim());
 
-          BLACKLIST = JSON.parse("[" + decodedText + "]");
+          const newList = JSON.parse("[" + decodedText + "]");
+          BLACKLIST = [...new Set([...BLACKLIST, ...newList])];
 
           console.log(
             "Automod: Blacklist loaded successfully. Word count:",
@@ -1698,7 +1770,7 @@
           );
           return;
         }
-        text = autoMod(text);
+        text = await autoMod(text);
         const msgRef = db.ref("messages/" + currentChannel).push();
         await msgRef.set({
           user: username,
@@ -1800,7 +1872,7 @@
         <div class="danger-zone" style="border-color: #ed4245;">
             <span class="settings-label" style="color:#ed4245;">Delete Account</span>
             <p style="font-size:12px; color: var(--text-muted); margin: 8px 0;">Once you delete your account, there is no going back. Please be certain.</p>
-            <button class="discord-btn" style="background:#ed4245;" onclick="deleteAccountUI()">Delete Account</button>
+            <button id="deleteAccountBtn" class="discord-btn" style="background:#ed4245;" onclick="deleteAccountUI()">Delete Account</button>
         </div>
     `;
 
@@ -1857,17 +1929,30 @@
           stat.style.color = "#e74c3c";
           return;
         }
-        db.ref(`users/${username}`)
-          .once("value")
-          .then((snap) => {
-            if (snap.val().password === cur) {
-              db.ref(`users/${username}`).update({ password: nP });
-              stat.textContent = "Success!";
-              stat.style.color = "#2ecc71";
-            } else {
-              stat.textContent = "Wrong current password";
-              stat.style.color = "#e74c3c";
-            }
+
+        const user = firebase.auth().currentUser;
+        const credential = firebase.auth.EmailAuthProvider.credential(
+          user.email,
+          cur,
+        );
+
+        user
+          .reauthenticateWithCredential(credential)
+          .then(() => {
+            user
+              .updatePassword(nP)
+              .then(() => {
+                stat.textContent = "Success!";
+                stat.style.color = "#2ecc71";
+              })
+              .catch((err) => {
+                stat.textContent = err.message;
+                stat.style.color = "#e74c3c";
+              });
+          })
+          .catch((err) => {
+            stat.textContent = "Wrong current password";
+            stat.style.color = "#e74c3c";
           });
       }
 
@@ -1878,8 +1963,15 @@
           "Confirm Password",
           "Irreversible: Enter password to wipe account history:",
           async (p) => {
-            const s = await db.ref(`users/${username}`).once("value");
-            if (s.val().password === p) {
+            const user = firebase.auth().currentUser;
+            const credential = firebase.auth.EmailAuthProvider.credential(
+              user.email,
+              p,
+            );
+
+            try {
+              await user.reauthenticateWithCredential(credential);
+
               const msgSnap = await db.ref("messages").once("value");
               const promises = [];
               msgSnap.forEach((ch) =>
@@ -1895,9 +1987,11 @@
               await Promise.all(promises);
               await db.ref(`users/${username}`).remove();
               await db.ref(`presence/${username}`).remove();
+
+              await user.delete();
               location.reload();
-            } else {
-              showModal("Error", "Incorrect password", null, { hideCancel: true });
+            } catch (error) {
+              showModal("Error", error.message, null, { hideCancel: true });
             }
           },
           { showInput: true },
