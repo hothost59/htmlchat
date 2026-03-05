@@ -4,11 +4,11 @@
     <meta
       http-equiv="Content-Security-Policy"
       content="
-      default-src 'self';
-      script-src 'self' https://www.gstatic.com https://www.googleapis.com;
-      connect-src https://*.firebaseio.com https://*.googleapis.com;
-      style-src 'self' 'unsafe-inline';
-      "
+default-src 'self';
+script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.googleapis.com;
+connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://www.gstatic.com;
+style-src 'self' 'unsafe-inline';
+"
     />
     <meta charset="utf-8" />
     <title>Chat 💬</title>
