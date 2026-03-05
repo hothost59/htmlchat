@@ -1,6 +1,15 @@
 <!doctype html>
 <html>
   <head>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+      default-src 'self';
+      script-src 'self' https://www.gstatic.com https://www.googleapis.com;
+      connect-src https://*.firebaseio.com https://*.googleapis.com;
+      style-src 'self' 'unsafe-inline';
+      "
+    />
     <meta charset="utf-8" />
     <title>Chat 💬</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -342,14 +351,14 @@
       }
 
       #messages {
-  flex: 1;
-  padding: 14px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-anchor: none;
-}
+        flex: 1;
+        padding: 14px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-anchor: none;
+      }
 
       .message {
         display: flex;
