@@ -11,6 +11,7 @@ https://esm.sh
 https://*.firebaseio.com;
 connect-src 'self'
 https://*.firebaseio.com
+wss://*.firebaseio.com
 https://*.googleapis.com
 https://www.gstatic.com
 https://cdn.jsdelivr.net
@@ -19,7 +20,7 @@ style-src 'self' 'unsafe-inline';
 img-src https:;
 font-src 'none';
 object-src 'none';
-frame-src 'none';
+frame-src https://*.firebaseio.com;
 base-uri 'none';
 form-action 'self';
 frame-ancestors 'none';
