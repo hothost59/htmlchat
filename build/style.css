@@ -1,0 +1,31 @@
+:root {
+    --bg: #36393f; --panel: #2f3136; --muted: #b9bbbe; --accent: #7289da; --card: #4f545c;
+    --text: #e6e6e6; --input-bg: #202225; --bg-secondary: #2b2d31; --bg-tertiary: #1e1f22;
+}
+.light {
+    --bg: #f4f6f8; --panel: #ffffff; --muted: #6b7280; --accent: #4f46e5; --card: #f3f4f6;
+    --text: #111827; --input-bg: #e5e7eb; --bg-secondary: #f2f3f5; --bg-tertiary: #ebedef;
+}
+html, body { height: 100%; width: 100%; margin: 0; overflow: hidden; font-family: sans-serif; color: var(--text); background: var(--bg); }
+#authDiv { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 40; background: #2f3136; }
+.authCard { width: 400px; background: var(--panel); border-radius: 8px; padding: 30px; display: flex; flex-direction: column; gap: 15px; }
+#app { height: 100vh; display: flex; }
+#sidebar { width: 260px; background: var(--panel); display: flex; flex-direction: column; padding: 15px; }
+#main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+#messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.message { display: flex; gap: 15px; position: relative; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+.msgBody { background: var(--card); padding: 10px; border-radius: 8px; max-width: 80%; }
+.channelRow { padding: 10px; border-radius: 5px; cursor: pointer; display: flex; justify-content: space-between; }
+.channelRow.active, .channelRow:hover { background: var(--accent); color: white; }
+#bottomBar { padding: 20px; display: flex; gap: 10px; background: var(--bg); }
+#msgInput { flex: 1; background: var(--input-bg); color: white; border: none; border-radius: 5px; padding: 10px; resize: none; }
+#modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; }
+.modalCard { background: var(--panel); padding: 20px; border-radius: 8px; width: 400px; }
+.badge { background: #f00; color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 10px; }
+.statusDot { width: 10px; height: 10px; border-radius: 50%; }
+.status-online { background: #2ecc71; }
+.status-away { background: #f1c40f; }
+.status-offline { background: #95a5a6; }
+.tinyBtn { background: none; border: 1px solid #444; color: var(--muted); cursor: pointer; border-radius: 4px; padding: 4px 8px; }
+.discord-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
