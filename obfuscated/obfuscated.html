@@ -1,0 +1,1216 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="
+default-src 'self';
+script-src 'self' 'unsafe-inline'
+https://www.gstatic.com
+https://www.googletagmanager.com
+https://cdn.jsdelivr.net
+https://esm.sh
+https://*.firebaseio.com;
+connect-src 'self'
+https://*.firebaseio.com
+wss://*.firebaseio.com
+https://*.googleapis.com
+https://www.gstatic.com
+https://cdn.jsdelivr.net
+https://esm.sh;
+style-src 'self' 'unsafe-inline';
+img-src https:;
+font-src 'none';
+object-src 'none';
+frame-src https://*.firebaseio.com;
+base-uri 'none';
+form-action 'self';
+frame-ancestors 'none';
+upgrade-insecure-requests;
+">
+    <meta charset="utf-8" />
+    <title>Chat 💬</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-5XKHS5WN");
+    </script>
+    <!-- End Google Tag Manager -->
+    <style>
+      :root {
+        --bg: #36393f;
+        --panel: #2f3136;
+        --muted: #b9bbbe;
+        --accent: #7289da;
+        --card: #4f545c;
+        --card-hover: #5b616b;
+        --sidebar-grad: linear-gradient(to bottom, #2f3136, #202225);
+        --text: #e6e6e6;
+        --input-bg: #202225;
+        --auth-grad: linear-gradient(135deg, var(--panel), #202225);
+        --channel-bg: #99aab5;
+        --channel-text: #000000;
+        --bg-secondary: #2b2d31;
+        --bg-tertiary: #1e1f22;
+        --text-muted: #b5bac1;
+        --accent-faint: hsla(235, 85%, 65%, 0.3);
+        --accent-bright: #c1cef8;
+      }
+
+      .light {
+        --bg: #f4f6f8;
+        --panel: #ffffff;
+        --muted: #6b7280;
+        --accent: #4f46e5;
+        --card: #f3f4f6;
+        --text: #111827;
+        --sidebar-grad: linear-gradient(to bottom, #ffffff, #f1f5f9);
+        --input-bg: #e5e7eb;
+        --auth-grad: linear-gradient(135deg, var(--panel), #f9fafb);
+        --channel-bg: #e5e7eb;
+        --channel-text: #1f2937;
+        --bg-secondary: #f2f3f5;
+        --bg-tertiary: #ebedef;
+        --text-muted: #5c6370;
+        --accent-faint: rgba(79, 70, 229, 0.1);
+        --accent-bright: #4f46e5;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family:
+          "Segoe UI",
+          Roboto,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        color: var(--text);
+      }
+
+      body {
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+      .light ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      #authDiv {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+        background: linear-gradient(-45deg, #2f3136, #202225, #7289da, #2f3136);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+      }
+
+      .authCard {
+        width: 412px;
+        background: var(--panel);
+        border-radius: 14px;
+        padding: 32px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .auth-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .authTabs {
+        display: flex;
+        gap: 8px;
+      }
+
+      .authTabs button {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: var(--accent);
+        color: white;
+        font-weight: 600;
+        transition: all 0.18s;
+      }
+
+      .authTabs button.active {
+        opacity: 0.9;
+      }
+
+      .authCard input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        background: var(--input-bg);
+        color: var(--text);
+      }
+
+      #app {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        gap: 0;
+        align-items: stretch;
+      }
+
+      #sidebar {
+        width: 300px;
+        background: var(--sidebar-grad);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 18px rgba(0, 0, 0, 0.35);
+        gap: 10px;
+      }
+
+      #sidebarHeader {
+        font-weight: 800;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      #sidebarHeader .controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      #main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+        min-width: 0;
+      }
+
+      #chatHeader {
+        padding: 12px 16px;
+        background: var(--panel);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        font-weight: 800;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #chatHeader .meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 13px;
+      }
+
+      #bottomBar {
+        display: flex;
+        gap: 12px;
+        padding: 12px;
+        background: var(--sidebar-grad);
+        align-items: center;
+      }
+
+      #msgInput {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: none;
+        background: var(--input-bg);
+        color: var(--text);
+        font-size: 15px;
+        font-family: inherit;
+        resize: none;
+        max-height: 200px;
+        min-height: 44px;
+        overflow-y: hidden;
+        line-height: 1.4;
+        box-sizing: border-box;
+      }
+
+      #channelList {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 4px;
+      }
+
+      .channelRow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: var(--channel-bg);
+        color: var(--channel-text);
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .channelRow:hover {
+        transform: scale(1.03) translateY(-2px);
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .channelRow.active {
+        background: var(--accent);
+        color: white;
+        transform: scale(1.03);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .close-dm-btn {
+        font-size: 14px;
+        opacity: 0;
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 2px 4px;
+        border-radius: 50%;
+      }
+
+      .channelRow:hover .close-dm-btn {
+        opacity: 0.7;
+      }
+
+      .close-dm-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+        opacity: 1;
+      }
+
+      #rightbar {
+        width: 260px;
+        background: var(--panel);
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: -2px 0 18px rgba(0, 0, 0, 0.18);
+      }
+
+      #userList {
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .userRow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .userRow:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateX(4px);
+      }
+
+      .userRow .userName {
+        font-weight: 700;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #messages {
+        flex: 1;
+        padding: 14px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-anchor: none;
+      }
+
+      .message {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        max-width: 980px;
+        transition: all 0.28s;
+        opacity: 0;
+        transform: translateY(10px);
+        position: relative;
+      }
+
+      .message.show {
+        opacity: 1;
+        transform: translateY(0);
+        animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        background: #6b6f75;
+        flex: 0 0 40px;
+      }
+
+      .msgBody {
+        background: var(--card);
+        padding: 8px 12px;
+        border-radius: 10px;
+        min-width: 0;
+      }
+
+      .msgHeader {
+        font-weight: 700;
+        font-size: 14px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .timestamp {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .grouped .avatar,
+      .grouped .msgHeader .username {
+        visibility: hidden;
+        width: 0;
+        margin-right: 0;
+        height: 0;
+      }
+
+      .grouped {
+        margin-top: -10px;
+      }
+
+      .message-menu {
+        position: absolute;
+        top: -10px;
+        right: 10px;
+        background: var(--panel);
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        padding: 4px;
+        display: none;
+        cursor: pointer;
+        z-index: 10;
+        gap: 4px;
+      }
+
+      .message:hover .message-menu {
+        display: flex;
+      }
+
+      .msgText {
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.4;
+      }
+
+      .menu-item {
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .menu-item:hover {
+        background: var(--accent);
+        color: white;
+      }
+
+      .settings-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 20px 0;
+        margin: 0;
+      }
+      .settings-section:first-child {
+        border-top: none;
+        padding-top: 10px;
+      }
+
+      .settings-label {
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .settings-input-group {
+        margin-bottom: 20px;
+      }
+
+      .settings-input-group input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        background-color: var(--bg-tertiary);
+        border: none;
+        border-radius: 4px;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .discord-btn {
+        background-color: var(--accent);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 3px;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .discord-btn:hover {
+        filter: brightness(1.1);
+      }
+
+      .danger-zone {
+        margin-top: 10px;
+        padding: 15px;
+        border: 1px solid #ed4245;
+        border-radius: 8px;
+      }
+
+      .settings-req-box {
+        background: var(--bg-secondary);
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-size: 13px;
+      }
+
+      .settings-section h4 {
+        margin: 0 0 10px 0;
+        color: var(--muted);
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 1px;
+      }
+
+      .settings-section input {
+        width: 95%;
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        border: none;
+        background: var(--input-bg);
+        color: var(--text);
+      }
+
+      .settings-section button {
+        background: var(--card);
+        color: var(--text);
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+        width: 100%;
+        margin-bottom: 5px;
+      }
+
+      .settings-section button:hover {
+        background: var(--card-hover);
+      }
+
+      .settings-section .btn-save {
+        background: var(--accent) !important;
+        color: white !important;
+        margin-top: 10px;
+      }
+
+      .credit-item {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .credit-item strong {
+        color: var(--text);
+      }
+
+      #modalOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+
+      .modalCard {
+        background: var(--panel);
+        padding: 18px;
+        border-radius: 12px;
+        width: 380px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: springIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      #modalCustomContent .message {
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 10px;
+        opacity: 1;
+        transform: none;
+        pointer-events: none;
+      }
+
+      .modalActions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .statusDot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex: 0 0 10px;
+      }
+
+      .status-online {
+        background: #2ecc71;
+        animation: pulse 2s infinite;
+      }
+
+      .status-away {
+        background: #f1c40f;
+      }
+
+      .status-offline {
+        background: #95a5a6;
+      }
+
+      .badge {
+        background: #ff5b5b;
+        color: white;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .requirement {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        transition: color 0.3s ease;
+        font-size: 13px;
+      }
+
+      .requirement.valid {
+        color: #2ecc71;
+      }
+
+      #scrollBtn {
+        position: fixed;
+        right: 26px;
+        bottom: 96px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: none;
+        background: var(--accent);
+        color: white;
+        cursor: pointer;
+        opacity: 0;
+        transition:
+          opacity 0.25s,
+          transform 0.18s;
+      }
+
+      #scrollBtn.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .tinyBtn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 6px 8px;
+        border-radius: 8px;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      #submitBtn,
+      #sendBtn,
+      .modalActions button {
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: none;
+        background: var(--accent);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      #submitBtn:hover,
+      #sendBtn:hover,
+      .modalActions button:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 4px 12px rgba(114, 137, 218, 0.4);
+      }
+
+      #submitBtn:active,
+      #sendBtn:active,
+      .modalActions button:active {
+        transform: translateY(0);
+      }
+
+      .btn-danger {
+        background-image: linear-gradient(
+          to top,
+          #c0392b 0%,
+          #e74c3c 100%
+        ) !important;
+        color: white !important;
+      }
+
+      .browse-channel-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid var(--card);
+        border-radius: 5px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+
+      .browse-channel-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        border-radius: 5px;
+      }
+
+      .browse-channel-item button {
+        padding: 6px 10px;
+        font-size: 12px;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        background: var(--accent);
+      }
+
+      .browse-channel-item button:disabled {
+        opacity: 0.5;
+      }
+
+      .reply-quote {
+        background: var(--bg);
+        border-left: 3px solid var(--accent);
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        font-size: 13px;
+        border-radius: 4px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+      }
+
+      .mention-highlight {
+        background-color: var(--accent-faint);
+        color: var(--accent-bright);
+        font-weight: 700;
+        padding: 1px 3px;
+        border-radius: 3px;
+      }
+
+      @keyframes shake {
+        10%,
+        90% {
+          transform: translate3d(-1px, 0, 0);
+        }
+
+        20%,
+        80% {
+          transform: translate3d(2px, 0, 0);
+        }
+
+        30%,
+        50%,
+        70% {
+          transform: translate3d(-4px, 0, 0);
+        }
+
+        40%,
+        60% {
+          transform: translate3d(4px, 0, 0);
+        }
+      }
+
+      .shake {
+        animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      }
+
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+        }
+
+        70% {
+          transform: scale(1.1);
+          box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+        }
+
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+        }
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+
+        50% {
+          background-position: 100% 50%;
+        }
+
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      @keyframes springIn {
+        0% {
+          transform: scale(0.3);
+          opacity: 0;
+        }
+
+        50% {
+          transform: scale(1.05);
+          opacity: 1;
+        }
+
+        70% {
+          transform: scale(0.9);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @media (max-width: 1000px) {
+        #rightbar {
+          display: none;
+        }
+
+        #sidebar {
+          width: 220px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="cozy">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-5XKHS5WN"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="authDiv">
+      <div class="authCard">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+          "
+        >
+          <button
+            class="tinyBtn"
+            id="themeBtn"
+            title="Toggle theme"
+            onclick="toggleTheme()"
+          >
+            🌙
+          </button>
+        </div>
+
+        <h3
+          id="authTitle"
+          style="text-align: center; margin-top: 0; font-size: 24px"
+        >
+          Welcome back!
+        </h3>
+        <div
+          id="authSubtext"
+          style="text-align: center; color: var(--muted); margin-bottom: 20px"
+        >
+          We're so excited to see you again!
+        </div>
+
+        <div style="display: none" id="authTabs">
+          <button id="loginTab" class="active"></button>
+          <button id="signupTab"></button>
+        </div>
+
+        <div>
+          <label class="auth-label">Username</label>
+          <input id="authUsername" placeholder="" />
+        </div>
+
+        <div>
+          <label class="auth-label">Password</label>
+          <input id="authPassword" placeholder="" type="password" />
+        </div>
+
+        <div id="authConfirmContainer" style="display: none">
+          <label class="auth-label">Confirm Password</label>
+          <input id="authConfirm" placeholder="" type="password" />
+        </div>
+        <div
+          id="passwordRequirements"
+          style="
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 10px;
+            background: var(--input-bg);
+            border-radius: 8px;
+          "
+        >
+          <div id="req-length" class="requirement">
+            ✅ <span>8+ characters</span>
+          </div>
+          <div id="req-upper" class="requirement">
+            ✅ <span>One uppercase</span>
+          </div>
+          <div id="req-num" class="requirement">✅ <span>One number</span></div>
+        </div>
+        <button id="submitBtn" style="width: 100%" onclick="submitAuth()">
+          Login
+        </button>
+        <div
+          id="authFooter"
+          style="margin-top: 10px; font-size: 14px; color: var(--muted)"
+        >
+          Need an account?
+          <a
+            href="#"
+            onclick="
+              switchAuth('signup');
+              return false;
+            "
+            style="color: var(--accent); text-decoration: none"
+            >Register</a
+          >
+        </div>
+        <div
+          id="authMessage"
+          style="
+            text-align: center;
+            font-size: 14px;
+            margin-top: 5px;
+            color: #e74c3c;
+          "
+        ></div>
+      </div>
+    </div>
+
+    <div id="app" style="display: none">
+      <div id="sidebar">
+        <div id="sidebarHeader">
+          <div>Channels 🗨️</div>
+          <div class="controls">
+            <button
+              id="notifBtn"
+              class="tinyBtn"
+              onclick="showNotificationsModal()"
+            >
+              🔔
+              <div class="badge" id="notifBadge"></div>
+            </button>
+            <button id="myStatusBtn" class="tinyBtn" onclick="cycleStatus()">
+              🟢
+            </button>
+            <button
+              id="settingsBtn"
+              class="tinyBtn"
+              onclick="showSettingsModal()"
+            >
+              ⚙️
+            </button>
+            <button id="logoutBtn" class="tinyBtn" onclick="logout()">
+              🚪
+            </button>
+          </div>
+        </div>
+        <div id="channelList"></div>
+        <button
+          onclick="showBrowseDialog()"
+          style="
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+          "
+        >
+          Browse / Create
+        </button>
+      </div>
+
+      <div id="main">
+        <div id="chatHeader">
+          <div id="chatTitle">No channel selected</div>
+          <div id="meLabel" style="font-size: 12px; color: var(--muted)"></div>
+        </div>
+        <div style="display: flex; flex: 1; min-height: 0">
+          <div id="messages"></div>
+          <div id="rightbar">
+            <div style="font-weight: 800; margin-bottom: 10px">Users 👥</div>
+            <div id="userList"></div>
+          </div>
+        </div>
+        <div
+          id="replyPreview"
+          style="
+            display: none;
+            padding: 8px 12px;
+            background: var(--panel);
+            border-top: 1px solid var(--card);
+          "
+        >
+          <span
+            onclick="cancelReply()"
+            style="float: right; cursor: pointer; font-weight: bold"
+            >✖️</span
+          >
+          Replying to <strong id="replyUser"></strong>:
+          <span id="replyText" style="opacity: 0.6"></span>
+        </div>
+        <div id="bottomBar">
+          <textarea
+            id="msgInput"
+            placeholder="Type a message..."
+            rows="1"
+            oninput="autoExpand(this)"
+            onkeydown="
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+              }
+            "
+          ></textarea>
+          <button
+            id="sendBtn"
+            onclick="sendMessage()"
+            style="align-self: flex-end"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button id="scrollBtn">⬇️</button>
+
+    <div id="modalOverlay">
+      <div class="modalCard">
+        <h3 id="modalTitle"></h3>
+        <div
+          id="modalSubtitle"
+          style="font-size: 14px; color: var(--muted); margin-bottom: 10px"
+        ></div>
+        <div id="modalCustomContent"></div>
+        <input
+          id="modalInput"
+          autocomplete="off"
+          style="
+            display: none;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+            border: none;
+          "
+        />
+        <div
+          class="modalActions"
+          style="
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 10px;
+          "
+        >
+          <button
+            id="modalConfirmBtn"
+            onclick="submitModal()"
+            style="
+              padding: 8px 16px;
+              background: var(--accent);
+              color: white;
+              border-radius: 5px;
+              border: none;
+              cursor: pointer;
+            "
+          >
+            OK
+          </button>
+          <button
+            id="modalCancelBtn"
+            onclick="closeModal()"
+            style="
+              padding: 8px 16px;
+              background: var(--card);
+              color: white;
+              border-radius: 5px;
+              border: none;
+              cursor: pointer;
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <!-- Obscenity Library -->
+    <script type="module">
+      import {
+        RegExpMatcher,
+        TextCensor,
+        englishDataset,
+        englishRecommendedTransformers,
+      } from "https://esm.sh/obscenity@0.4.6";
+
+      const matcher = new RegExpMatcher({
+        ...englishDataset.build(),
+        ...englishRecommendedTransformers,
+      });
+      const censor = new TextCensor();
+
+      window.obscenity = { matcher, censor };
+    </script>
+
+    <script>
+      const _0x1c153e=_0x1d5e;(function(_0x5e1c33,_0x33d3e6){const _0x4c7f26=_0x1d5e,_0x17f8ed=_0x5e1c33();while(!![]){try{const _0x3cc7ae=parseInt(_0x4c7f26(0x1b0))/0x1+-parseInt(_0x4c7f26(0x1a4))/0x2*(parseInt(_0x4c7f26(0x205))/0x3)+-parseInt(_0x4c7f26(0x199))/0x4*(-parseInt(_0x4c7f26(0x1db))/0x5)+parseInt(_0x4c7f26(0x1d1))/0x6*(-parseInt(_0x4c7f26(0x112))/0x7)+-parseInt(_0x4c7f26(0x1f4))/0x8*(parseInt(_0x4c7f26(0xe6))/0x9)+-parseInt(_0x4c7f26(0xe7))/0xa*(parseInt(_0x4c7f26(0x1dc))/0xb)+parseInt(_0x4c7f26(0x1e4))/0xc;if(_0x3cc7ae===_0x33d3e6)break;else _0x17f8ed['push'](_0x17f8ed['shift']());}catch(_0xd05ea3){_0x17f8ed['push'](_0x17f8ed['shift']());}}}(_0x45f9,0xc291a));const firebaseConfig={'apiKey':'AIzaSyDbyrqzcZ4Wk57xBNVDzNuRerQaBx2p1L0','authDomain':'htmlchat-8b2c5.firebaseapp.com','databaseURL':_0x1c153e(0x1d6),'projectId':_0x1c153e(0x11c),'storageBucket':_0x1c153e(0x157),'messagingSenderId':_0x1c153e(0x14c),'appId':_0x1c153e(0x18c)};firebase['initializeApp'](firebaseConfig);const db=firebase['database']();let username='',currentChannel='',myStatus=_0x1c153e(0x104),lastMsgTime=0x0,replyingToId=null,modalCallback=null,lastMessageMeta={'user':null,'ts':0x0},autoScroll=!![],compactView=![],lightTheme=![],userSettings={'desktopNotifications':!![]},loginTime=Date[_0x1c153e(0xdb)](),mentionCounts={},channelsData=[],BLACKLIST=[];function autoMod(_0x238da9){const _0x50ed69=_0x1c153e;let _0x3a90a7=_0x238da9;if(_0x3a90a7['length']>0x1f4)_0x3a90a7=_0x3a90a7[_0x50ed69(0x184)](0x0,0x1f4)+_0x50ed69(0x146);if(/(.)\1{8,}/[_0x50ed69(0x1e7)](_0x3a90a7))return'🤐\x20(Flooding\x20blocked)';if(window[_0x50ed69(0x1a5)]&&window['obscenity']['matcher']&&window[_0x50ed69(0x1a5)]['censor']){const _0x34e3db=window[_0x50ed69(0x1a5)]['matcher'][_0x50ed69(0xf4)](_0x3a90a7);_0x3a90a7=window[_0x50ed69(0x1a5)][_0x50ed69(0x185)][_0x50ed69(0x10b)](_0x3a90a7,_0x34e3db);}if(BLACKLIST['length']===0x0)return _0x3a90a7;BLACKLIST[_0x50ed69(0xf1)](_0x3baad0=>{const _0x457c3a=_0x50ed69,_0x3fea22=_0x3baad0[_0x457c3a(0x190)](/[.*+?^${}()|[\]\\]/g,_0x457c3a(0x1ea)),_0x3bbc31=new RegExp('\x5cb'+_0x3fea22+'\x5cb','gi');_0x3a90a7=_0x3a90a7[_0x457c3a(0x190)](_0x3bbc31,'🤐');});const _0xe4313=(_0x3a90a7['match'](/[A-Z]/g)||[])[_0x50ed69(0xd6)];if(_0xe4313>_0x3a90a7[_0x50ed69(0xd6)]*0.7&&_0x3a90a7[_0x50ed69(0xd6)]>0x5)_0x3a90a7=_0x3a90a7[_0x50ed69(0x207)]();return _0x3a90a7;}function isBanned(_0x3edb98){const _0x3aea80=_0x1c153e;if(!_0x3edb98)return![];let _0x1bb25a=_0x3edb98[_0x3aea80(0x207)]();if(/(.)\1{8,}/[_0x3aea80(0x1e7)](_0x1bb25a))return!![];if(window[_0x3aea80(0x1a5)]&&window['obscenity'][_0x3aea80(0x186)]&&window[_0x3aea80(0x1a5)][_0x3aea80(0x186)][_0x3aea80(0x139)](_0x3edb98))return!![];if(BLACKLIST[_0x3aea80(0xd6)]===0x0)return![];return BLACKLIST[_0x3aea80(0x110)](_0x1a6700=>{const _0x5b5672=_0x3aea80,_0x2d50ad=_0x1a6700[_0x5b5672(0x190)](/[.*+?^${}()|[\]\\]/g,'\x5c$&'),_0x1199af=new RegExp('\x5cb'+_0x2d50ad+'\x5cb','i');return _0x1199af[_0x5b5672(0x1e7)](_0x1bb25a);});}function parseMentions(_0x42000b){if(!_0x42000b)return'';let _0x1d0a96=escapeHTML(_0x42000b);return _0x1d0a96=_0x1d0a96['replace'](/@([a-zA-Z0-9_]+)/g,(_0x28f4bb,_0x809fbd)=>{const _0x2c78be=_0x1d5e,_0x402d2e=_0x809fbd===username;return _0x2c78be(0x193)+(_0x402d2e?'me':'')+'\x22\x20data-user=\x22'+_0x809fbd+'\x22>'+_0x28f4bb+_0x2c78be(0x19b);}),_0x1d0a96;}function uidColor(_0x455d3f){const _0x74d7e5=_0x1c153e;if(!_0x455d3f)return _0x74d7e5(0x13e);const _0x1bf536=[_0x74d7e5(0x1bf),_0x74d7e5(0x1d0),_0x74d7e5(0x206),_0x74d7e5(0x1ad),'#f39c12','#3498db',_0x74d7e5(0x105),_0x74d7e5(0x137),'#1abc9c',_0x74d7e5(0x138)];let _0x227e54=0x0;for(let _0x48313d=0x0;_0x48313d<_0x455d3f['length'];_0x48313d++)_0x227e54=(_0x227e54<<0x5)-_0x227e54+_0x455d3f['charCodeAt'](_0x48313d);return _0x227e54=Math[_0x74d7e5(0xdc)](_0x227e54),_0x1bf536[_0x227e54%_0x1bf536[_0x74d7e5(0xd6)]];}function escapeHTML(_0x16005b){const _0x5b2503=_0x1c153e;if(!_0x16005b)return'';return _0x16005b[_0x5b2503(0x190)](/&/g,_0x5b2503(0x15f))[_0x5b2503(0x190)](/</g,_0x5b2503(0x12a))['replace'](/>/g,_0x5b2503(0x155))[_0x5b2503(0x190)](/"/g,_0x5b2503(0x17d))[_0x5b2503(0x190)](/'/g,_0x5b2503(0x1cc));}function initials(_0x8020f7){const _0x4f2477=_0x1c153e;return _0x8020f7?_0x8020f7[_0x4f2477(0x10c)]()[_0x4f2477(0x1fb)](0x0)[_0x4f2477(0x1ae)]():'?';}function nowHHMM(_0x3675cc){const _0x551275=_0x1c153e,_0x3c5cb7=_0x3675cc?new Date(_0x3675cc):new Date();return String(_0x3c5cb7[_0x551275(0x133)]())[_0x551275(0xd8)](0x2,'0')+':'+String(_0x3c5cb7[_0x551275(0x163)]())['padStart'](0x2,'0');}function generateAvatarUrl(_0x7738d0){const _0x56e348=_0x1c153e,_0x4889dd=document[_0x56e348(0x1d2)](_0x56e348(0xe1));_0x4889dd[_0x56e348(0x16b)]=0x80,_0x4889dd[_0x56e348(0x1df)]=0x80;const _0xf31e17=_0x4889dd['getContext']('2d');return _0xf31e17[_0x56e348(0x13f)]=uidColor(_0x7738d0),_0xf31e17['fillRect'](0x0,0x0,0x80,0x80),_0xf31e17[_0x56e348(0x13f)]=_0x56e348(0xde),_0xf31e17[_0x56e348(0x1f7)]='bold\x2072px\x20sans-serif',_0xf31e17['textAlign']=_0x56e348(0x1cd),_0xf31e17[_0x56e348(0x195)]='middle',_0xf31e17[_0x56e348(0x175)](initials(_0x7738d0),0x40,0x40),_0x4889dd['toDataURL']();}function toggleTheme(){const _0x11c63f=_0x1c153e;lightTheme=!lightTheme,document[_0x11c63f(0xf0)]['classList']['toggle'](_0x11c63f(0xe5),lightTheme);const _0x48d3fb=document[_0x11c63f(0x12c)](_0x11c63f(0x1fe));if(_0x48d3fb)_0x48d3fb['textContent']=lightTheme?'☀️':'🌙';}function toggleView(){const _0x3ec70d=_0x1c153e;compactView=!compactView,document[_0x3ec70d(0x18a)][_0x3ec70d(0x13a)][_0x3ec70d(0x127)]('compact',compactView);const _0x36afd6=document[_0x3ec70d(0x12c)]('viewBtn');if(_0x36afd6)_0x36afd6[_0x3ec70d(0xdd)]=compactView?'📏':_0x3ec70d(0x1a1);}function switchAuth(_0x5b36f6){const _0x3e9446=_0x1c153e,_0x11a8e0=_0x5b36f6==='signup';document[_0x3e9446(0x12c)](_0x3e9446(0x164))['classList'][_0x3e9446(0x127)](_0x3e9446(0xf5),_0x5b36f6===_0x3e9446(0x1dd)),document['getElementById'](_0x3e9446(0x11d))['classList'][_0x3e9446(0x127)](_0x3e9446(0xf5),_0x11a8e0),document['getElementById']('authTitle')[_0x3e9446(0xdd)]=_0x11a8e0?_0x3e9446(0x1fd):_0x3e9446(0x1a7),document[_0x3e9446(0x12c)]('authSubtext')[_0x3e9446(0xdd)]=_0x11a8e0?'Join\x20our\x20community\x20today!':_0x3e9446(0x116),document[_0x3e9446(0x12c)](_0x3e9446(0x15c))[_0x3e9446(0xf3)][_0x3e9446(0x1c5)]=_0x11a8e0?_0x3e9446(0x1a8):_0x3e9446(0xed),document['getElementById'](_0x3e9446(0x15b))[_0x3e9446(0xf3)][_0x3e9446(0x1c5)]=_0x11a8e0?_0x3e9446(0xd7):_0x3e9446(0xed);const _0x18aa72=document[_0x3e9446(0x12c)](_0x3e9446(0x182));_0x11a8e0?_0x18aa72['innerHTML']='Already\x20have\x20an\x20account?\x20<a\x20href=\x22#\x22\x20onclick=\x22switchAuth(\x27login\x27);\x20return\x20false;\x22\x20style=\x22color:\x20var(--accent);\x20text-decoration:\x20none;\x22>Login</a>':_0x18aa72[_0x3e9446(0x1ee)]='Need\x20an\x20account?\x20<a\x20href=\x22#\x22\x20onclick=\x22switchAuth(\x27signup\x27);\x20return\x20false;\x22\x20style=\x22color:\x20var(--accent);\x20text-decoration:\x20none;\x22>Register</a>',document[_0x3e9446(0x12c)](_0x3e9446(0xe4))[_0x3e9446(0xdd)]=_0x11a8e0?'Continue':_0x3e9446(0x15a),document[_0x3e9446(0x12c)](_0x3e9446(0x10f))[_0x3e9446(0xdd)]='';}function userToEmail(_0x980252){const _0x5154a7=_0x1c153e;return _0x980252[_0x5154a7(0x207)]()+_0x5154a7(0x141);}function _0x1d5e(_0x66963e,_0x37c30b){_0x66963e=_0x66963e-0xd4;const _0x45f949=_0x45f9();let _0x1d5ea4=_0x45f949[_0x66963e];return _0x1d5ea4;}async function submitAuth(){const _0x29cc32=_0x1c153e,_0x4fb144=document[_0x29cc32(0x12c)](_0x29cc32(0x14a))['value'][_0x29cc32(0x10c)](),_0x4f0aca=document[_0x29cc32(0x12c)](_0x29cc32(0x154))[_0x29cc32(0x148)],_0x16fc82=document[_0x29cc32(0x12c)]('authConfirm')['value'];if(!_0x4fb144||!_0x4f0aca)return;if(/\s/[_0x29cc32(0x1e7)](_0x4fb144))return document['getElementById']('authMessage')['textContent']=_0x29cc32(0x1b7);const _0x1d7bc3=document[_0x29cc32(0x12c)]('signupTab')[_0x29cc32(0x13a)][_0x29cc32(0x108)](_0x29cc32(0xf5)),_0x28a3f3=userToEmail(_0x4fb144);try{if(_0x1d7bc3){if(_0x4fb144[_0x29cc32(0xd6)]<0x3)return document[_0x29cc32(0x12c)](_0x29cc32(0x10f))[_0x29cc32(0xdd)]='Username\x20too\x20short';if(isBanned(_0x4fb144))return document[_0x29cc32(0x12c)]('authMessage')[_0x29cc32(0xdd)]=_0x29cc32(0x1ba);if(_0x4fb144[_0x29cc32(0x207)]()[_0x29cc32(0x16c)](_0x29cc32(0x19e))||_0x4fb144[_0x29cc32(0xe8)]('__'))return document[_0x29cc32(0x12c)]('authMessage')[_0x29cc32(0xdd)]=_0x29cc32(0x1e3);if(_0x4f0aca[_0x29cc32(0xd6)]<0x8)return document[_0x29cc32(0x12c)](_0x29cc32(0x10f))[_0x29cc32(0xdd)]='Password\x20too\x20weak';if(_0x4f0aca!==_0x16fc82)return document['getElementById'](_0x29cc32(0x10f))[_0x29cc32(0xdd)]='Passwords\x20don\x27t\x20match';await firebase[_0x29cc32(0x15d)]()['createUserWithEmailAndPassword'](_0x28a3f3,_0x4f0aca),await db[_0x29cc32(0x19d)]('users/'+_0x4fb144)[_0x29cc32(0x181)]({'settings':{'desktopNotifications':!![]},'createdAt':Date[_0x29cc32(0xdb)]()});}else await firebase[_0x29cc32(0x15d)]()['signInWithEmailAndPassword'](_0x28a3f3,_0x4f0aca);username=_0x4fb144,afterLogin();}catch(_0x3f8a2e){console[_0x29cc32(0xf7)](_0x29cc32(0x11a),_0x3f8a2e);let _0x3c08e6=_0x29cc32(0x1e0);if(_0x3f8a2e[_0x29cc32(0x170)]===_0x29cc32(0x17e)||_0x3f8a2e['code']===_0x29cc32(0xea))_0x3c08e6=_0x29cc32(0x1ac);else _0x3f8a2e['code']===_0x29cc32(0x159)?_0x3c08e6=_0x29cc32(0x169):_0x3c08e6=_0x3f8a2e[_0x29cc32(0xdf)];document[_0x29cc32(0x12c)](_0x29cc32(0x10f))[_0x29cc32(0xdd)]=_0x3c08e6;}}function afterLogin(){const _0x1c4ea0=_0x1c153e;document[_0x1c4ea0(0x12c)](_0x1c4ea0(0x16e))[_0x1c4ea0(0xf3)]['display']=_0x1c4ea0(0xed),document['getElementById'](_0x1c4ea0(0xd4))[_0x1c4ea0(0xf3)][_0x1c4ea0(0x1c5)]=_0x1c4ea0(0xd7),document['getElementById'](_0x1c4ea0(0x1de))[_0x1c4ea0(0xdd)]='👤\x20'+username;if('Notification'in window)Notification['requestPermission']();loadChannels(),startPresence(),listenToNotifs(),attachScrollHandler(),loadUserList();}firebase[_0x1c153e(0x15d)]()[_0x1c153e(0x16a)](async _0x2e518f=>{const _0x4a4fd0=_0x1c153e;if(_0x2e518f&&!username){const _0x194566=_0x2e518f[_0x4a4fd0(0x132)];if(_0x194566&&_0x194566[_0x4a4fd0(0x1e9)]('@chat.com')){username=_0x194566['split']('@')[0x0];const _0x36626e=await db[_0x4a4fd0(0x19d)](_0x4a4fd0(0x1ff)+username)[_0x4a4fd0(0x18b)]('value');_0x36626e[_0x4a4fd0(0x122)]()?afterLogin():firebase[_0x4a4fd0(0x15d)]()[_0x4a4fd0(0x124)]();}}});function logout(){const _0x5134eb=_0x1c153e;firebase[_0x5134eb(0x15d)]()[_0x5134eb(0x124)]()[_0x5134eb(0x119)](()=>{const _0x516b49=_0x5134eb;location[_0x516b49(0x1a3)]();});}async function loadExternalBlacklist(){const _0x5ef75a=_0x1c153e;try{const _0x53e931=_0x5ef75a(0x173),_0x2847a2=await fetch(_0x53e931),_0x277491=await _0x2847a2[_0x5ef75a(0xe2)](),_0x57f40b=atob(_0x277491[_0x5ef75a(0x10c)]()),_0x476469=JSON['parse']('['+_0x57f40b+']');BLACKLIST=[...new Set([...BLACKLIST,..._0x476469])],console[_0x5ef75a(0x1f6)](_0x5ef75a(0xec),BLACKLIST[_0x5ef75a(0xd6)]);}catch(_0x3c703b){console[_0x5ef75a(0xf7)]('Automod:\x20Failed\x20to\x20load\x20blacklist\x20from\x20GitHub.',_0x3c703b);}}function showModal(_0x3e28cd,_0x245f04,_0x14419d,_0x1cbe71={}){const _0x4135d1=_0x1c153e;modalCallback=_0x14419d,document[_0x4135d1(0x12c)](_0x4135d1(0x144))[_0x4135d1(0xdd)]=_0x3e28cd,document['getElementById'](_0x4135d1(0x13c))[_0x4135d1(0xdd)]=_0x245f04,document[_0x4135d1(0x12c)](_0x4135d1(0x118))['style']['display']=_0x4135d1(0xd7);const _0x174152=document[_0x4135d1(0x12c)](_0x4135d1(0x200));_0x174152['style']['display']=_0x1cbe71[_0x4135d1(0x11f)]?_0x4135d1(0x1a8):'none',_0x174152[_0x4135d1(0x148)]='';const _0x202c11=document['getElementById'](_0x4135d1(0x14f));_0x202c11[_0x4135d1(0x1ee)]='';if(_0x1cbe71['customHTML'])_0x202c11[_0x4135d1(0x1e5)](_0x1cbe71[_0x4135d1(0x1ef)]);if(_0x1cbe71['showInput'])_0x174152[_0x4135d1(0x17c)]();document[_0x4135d1(0x12c)](_0x4135d1(0x102))[_0x4135d1(0xf3)][_0x4135d1(0x1c5)]=_0x1cbe71[_0x4135d1(0x18f)]?_0x4135d1(0xed):_0x4135d1(0x1a8);}function closeModal(){const _0xf8c8da=_0x1c153e;document['getElementById'](_0xf8c8da(0x118))[_0xf8c8da(0xf3)][_0xf8c8da(0x1c5)]=_0xf8c8da(0xed);}function submitModal(){const _0x1e133e=_0x1c153e,_0x381b47=document[_0x1e133e(0x12c)](_0x1e133e(0x200)),_0x3d11f9=_0x381b47['style'][_0x1e133e(0x1c5)]!==_0x1e133e(0xed)?_0x381b47['value'][_0x1e133e(0x10c)]():null;if(modalCallback)modalCallback(_0x3d11f9!==null?_0x3d11f9||!![]:!![]);closeModal();}function _0x45f9(){const _0x40d8c6=['offline','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22statusDot\x20status-','onscroll','presence','focus','&quot;','auth/user-not-found','Browse\x20&\x20Create\x20Channels','.message-menu','set','authFooter','Show','substring','censor','matcher','val','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','Error','body','once','1:678413131330:web:7685c9e904b8f4d055d7db','EmailAuthProvider','<span\x20style=\x22font-weight:600;\x22>','hideCancel','replace','hiddenChannels','onblur','<span\x20class=\x22mention-highlight\x20','browse-channel-list','textBaseline','⏳\x20Rate\x20Limit','catch','userRow','959384iqiYMa','channels/','</span>','key','ref','dm__','Mention\x20in\x20','confirmPassword','🛋️','<div\x20class=\x22badge\x22>','reload','265566vrAuYe','obscenity','users','Welcome\x20back!','block','div','channels','msgInput','Invalid\x20login','#16a085','toUpperCase','scrollTop','701987UBVfrx','padding:8px;\x20border-bottom:1px\x20solid\x20var(--card);\x20cursor:pointer;','channels/dm__','map','Delete\x20Message\x20🗑️',';\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x27,\x20\x27','Username\x20cannot\x20contain\x20spaces','<div\x20style=\x22text-align:\x20center;\x20padding:\x2020px;\x20color:\x20var(--muted);\x22>No\x20channels\x20yet.\x20Start\x20one!</div>','messages','Username\x20not\x20allowed','channel','Disabled','\x27)\x22>✏️</div><div\x20class=\x22menu-item\x22\x20onclick=\x22deleteMsgUI(\x27','className','#e67e22','valid','10px','Forward','...</div>','overflowY','display','\x22></div>','req-length','name','string','\x20grouped','/members/','&#039;','center','Confirm\x20Password','Wrong\x20current\x20password','#e74c3c','6wObOVL','createElement','<div\x20class=\x22browse-channel-item\x22><span>#\x20','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22unhideChannel(\x27','notifBadge','https://htmlchat-8b2c5-default-rtdb.firebaseio.com','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22settingsStatus\x22\x20style=\x22font-weight:bold;\x20font-size:12px;\x20margin-bottom:10px;\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20<!--\x20USER\x20PROFILE\x20/\x20APPEARANCE\x20-->\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-section\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22settings-label\x22>App\x20Settings</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20align-items:center;\x20background:\x20var(--bg-secondary);\x20padding:12px;\x20border-radius:8px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-weight:600;\x22>Theme\x20Mode</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:12px;\x20color:\x20var(--text-muted);\x22>Switch\x20between\x20light\x20and\x20dark\x20appearance</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22discord-btn\x22\x20onclick=\x22toggleTheme()\x22\x20style=\x22background:\x20var(--card);\x22>🌓\x20Toggle</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<!--\x20NOTIFICATIONS\x20-->\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-section\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22settings-label\x22>Notifications</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;\x20justify-content:space-between;\x20align-items:center;\x20background:\x20var(--bg-secondary);\x20padding:12px;\x20border-radius:8px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-weight:600;\x22>Desktop\x20Notifications</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:12px;\x20color:\x20var(--text-muted);\x22>Get\x20notified\x20of\x20mentions\x20on\x20your\x20desktop</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22discord-btn\x22\x20id=\x22notifToggleBtn\x22\x20onclick=\x22toggleDesktopNotifications()\x22\x20style=\x22background:','Channel\x20name\x20not\x20allowed','textarea','find','15MSQywd','1199LenxHy','login','meLabel','height','Authentication\x20failed','cloneNode','.reply-placeholder','Username\x20cannot\x20start\x20with\x20\x27dm__\x27\x20or\x20contain\x20\x27__\x27','42605916yawbuj','appendChild','delete','test','User\x20Settings','endsWith','\x5c$&','desktopNotifications','/hiddenChannels/','textAlign','innerHTML','customHTML','querySelector','[Deleted\x20User]','members','join','16DFeBkp','target','log','font','inline','message\x20show','settings-req-length','charAt','credential','Create\x20an\x20account','themeBtn','users/','modalInput','Mentions\x20🔔','sort','gap','Joined','27FVWuEj','#9b59b6','toLowerCase','app','\x20mentioned\x20you\x20in\x20','length','flex','padStart','color','</div>','now','abs','textContent','#FFFFFF','message','chatTitle','canvas','text','settingsStatus','submitBtn','light','6685740rDXlle','56390uToCwT','includes','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22message-menu\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22menu-item\x22\x20onclick=\x22replyToUI(\x27','auth/wrong-password','.message[data-id=\x22','Automod:\x20Blacklist\x20loaded\x20successfully.\x20Word\x20count:','none','onfocus','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22msgText\x22>','documentElement','forEach','newPassword','style','getAllMatches','active','setSelectionRange','error','\x27)\x22>↪️</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22msgBody\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22reply-placeholder\x22\x20style=\x22display:none\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22msgHeader\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22username\x22\x20style=\x22color:','all','left','dataset','req-upper','replyText','onDisconnect','split','scrollBtn','modalCancelBtn','onclick','online','#2ecc71','\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>','child_removed','contains','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22userName\x22>','auto','applyTo','trim','off','status','authMessage','some','push','6157522gNeOZT','nicerEditArea','var(--card)','update','We\x27re\x20so\x20excited\x20to\x20see\x20you\x20again!','smooth','modalOverlay','then','Auth\x20error','Notification','htmlchat-8b2c5','signupTab','var(--accent)','showInput','background','replyTo','exists','presence/','signOut','messages/','type','toggle','close-dm-btn','limitToLast','&lt;','Irreversible:\x20Enter\x20password\x20to\x20wipe\x20account\x20history:','getElementById','\x22]\x20.msgText','scrollHeight','replyUser','from','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20100%;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20min-height:\x20120px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x2012px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x2010px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20var(--input-bg);\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20var(--text);\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border:\x202px\x20solid\x20var(--card);\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-family:\x20inherit;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x2015px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20resize:\x20vertical;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20box-sizing:\x20border-box;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20outline:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20transition:\x20border-color\x200.2s;\x0a\x20\x20\x20\x20\x20\x20\x20\x20','email','getHours','/notifications','Edit\x20your\x20message:','span','#d35400','#8e44ad','hasMatch','classList','column','modalSubtitle','browse-channel-item','#7289da','fillStyle','</div><hr\x20style=\x22border-color:\x20var(--card);\x20margin:\x2015px\x200;\x22><p\x20style=\x22font-size:\x2014px;\x20color:\x20var(--muted);\x22>Or,\x20create\x20a\x20new\x20one:</p>','@chat.com','12px','child_added','modalTitle','disabled','...','public','value','channelRow','authUsername','localeCompare','678413131330','child_changed','👤\x20','modalCustomContent','replyPreview','Fill\x20all\x20fields','updatePassword','remove','authPassword','&gt;','</button></div>','htmlchat-8b2c5.firebasestorage.app','Edit\x20Message\x20✏️','auth/email-already-in-use','Login','passwordRequirements','authConfirmContainer','auth','<div\x20class=\x22avatar\x22\x20style=\x22background:','&amp;','<div\x20class=\x22menu-item\x22\x20onclick=\x22showEditUI(\x27','\x27)\x22>↩️</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22menu-item\x22\x20onclick=\x22showForwardUI(\x27','Permanently\x20remove\x20this\x20message?','getMinutes','loginTab','channelList','user','Please\x20wait\x201.5\x20seconds\x20between\x20messages.','settings-req-upper','Username\x20taken','onAuthStateChanged','width','startsWith',';\x20width:34px;\x20height:34px;\x20font-size:14px;\x22>','authDiv','oninput','code','\x27)\x22>↩️\x20@','<div\x20class=\x22channelLeft\x22\x20style=\x22display:flex;\x20align-items:center;\x20gap:8px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>','https://cdn.jsdelivr.net/gh/hothost59/automod-list@master/list.txt','myStatusBtn','fillText','borderColor','stopPropagation'];_0x45f9=function(){return _0x40d8c6;};return _0x45f9();}function loadUserList(){const _0x2b354f=_0x1c153e,_0x2836ef=document[_0x2b354f(0x12c)]('userList');db[_0x2b354f(0x19d)](_0x2b354f(0x1a6))['on']('value',_0x596025=>{const _0x19566b=_0x2b354f;db[_0x19566b(0x19d)](_0x19566b(0x17b))['on'](_0x19566b(0x148),_0x14ed01=>{const _0x1d4c17=_0x19566b,_0x5221c6=_0x14ed01[_0x1d4c17(0x187)]()||{},_0x5a11e6=_0x596025['val']()||{},_0x51bda4=Object['keys'](_0x5a11e6)[_0x1d4c17(0x1b3)](_0x19d5dd=>({'name':_0x19d5dd,'status':_0x5221c6[_0x19d5dd]?.[_0x1d4c17(0x10e)]||'offline'})),_0x39c15a={'online':0x0,'away':0x1,'offline':0x2};_0x51bda4[_0x1d4c17(0x202)]((_0x5d5db8,_0x11e98f)=>_0x39c15a[_0x5d5db8['status']]-_0x39c15a[_0x11e98f['status']]||_0x5d5db8[_0x1d4c17(0x1c8)][_0x1d4c17(0x14b)](_0x11e98f['name'])),_0x2836ef[_0x1d4c17(0x1ee)]='',_0x51bda4[_0x1d4c17(0xf1)](_0x41ab7d=>{const _0xb6a7fa=_0x1d4c17,_0x532ac5=document[_0xb6a7fa(0x1d2)](_0xb6a7fa(0x1a9));_0x532ac5['className']=_0xb6a7fa(0x198),_0x532ac5[_0xb6a7fa(0x1ee)]=_0xb6a7fa(0x15e)+uidColor(_0x41ab7d[_0xb6a7fa(0x1c8)])+_0xb6a7fa(0x16d)+initials(_0x41ab7d[_0xb6a7fa(0x1c8)])+_0xb6a7fa(0x109)+_0x41ab7d[_0xb6a7fa(0x1c8)]+_0xb6a7fa(0x179)+_0x41ab7d[_0xb6a7fa(0x10e)]+_0xb6a7fa(0x1c6),_0x532ac5[_0xb6a7fa(0x103)]=()=>createDMWith(_0x41ab7d[_0xb6a7fa(0x1c8)]),_0x2836ef['appendChild'](_0x532ac5);});});});}async function loadChannels(){const _0x3f99c2=_0x1c153e,_0x534404=await db['ref']('users/'+username)[_0x3f99c2(0x18b)]('value'),_0x4c34c6=_0x534404['val']()?.['hiddenChannels']||{};db['ref']('channels')['on'](_0x3f99c2(0x148),_0x2d1a79=>{const _0x33133e=_0x3f99c2;channelsData=[],_0x2d1a79[_0x33133e(0xf1)](_0x24c814=>{const _0x3dd205=_0x33133e,_0x543f02=_0x24c814[_0x3dd205(0x187)](),_0x5529c6=_0x24c814[_0x3dd205(0x19c)]['startsWith'](_0x3dd205(0x19e));if(_0x5529c6){const _0x99e97b=_0x24c814['key'][_0x3dd205(0x190)](_0x3dd205(0x19e),'')[_0x3dd205(0x100)]('__');if(!_0x99e97b[_0x3dd205(0xe8)](username))return;if(_0x543f02[_0x3dd205(0x126)]==='dm'&&_0x543f02[_0x3dd205(0x1f2)]&&_0x543f02[_0x3dd205(0x1f2)][username]&&_0x543f02[_0x3dd205(0x1f2)][username]['active']===![])return;}else{if(_0x4c34c6[_0x24c814[_0x3dd205(0x19c)]])return;}channelsData[_0x3dd205(0x111)]({'id':_0x24c814[_0x3dd205(0x19c)],..._0x543f02});}),renderChannels();});}function renderChannels(){const _0x3dda2c=_0x1c153e,_0x5e57df=document[_0x3dda2c(0x12c)](_0x3dda2c(0x165));_0x5e57df[_0x3dda2c(0x1ee)]='',channelsData[_0x3dda2c(0xf1)](_0x514971=>{const _0xab37e8=_0x3dda2c,_0x18e75f=_0x514971['id'][_0xab37e8(0x16c)](_0xab37e8(0x19e)),_0xc74952=document[_0xab37e8(0x1d2)](_0xab37e8(0x1a9));_0xc74952[_0xab37e8(0x1be)]=_0xab37e8(0x149)+(_0x514971['id']===currentChannel?'\x20active':''),_0xc74952[_0xab37e8(0xfc)]['id']=_0x514971['id'];let _0x1d816e=_0x514971['id'];if(_0x18e75f){const _0x4ddc05=_0x514971['id']['replace'](_0xab37e8(0x19e),'')['split']('__');_0x1d816e=_0xab37e8(0x14e)+(_0x4ddc05[_0xab37e8(0x1da)](_0x4d6273=>_0x4d6273!==username)||_0x4ddc05[0x0]);}else _0x1d816e='#\x20'+_0x1d816e;const _0x952e98=mentionCounts[_0x514971['id']]||0x0,_0x5f14e7=_0x952e98>0x0?_0xab37e8(0x1a2)+_0x952e98+_0xab37e8(0xda):'';_0xc74952[_0xab37e8(0x1ee)]=_0xab37e8(0x172)+escapeHTML(_0x1d816e)+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+_0x5f14e7+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>';const _0xd4c621=document[_0xab37e8(0x1d2)](_0xab37e8(0x136));_0xd4c621[_0xab37e8(0x1ee)]='✖️',_0xd4c621['className']=_0xab37e8(0x128),_0xd4c621['onclick']=_0xe40dac=>{const _0x82f333=_0xab37e8;_0xe40dac[_0x82f333(0x177)](),_0x18e75f?closeDM(_0x514971['id']):hideChannel(_0x514971['id']);},_0xc74952[_0xab37e8(0x1e5)](_0xd4c621),_0xc74952[_0xab37e8(0x103)]=()=>joinChannel(_0x514971['id']),_0x5e57df['appendChild'](_0xc74952);});}function autoExpand(_0x10c76c){const _0xb00d3c=_0x1c153e;_0x10c76c[_0xb00d3c(0xf3)][_0xb00d3c(0x1df)]=_0xb00d3c(0x10a),_0x10c76c[_0xb00d3c(0xf3)][_0xb00d3c(0x1df)]=_0x10c76c[_0xb00d3c(0x12e)]+'px',_0x10c76c[_0xb00d3c(0x12e)]>0xc8?_0x10c76c[_0xb00d3c(0xf3)][_0xb00d3c(0x1c4)]=_0xb00d3c(0x10a):_0x10c76c[_0xb00d3c(0xf3)][_0xb00d3c(0x1c4)]='hidden';}async function joinChannel(_0x26153e){const _0x4d3fc2=_0x1c153e;if(_0x26153e[_0x4d3fc2(0x16c)](_0x4d3fc2(0x19e))){const _0x3ebb8a=_0x26153e[_0x4d3fc2(0x190)]('dm__','')[_0x4d3fc2(0x100)]('__');if(!_0x3ebb8a[_0x4d3fc2(0xe8)](username)){showModal('Unauthorized','You\x20are\x20not\x20authorized\x20to\x20view\x20this\x20DM.',null,{'hideCancel':!![]});return;}}if(currentChannel)db[_0x4d3fc2(0x19d)](_0x4d3fc2(0x125)+currentChannel)[_0x4d3fc2(0x10d)]();currentChannel=_0x26153e,renderChannels(),db[_0x4d3fc2(0x19d)](_0x4d3fc2(0x1ff)+username+_0x4d3fc2(0x134))[_0x4d3fc2(0x18b)]('value',_0x3d384f=>{const _0x2813e4=_0x4d3fc2;_0x3d384f[_0x2813e4(0xf1)](_0x5394d5=>{const _0x352633=_0x2813e4;if(_0x5394d5[_0x352633(0x187)]()[_0x352633(0x1bb)]===_0x26153e)_0x5394d5[_0x352633(0x19d)]['remove']();});});let _0x5d91e0=_0x26153e;if(_0x26153e[_0x4d3fc2(0x16c)]('dm__')){const _0x4eefdd=_0x26153e['replace'](_0x4d3fc2(0x19e),'')[_0x4d3fc2(0x100)]('__');_0x5d91e0=_0x4d3fc2(0x14e)+(_0x4eefdd[_0x4d3fc2(0x1da)](_0x482986=>_0x482986!==username)||_0x4eefdd[0x0]);}else _0x5d91e0='#\x20'+_0x5d91e0;document[_0x4d3fc2(0x12c)](_0x4d3fc2(0xe0))[_0x4d3fc2(0xdd)]=_0x5d91e0,document[_0x4d3fc2(0x12c)]('messages')[_0x4d3fc2(0x1ee)]='',lastMessageMeta={'user':null,'ts':0x0};const _0x20cfdf=db['ref'](_0x4d3fc2(0x125)+_0x26153e);_0x20cfdf['on'](_0x4d3fc2(0x143),_0x40ecd4=>appendMessage(_0x40ecd4[_0x4d3fc2(0x187)](),_0x40ecd4[_0x4d3fc2(0x19c)])),_0x20cfdf['on'](_0x4d3fc2(0x107),_0x37647e=>{const _0x1992ce=_0x4d3fc2,_0x4d0657=document['querySelector'](_0x1992ce(0xeb)+_0x37647e['key']+'\x22]');if(_0x4d0657)_0x4d0657[_0x1992ce(0x153)]();}),_0x20cfdf['on'](_0x4d3fc2(0x14d),_0x1814ed=>{const _0x32f1f2=_0x4d3fc2,_0xe39b13=document['querySelector'](_0x32f1f2(0xeb)+_0x1814ed[_0x32f1f2(0x19c)]+_0x32f1f2(0x12d));if(_0xe39b13)_0xe39b13[_0x32f1f2(0x1ee)]=parseMentions(_0x1814ed['val']()[_0x32f1f2(0xe2)]);});}async function createDMWith(_0x1f6c44){const _0x4b44b6=_0x1c153e;if(_0x1f6c44===username)return;const _0x4f7fde=[username,_0x1f6c44]['sort']()['join']('__'),_0x47143b=await db[_0x4b44b6(0x19d)](_0x4b44b6(0x1b2)+_0x4f7fde)[_0x4b44b6(0x18b)](_0x4b44b6(0x148));if(!_0x47143b[_0x4b44b6(0x122)]()){const _0x321a77={};_0x321a77[username]={'active':!![]},_0x321a77[_0x1f6c44]={'active':!![]},await db[_0x4b44b6(0x19d)](_0x4b44b6(0x1b2)+_0x4f7fde)[_0x4b44b6(0x181)]({'type':'dm','members':_0x321a77});}else db[_0x4b44b6(0x19d)](_0x4b44b6(0x1b2)+_0x4f7fde+_0x4b44b6(0x1cb)+username)[_0x4b44b6(0x115)]({'active':!![]});joinChannel(_0x4b44b6(0x19e)+_0x4f7fde);}function closeDM(_0xedc489){const _0x151178=_0x1c153e;db[_0x151178(0x19d)](_0x151178(0x19a)+_0xedc489+_0x151178(0x1cb)+username)['update']({'active':![]});if(currentChannel===_0xedc489)currentChannel='';loadChannels();}async function hideChannel(_0x1f19b6){const _0x3870f2=_0x1c153e;await db[_0x3870f2(0x19d)]('users/'+username+_0x3870f2(0x1ec)+_0x1f19b6)[_0x3870f2(0x181)](!![]);if(currentChannel===_0x1f19b6)currentChannel='';loadChannels();}async function appendMessage(_0x15749b,_0x48dbbc){const _0x3b49a1=_0x1c153e,_0x3794fb=document[_0x3b49a1(0x12c)]('messages'),_0x34537c=_0x15749b['ts']-lastMessageMeta['ts']<0x493e0,_0x5b5cf3=lastMessageMeta['user']===_0x15749b[_0x3b49a1(0x166)]&&_0x34537c&&!_0x15749b['replyTo'];lastMessageMeta={'user':_0x15749b[_0x3b49a1(0x166)],'ts':_0x15749b['ts']};const _0x3c85da=document[_0x3b49a1(0x1d2)](_0x3b49a1(0x1a9));_0x3c85da[_0x3b49a1(0x1be)]=_0x3b49a1(0x1f9)+(_0x5b5cf3?_0x3b49a1(0x1ca):''),_0x3c85da[_0x3b49a1(0xfc)]['id']=_0x48dbbc,_0x3c85da[_0x3b49a1(0x1ee)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22avatar\x22\x20style=\x22background:'+uidColor(_0x15749b['user'])+'\x22>'+initials(_0x15749b[_0x3b49a1(0x166)])+_0x3b49a1(0xf9)+uidColor(_0x15749b['user'])+'\x22>'+_0x15749b[_0x3b49a1(0x166)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22timestamp\x22>'+nowHHMM(_0x15749b['ts'])+_0x3b49a1(0xef)+parseMentions(_0x15749b['text'])+_0x3b49a1(0xe9)+_0x48dbbc+_0x3b49a1(0x1b6)+_0x15749b[_0x3b49a1(0x166)]+'\x27,\x20\x27'+_0x15749b[_0x3b49a1(0xe2)]['replace'](/'/g,'\x5c\x27')+_0x3b49a1(0x161)+_0x48dbbc+_0x3b49a1(0xf8)+(_0x15749b[_0x3b49a1(0x166)]===username?_0x3b49a1(0x160)+_0x48dbbc+_0x3b49a1(0x1bd)+_0x48dbbc+'\x27)\x22>🗑️</div>':'')+_0x3b49a1(0x106),_0x3794fb[_0x3b49a1(0x1e5)](_0x3c85da);if(autoScroll)_0x3794fb[_0x3b49a1(0x1af)]=_0x3794fb[_0x3b49a1(0x12e)];if(_0x15749b[_0x3b49a1(0x121)]){const _0x4f23c6=_0x3c85da[_0x3b49a1(0x1f0)](_0x3b49a1(0x1e2));db[_0x3b49a1(0x19d)](_0x3b49a1(0x125)+currentChannel+'/'+_0x15749b['replyTo'])[_0x3b49a1(0x18b)]('value',_0x568b2f=>{const _0x1eb159=_0x3b49a1;if(_0x568b2f[_0x1eb159(0x122)]()){const _0x3004e3=_0x568b2f[_0x1eb159(0x187)]();_0x4f23c6[_0x1eb159(0x1ee)]='<div\x20class=\x22reply-quote\x22\x20onclick=\x22jumpTo(\x27'+_0x15749b['replyTo']+_0x1eb159(0x171)+_0x3004e3['user']+':\x20'+escapeHTML(_0x3004e3[_0x1eb159(0xe2)])[_0x1eb159(0x184)](0x0,0x28)+_0x1eb159(0x1c3),_0x4f23c6['style'][_0x1eb159(0x1c5)]='block';if(autoScroll)_0x3794fb['scrollTop']=_0x3794fb[_0x1eb159(0x12e)];}});}}async function sendMessage(){const _0x3c0613=_0x1c153e,_0x1e4460=document[_0x3c0613(0x12c)](_0x3c0613(0x1ab));let _0x1968f5=_0x1e4460[_0x3c0613(0x148)][_0x3c0613(0x10c)]();if(!_0x1968f5||!currentChannel)return;const _0x517b9f=Date[_0x3c0613(0xdb)]();if(_0x517b9f-lastMsgTime<0x5dc){showModal(_0x3c0613(0x196),_0x3c0613(0x167),null,{'showInput':![],'hideCancel':!![]});return;}_0x1968f5=await autoMod(_0x1968f5);const _0x2bb9ae=db[_0x3c0613(0x19d)](_0x3c0613(0x125)+currentChannel)[_0x3c0613(0x111)]();await _0x2bb9ae['set']({'user':username,'text':_0x1968f5,'ts':_0x517b9f,'replyTo':replyingToId});const _0x1c12a9=_0x1968f5['match'](/@([a-zA-Z0-9_]+)/g);if(_0x1c12a9){const _0x17a37a=[...new Set(_0x1c12a9[_0x3c0613(0x1b3)](_0x4f34d2=>_0x4f34d2[_0x3c0613(0x184)](0x1)))];_0x17a37a[_0x3c0613(0xf1)](async _0x3503e3=>{const _0x21d08a=_0x3c0613;if(_0x3503e3===username)return;const _0x2de315=await db[_0x21d08a(0x19d)](_0x21d08a(0x1ff)+_0x3503e3)[_0x21d08a(0x18b)](_0x21d08a(0x148));if(_0x2de315['exists']()){const _0x5f2c0c={'from':username,'channel':currentChannel,'messageId':_0x2bb9ae[_0x21d08a(0x19c)],'text':_0x1968f5[_0x21d08a(0x184)](0x0,0x64),'ts':_0x517b9f};db[_0x21d08a(0x19d)](_0x21d08a(0x1ff)+_0x3503e3+_0x21d08a(0x134))['push'](_0x5f2c0c);}});}_0x1e4460['value']='',autoExpand(_0x1e4460),lastMsgTime=_0x517b9f,cancelReply();}function showSettingsModal(){const _0x5a99de=_0x1c153e,_0x280ed1=document['createElement'](_0x5a99de(0x1a9));_0x280ed1[_0x5a99de(0xf3)][_0x5a99de(0x1ed)]=_0x5a99de(0xfb),_0x280ed1[_0x5a99de(0x1ee)]=_0x5a99de(0x1d7)+(userSettings[_0x5a99de(0x1eb)]?_0x5a99de(0x11e):'var(--card)')+_0x5a99de(0x1b5)+(userSettings[_0x5a99de(0x1eb)]?'Enabled':_0x5a99de(0x1bc))+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<!--\x20PASSWORD\x20-->\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-section\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22settings-label\x22>Password\x20and\x20Authentication</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-input-group\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22currentPassword\x22\x20type=\x22password\x22\x20placeholder=\x22Current\x20Password\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-input-group\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22newPassword\x22\x20type=\x22password\x22\x20placeholder=\x22New\x20Password\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-input-group\x22\x20style=\x22margin-bottom:10px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20id=\x22confirmPassword\x22\x20type=\x22password\x22\x20placeholder=\x22Confirm\x20New\x20Password\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-req-box\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22settings-req-length\x22\x20class=\x22requirement\x22>✅\x208+\x20characters</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22settings-req-upper\x22\x20class=\x22requirement\x22>✅\x20One\x20uppercase\x20letter</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22settings-req-num\x22\x20class=\x22requirement\x22>✅\x20One\x20number</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22discord-btn\x22\x20onclick=\x22changePassword()\x22>Change\x20Password</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<!--\x20CREDITS\x20-->\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22settings-section\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22settings-label\x22>About</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:14px;\x22>Developed\x20by\x20<strong\x20style=\x22color:var(--accent)\x22>hothost59</strong></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:12px;\x20color:\x20var(--text-muted);\x20margin-top:4px;\x22>Version\x201.0.0\x20•\x20Final\x20Release\x20Feb\x202026</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<!--\x20DANGER\x20ZONE\x20-->\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22danger-zone\x22\x20style=\x22border-color:\x20#ed4245;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22settings-label\x22\x20style=\x22color:#ed4245;\x22>Delete\x20Account</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22font-size:12px;\x20color:\x20var(--text-muted);\x20margin:\x208px\x200;\x22>Once\x20you\x20delete\x20your\x20account,\x20there\x20is\x20no\x20going\x20back.\x20Please\x20be\x20certain.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22deleteAccountBtn\x22\x20class=\x22discord-btn\x22\x20style=\x22background:#ed4245;\x22\x20onclick=\x22deleteAccountUI()\x22>Delete\x20Account</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20',showModal(_0x5a99de(0x1e8),'',null,{'customHTML':_0x280ed1,'showInput':![]});const _0x3eb279=document[_0x5a99de(0x12c)](_0x5a99de(0xf2));if(_0x3eb279)_0x3eb279[_0x5a99de(0x16f)]=()=>{const _0x2afd20=_0x5a99de,_0x33a2b7=_0x3eb279[_0x2afd20(0x148)];document[_0x2afd20(0x12c)](_0x2afd20(0x1fa))[_0x2afd20(0x13a)]['toggle'](_0x2afd20(0x1c0),_0x33a2b7[_0x2afd20(0xd6)]>=0x8),document[_0x2afd20(0x12c)](_0x2afd20(0x168))['classList']['toggle'](_0x2afd20(0x1c0),/[A-Z]/['test'](_0x33a2b7)),document[_0x2afd20(0x12c)]('settings-req-num')[_0x2afd20(0x13a)]['toggle'](_0x2afd20(0x1c0),/[0-9]/[_0x2afd20(0x1e7)](_0x33a2b7));};}async function toggleDesktopNotifications(){const _0x22b2d0=_0x1c153e;userSettings[_0x22b2d0(0x1eb)]=!userSettings['desktopNotifications'],await db[_0x22b2d0(0x19d)](_0x22b2d0(0x1ff)+username+'/settings/desktopNotifications')[_0x22b2d0(0x181)](userSettings[_0x22b2d0(0x1eb)]);const _0x2bfe25=document[_0x22b2d0(0x12c)]('notifToggleBtn');_0x2bfe25&&(_0x2bfe25[_0x22b2d0(0xdd)]=userSettings[_0x22b2d0(0x1eb)]?'Enabled':_0x22b2d0(0x1bc),_0x2bfe25[_0x22b2d0(0xf3)][_0x22b2d0(0x120)]=userSettings['desktopNotifications']?_0x22b2d0(0x11e):_0x22b2d0(0x114));}function changePassword(){const _0x375d73=_0x1c153e,_0x9d5069=document['getElementById']('currentPassword')[_0x375d73(0x148)],_0x287de3=document[_0x375d73(0x12c)]('newPassword')[_0x375d73(0x148)],_0x5387b3=document[_0x375d73(0x12c)](_0x375d73(0x1a0))['value'],_0x3a7cbd=document['getElementById'](_0x375d73(0xe3));if(!_0x9d5069||!_0x287de3||!_0x5387b3){_0x3a7cbd['textContent']=_0x375d73(0x151),_0x3a7cbd[_0x375d73(0xf3)]['color']=_0x375d73(0x1d0);return;}if(_0x287de3!==_0x5387b3){_0x3a7cbd[_0x375d73(0xdd)]='Passwords\x20don\x27t\x20match',_0x3a7cbd[_0x375d73(0xf3)][_0x375d73(0xd9)]=_0x375d73(0x1d0);return;}const _0x2b2b70=firebase[_0x375d73(0x15d)]()['currentUser'],_0x4fe926=firebase[_0x375d73(0x15d)][_0x375d73(0x18d)][_0x375d73(0x1fc)](_0x2b2b70[_0x375d73(0x132)],_0x9d5069);_0x2b2b70['reauthenticateWithCredential'](_0x4fe926)[_0x375d73(0x119)](()=>{const _0x526ffd=_0x375d73;_0x2b2b70[_0x526ffd(0x152)](_0x287de3)['then'](()=>{const _0x40c247=_0x526ffd;_0x3a7cbd[_0x40c247(0xdd)]='Success!',_0x3a7cbd[_0x40c247(0xf3)]['color']='#2ecc71';})[_0x526ffd(0x197)](_0x2f4ac5=>{const _0xb81310=_0x526ffd;_0x3a7cbd['textContent']=_0x2f4ac5[_0xb81310(0xdf)],_0x3a7cbd[_0xb81310(0xf3)][_0xb81310(0xd9)]=_0xb81310(0x1d0);});})['catch'](_0x1c5bde=>{const _0x411215=_0x375d73;_0x3a7cbd['textContent']=_0x411215(0x1cf),_0x3a7cbd[_0x411215(0xf3)]['color']=_0x411215(0x1d0);});}async function deleteAccountUI(){const _0xa470ae=_0x1c153e;closeModal(),showModal(_0xa470ae(0x1ce),_0xa470ae(0x12b),async _0x46b5ea=>{const _0xcf9201=_0xa470ae,_0x41f2f3=firebase[_0xcf9201(0x15d)]()['currentUser'],_0x404e3e=firebase[_0xcf9201(0x15d)][_0xcf9201(0x18d)][_0xcf9201(0x1fc)](_0x41f2f3[_0xcf9201(0x132)],_0x46b5ea);try{await _0x41f2f3['reauthenticateWithCredential'](_0x404e3e);const _0x2f1e51=await db['ref'](_0xcf9201(0x1b9))[_0xcf9201(0x18b)](_0xcf9201(0x148)),_0x32431a=[];_0x2f1e51[_0xcf9201(0xf1)](_0x1bbb94=>_0x1bbb94[_0xcf9201(0xf1)](_0x4e2eb2=>{const _0x30d576=_0xcf9201;if(_0x4e2eb2[_0x30d576(0x187)]()[_0x30d576(0x166)]===username)_0x32431a[_0x30d576(0x111)](db[_0x30d576(0x19d)]('messages/'+_0x1bbb94['key']+'/'+_0x4e2eb2[_0x30d576(0x19c)])[_0x30d576(0x115)]({'user':_0x30d576(0x1f1)}));})),await Promise[_0xcf9201(0xfa)](_0x32431a),await db[_0xcf9201(0x19d)](_0xcf9201(0x1ff)+username)[_0xcf9201(0x153)](),await db[_0xcf9201(0x19d)](_0xcf9201(0x123)+username)[_0xcf9201(0x153)](),await _0x41f2f3[_0xcf9201(0x1e6)](),location[_0xcf9201(0x1a3)]();}catch(_0xe735aa){showModal('Error',_0xe735aa['message'],null,{'hideCancel':!![]});}},{'showInput':!![]});}function deleteMsgUI(_0xfe1835){const _0x482534=_0x1c153e,_0x5e7a62=document[_0x482534(0x1f0)](_0x482534(0xeb)+_0xfe1835+'\x22]');if(!_0x5e7a62)return;const _0x58add6=_0x5e7a62[_0x482534(0x1e1)](!![]);_0x58add6[_0x482534(0x1f0)](_0x482534(0x180))?.['remove'](),showModal(_0x482534(0x1b4),_0x482534(0x162),_0x49f322=>{const _0x5266f9=_0x482534;if(_0x49f322)db[_0x5266f9(0x19d)](_0x5266f9(0x125)+currentChannel+'/'+_0xfe1835)[_0x5266f9(0x153)]();},{'customHTML':_0x58add6,'showInput':![]});}function showEditUI(_0x2752dc){const _0x155240=_0x1c153e;db[_0x155240(0x19d)](_0x155240(0x125)+currentChannel+'/'+_0x2752dc)[_0x155240(0x18b)](_0x155240(0x148),_0x219ab3=>{const _0x432592=_0x155240,_0x53cb69=_0x219ab3['val']()['text'],_0x145f9a=document[_0x432592(0x1d2)]('div');_0x145f9a[_0x432592(0xf3)][_0x432592(0x1c5)]=_0x432592(0xd7),_0x145f9a['style']['flexDirection']=_0x432592(0x13b),_0x145f9a[_0x432592(0xf3)][_0x432592(0x203)]=_0x432592(0x142);const _0x53cac4=document[_0x432592(0x1d2)]('div');_0x53cac4['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:\x2011px;\x20text-transform:\x20uppercase;\x20color:\x20var(--muted);\x20margin-bottom:\x204px;\x20letter-spacing:\x200.5px;\x22>Original\x20Message</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20var(--bg);\x20padding:\x2010px;\x20border-radius:\x208px;\x20border-left:\x203px\x20solid\x20var(--card);\x20font-size:\x2014px;\x20opacity:\x200.8;\x20font-style:\x20italic;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+escapeHTML(_0x53cb69)+_0x432592(0x188),_0x145f9a[_0x432592(0x1e5)](_0x53cac4);const _0x5e6975=document['createElement'](_0x432592(0x1d9));_0x5e6975['id']=_0x432592(0x113),_0x5e6975[_0x432592(0x148)]=_0x53cb69,_0x5e6975[_0x432592(0xf3)]=_0x432592(0x131),_0x5e6975[_0x432592(0xee)]=()=>_0x5e6975[_0x432592(0xf3)][_0x432592(0x176)]=_0x432592(0x11e),_0x5e6975[_0x432592(0x192)]=()=>_0x5e6975[_0x432592(0xf3)][_0x432592(0x176)]=_0x432592(0x114),_0x145f9a[_0x432592(0x1e5)](_0x5e6975),showModal(_0x432592(0x158),_0x432592(0x135),_0x323a32=>{const _0x4fc173=_0x432592;if(_0x323a32){const _0x25ff4a=document['getElementById']('nicerEditArea')['value'][_0x4fc173(0x10c)]();_0x25ff4a&&_0x25ff4a!==_0x53cb69&&db[_0x4fc173(0x19d)]('messages/'+currentChannel+'/'+_0x2752dc)[_0x4fc173(0x115)]({'text':autoMod(_0x25ff4a),'edited':!![],'lastEdited':Date[_0x4fc173(0xdb)]()});}},{'customHTML':_0x145f9a,'showInput':![]}),setTimeout(()=>{const _0x2270e0=_0x432592;_0x5e6975[_0x2270e0(0x17c)](),_0x5e6975[_0x2270e0(0xf6)](_0x5e6975[_0x2270e0(0x148)]['length'],_0x5e6975['value'][_0x2270e0(0xd6)]);},0x64);});}function showForwardUI(_0xb91378){const _0x34de17=_0x1c153e;db[_0x34de17(0x19d)](_0x34de17(0x125)+currentChannel+'/'+_0xb91378)[_0x34de17(0x18b)](_0x34de17(0x148),_0x2fe8f6=>{const _0x127b9e=_0x34de17,_0x19e2e8=_0x2fe8f6[_0x127b9e(0x187)]()[_0x127b9e(0xe2)],_0x43660f=document[_0x127b9e(0x1d2)]('div');_0x43660f[_0x127b9e(0x1be)]=_0x127b9e(0x194),_0x43660f[_0x127b9e(0xf3)]['marginTop']=_0x127b9e(0x1c1),channelsData[_0x127b9e(0xd6)]===0x0&&(_0x43660f['innerHTML']='<div\x20style=\x22text-align:\x20center;\x20padding:\x2020px;\x20color:\x20var(--muted);\x22>No\x20channels\x20available\x20to\x20forward\x20to.</div>'),channelsData['forEach'](_0x5f5835=>{const _0x4e2c4d=_0x127b9e;if(_0x5f5835['id']===currentChannel)return;const _0x5e7699=document['createElement'](_0x4e2c4d(0x1a9));_0x5e7699['className']=_0x4e2c4d(0x13d);let _0x54088f=_0x5f5835['id'];if(_0x5f5835['id'][_0x4e2c4d(0x16c)](_0x4e2c4d(0x19e))){const _0x1c4c21=_0x5f5835['id']['replace'](_0x4e2c4d(0x19e),'')[_0x4e2c4d(0x100)]('__');_0x54088f='👤\x20'+(_0x1c4c21[_0x4e2c4d(0x1da)](_0x52be8b=>_0x52be8b!==username)||_0x1c4c21[0x0]);}else _0x54088f='#\x20'+_0x54088f;_0x5e7699['innerHTML']=_0x4e2c4d(0x18e)+escapeHTML(_0x54088f)+_0x4e2c4d(0x19b);const _0x407922=document[_0x4e2c4d(0x1d2)]('button');_0x407922[_0x4e2c4d(0xdd)]=_0x4e2c4d(0x1c2),_0x407922[_0x4e2c4d(0x103)]=()=>{const _0x2cccfc=_0x4e2c4d;db[_0x2cccfc(0x19d)](_0x2cccfc(0x125)+_0x5f5835['id'])['push']({'user':username,'text':'[FWD]:\x20'+_0x19e2e8,'ts':Date['now']()}),closeModal();},_0x5e7699['appendChild'](_0x407922),_0x43660f['appendChild'](_0x5e7699);}),showModal('Forward\x20Message\x20↪️','Select\x20a\x20destination\x20channel:',null,{'customHTML':_0x43660f,'showInput':![]});});}async function showBrowseDialog(){const _0x4f67a1=_0x1c153e,_0x2b55ef=await db[_0x4f67a1(0x19d)](_0x4f67a1(0x1aa))[_0x4f67a1(0x18b)](_0x4f67a1(0x148)),_0x1bd00b=await db['ref']('users/'+username)[_0x4f67a1(0x18b)](_0x4f67a1(0x148)),_0xb68bf4=_0x1bd00b[_0x4f67a1(0x187)]()?.[_0x4f67a1(0x191)]||{},_0x5dd58d=[];_0x2b55ef[_0x4f67a1(0xf1)](_0x51e6f5=>{const _0x456f27=_0x4f67a1,_0xb068c4=_0x51e6f5[_0x456f27(0x187)]();if(_0xb068c4['type']==='dm')return;if(_0x51e6f5[_0x456f27(0x19c)][_0x456f27(0x16c)](_0x456f27(0x19e))){const _0x3f38b1=_0x51e6f5[_0x456f27(0x19c)][_0x456f27(0x190)](_0x456f27(0x19e),'')['split']('__');if(!_0x3f38b1[_0x456f27(0xe8)](username))return;}_0x5dd58d[_0x456f27(0x111)]({'id':_0x51e6f5[_0x456f27(0x19c)],'data':_0xb068c4});});let _0x2009a3=_0x5dd58d[_0x4f67a1(0xd6)]===0x0?_0x4f67a1(0x1b8):_0x5dd58d[_0x4f67a1(0x1b3)](_0x39593d=>{const _0x1751c7=_0x4f67a1,_0x50a786=_0xb68bf4[_0x39593d['id']];return _0x1751c7(0x1d3)+_0x39593d['id']+_0x1751c7(0x1d4)+_0x39593d['id']+'\x27,\x20this)\x22\x20'+(!_0x50a786?_0x1751c7(0x145):'')+'>'+(_0x50a786?_0x1751c7(0x183):_0x1751c7(0x204))+_0x1751c7(0x156);})[_0x4f67a1(0x1f3)]('');const _0x2dbf8d=document['createElement']('div');_0x2dbf8d['innerHTML']='<div\x20class=\x22browse-channel-list\x22>'+_0x2009a3+_0x4f67a1(0x140),showModal(_0x4f67a1(0x17f),'Manage\x20your\x20channels\x20list.',_0x150bf6=>{const _0x250109=_0x4f67a1;if(typeof _0x150bf6===_0x250109(0x1c9)&&_0x150bf6['length']>0x0){if(isBanned(_0x150bf6)){showModal(_0x250109(0x189),_0x250109(0x1d8),null,{'hideCancel':!![]});return;}if(_0x150bf6[_0x250109(0x207)]()[_0x250109(0x16c)](_0x250109(0x19e))){showModal(_0x250109(0x189),'Channel\x20name\x20cannot\x20start\x20with\x20\x27dm__\x27',null,{'hideCancel':!![]});return;}db[_0x250109(0x19d)]('channels/'+_0x150bf6)[_0x250109(0x18b)]('value')[_0x250109(0x119)](_0x3e24e1=>{const _0x8a44ae=_0x250109;!_0x3e24e1['exists']()&&(db['ref'](_0x8a44ae(0x19a)+_0x150bf6)[_0x8a44ae(0x181)]({'createdBy':username,'type':_0x8a44ae(0x147)}),joinChannel(_0x150bf6));});}},{'customHTML':_0x2dbf8d,'showInput':!![],'placeholder':'new-channel-name'});}async function unhideChannel(_0x122067,_0x28e0e4){const _0x2a82e2=_0x1c153e;await db[_0x2a82e2(0x19d)](_0x2a82e2(0x1ff)+username+_0x2a82e2(0x1ec)+_0x122067)[_0x2a82e2(0x153)](),_0x28e0e4['textContent']=_0x2a82e2(0x204),_0x28e0e4[_0x2a82e2(0x145)]=!![],loadChannels();}function replyToUI(_0x26f341,_0x57e5b0,_0x23c82e){const _0x29a392=_0x1c153e;replyingToId=_0x26f341,document[_0x29a392(0x12c)](_0x29a392(0x12f))['textContent']=_0x57e5b0,document['getElementById'](_0x29a392(0xfe))['textContent']=_0x23c82e[_0x29a392(0x184)](0x0,0x1e)+_0x29a392(0x146),document['getElementById'](_0x29a392(0x150))[_0x29a392(0xf3)][_0x29a392(0x1c5)]='block',document[_0x29a392(0x12c)]('msgInput')[_0x29a392(0x17c)]();}function cancelReply(){const _0x250476=_0x1c153e;replyingToId=null,document[_0x250476(0x12c)](_0x250476(0x150))[_0x250476(0xf3)][_0x250476(0x1c5)]=_0x250476(0xed);}function jumpTo(_0x29500f){const _0x297b91=_0x1c153e,_0x5671e6=document[_0x297b91(0x1f0)](_0x297b91(0xeb)+_0x29500f+'\x22]');if(_0x5671e6)_0x5671e6['scrollIntoView']({'behavior':_0x297b91(0x117),'block':'center'});}function startPresence(){const _0x3cfb8a=_0x1c153e,_0x133779=db[_0x3cfb8a(0x19d)](_0x3cfb8a(0x123)+username);_0x133779[_0x3cfb8a(0x181)]({'status':_0x3cfb8a(0x104),'lastSeen':Date['now']()}),_0x133779[_0x3cfb8a(0xff)]()[_0x3cfb8a(0x153)]();}function cycleStatus(){const _0x2e608d=_0x1c153e,_0x24b1e7={'online':'away','away':_0x2e608d(0x178),'offline':_0x2e608d(0x104)};myStatus=_0x24b1e7[myStatus],db[_0x2e608d(0x19d)](_0x2e608d(0x123)+username)['update']({'status':myStatus}),document[_0x2e608d(0x12c)](_0x2e608d(0x174))['textContent']={'online':'🟢','away':'🟡','offline':'⚪'}[myStatus];}function listenToNotifs(){const _0x362191=_0x1c153e,_0x4714bf=db[_0x362191(0x19d)](_0x362191(0x1ff)+username+_0x362191(0x134));_0x4714bf['on'](_0x362191(0x148),_0x5b5d4c=>{const _0x5f2af7=_0x362191,_0x30c351=document[_0x5f2af7(0x12c)](_0x5f2af7(0x1d5));_0x30c351[_0x5f2af7(0xf3)][_0x5f2af7(0x1c5)]=_0x5b5d4c[_0x5f2af7(0x122)]()?_0x5f2af7(0x1f8):_0x5f2af7(0xed),_0x30c351[_0x5f2af7(0xdd)]=_0x5b5d4c['numChildren'](),mentionCounts={},_0x5b5d4c[_0x5f2af7(0xf1)](_0x3fef6f=>{const _0x3fd989=_0x5f2af7,_0x2b77be=_0x3fef6f[_0x3fd989(0x187)]()[_0x3fd989(0x1bb)];mentionCounts[_0x2b77be]=(mentionCounts[_0x2b77be]||0x0)+0x1;}),renderChannels();}),_0x4714bf[_0x362191(0x129)](0x1)['on']('child_added',_0x5682e7=>{const _0x1637ce=_0x362191,_0x50d986=_0x5682e7[_0x1637ce(0x187)]();if(_0x50d986&&_0x50d986['ts']>loginTime&&userSettings[_0x1637ce(0x1eb)]){if(_0x1637ce(0x11b)in window&&Notification['permission']==='granted'){let _0x497a81=_0x50d986[_0x1637ce(0x1bb)];if(_0x497a81['startsWith'](_0x1637ce(0x19e))){const _0x1d951a=_0x497a81['replace']('dm__','')[_0x1637ce(0x100)]('__');_0x497a81=_0x1637ce(0x14e)+(_0x1d951a[_0x1637ce(0x1da)](_0x967939=>_0x967939!==username)||_0x1d951a[0x0]);}else _0x497a81='#'+_0x497a81;new Notification(_0x1637ce(0x19f)+_0x497a81,{'body':'@'+_0x50d986[_0x1637ce(0x130)]+':\x20'+_0x50d986['text'],'icon':generateAvatarUrl(_0x50d986['from'])})[_0x1637ce(0x103)]=()=>{window['focus'](),joinChannel(_0x50d986['channel']);};}}});}function showNotificationsModal(){const _0xcfc186=_0x1c153e;db['ref']('users/'+username+_0xcfc186(0x134))[_0xcfc186(0x18b)]('value',_0x48e84a=>{const _0x55f8d9=_0xcfc186,_0x421392=document[_0x55f8d9(0x1d2)](_0x55f8d9(0x1a9));_0x48e84a[_0x55f8d9(0xf1)](_0x2f4ba9=>{const _0x1f4fc1=_0x55f8d9,_0x168ceb=document[_0x1f4fc1(0x1d2)](_0x1f4fc1(0x1a9));_0x168ceb[_0x1f4fc1(0xf3)]=_0x1f4fc1(0x1b1);let _0x4f53a1=_0x2f4ba9['val']()[_0x1f4fc1(0x1bb)];if(_0x4f53a1[_0x1f4fc1(0x16c)](_0x1f4fc1(0x19e))){const _0x1698e8=_0x4f53a1[_0x1f4fc1(0x190)](_0x1f4fc1(0x19e),'')[_0x1f4fc1(0x100)]('__');_0x4f53a1=_0x1f4fc1(0x14e)+(_0x1698e8[_0x1f4fc1(0x1da)](_0x1400d7=>_0x1400d7!==username)||_0x1698e8[0x0]);}else _0x4f53a1='#'+_0x4f53a1;_0x168ceb[_0x1f4fc1(0xdd)]='@'+_0x2f4ba9[_0x1f4fc1(0x187)]()[_0x1f4fc1(0x130)]+_0x1f4fc1(0xd5)+_0x4f53a1,_0x168ceb[_0x1f4fc1(0x103)]=()=>{const _0x4070de=_0x1f4fc1;joinChannel(_0x2f4ba9[_0x4070de(0x187)]()[_0x4070de(0x1bb)]),closeModal();},_0x421392[_0x1f4fc1(0x1e5)](_0x168ceb);}),showModal(_0x55f8d9(0x201),'',null,{'customHTML':_0x421392,'showInput':![]}),db[_0x55f8d9(0x19d)]('users/'+username+_0x55f8d9(0x134))[_0x55f8d9(0x153)]();});}function attachScrollHandler(){const _0x372d64=_0x1c153e,_0x542e19=document['getElementById'](_0x372d64(0x1b9)),_0x5950de=document[_0x372d64(0x12c)](_0x372d64(0x101));_0x542e19[_0x372d64(0x17a)]=()=>{const _0x5e3277=_0x372d64,_0x5809e0=_0x542e19['scrollHeight']-_0x542e19[_0x5e3277(0x1af)]<0x320;autoScroll=_0x5809e0,_0x5950de[_0x5e3277(0x13a)][_0x5e3277(0x127)]('show',!_0x5809e0);},_0x5950de[_0x372d64(0x103)]=()=>{const _0x77f4e9=_0x372d64;_0x542e19[_0x77f4e9(0x1af)]=_0x542e19[_0x77f4e9(0x12e)],autoScroll=!![];};}document[_0x1c153e(0x12c)](_0x1c153e(0x154))[_0x1c153e(0x16f)]=_0x262b0b=>{const _0x98dd69=_0x1c153e,_0x2d5130=_0x262b0b[_0x98dd69(0x1f5)]['value'];document['getElementById'](_0x98dd69(0x1c7))['classList'][_0x98dd69(0x127)](_0x98dd69(0x1c0),_0x2d5130[_0x98dd69(0xd6)]>=0x8),document['getElementById'](_0x98dd69(0xfd))[_0x98dd69(0x13a)][_0x98dd69(0x127)](_0x98dd69(0x1c0),/[A-Z]/[_0x98dd69(0x1e7)](_0x2d5130)),document[_0x98dd69(0x12c)]('req-num')[_0x98dd69(0x13a)]['toggle'](_0x98dd69(0x1c0),/[0-9]/[_0x98dd69(0x1e7)](_0x2d5130));},loadExternalBlacklist();
+    </script>
+  </body>
+</html>
