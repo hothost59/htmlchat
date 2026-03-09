@@ -8,14 +8,17 @@ https://www.gstatic.com
 https://www.googletagmanager.com
 https://cdn.jsdelivr.net
 https://esm.sh
-https://*.firebaseio.com;
+https://*.firebaseio.com
+https://vercel.live;
 connect-src 'self'
 https://*.firebaseio.com
 wss://*.firebaseio.com
 https://*.googleapis.com
 https://www.gstatic.com
 https://cdn.jsdelivr.net
-https://esm.sh;
+https://esm.sh
+https://vercel.live
+https://vitals.vercel-insights.com;
 style-src 'self' 'unsafe-inline';
 img-src https:;
 font-src 'none';
@@ -906,6 +909,12 @@ upgrade-insecure-requests;
         }
       }
     </style>
+    <!-- Vercel Web Analytics -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <!-- End Vercel Web Analytics -->
   </head>
 
   <body class="cozy">
