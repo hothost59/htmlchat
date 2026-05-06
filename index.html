@@ -1238,11 +1238,24 @@ upgrade-insecure-requests;
       let mentionCounts = {};
       let channelsData = [];
       let BLACKLIST = [];
+      let lastSentMsg = "";
 
       function autoMod(text) {
         let p = text;
         if (p.length > 500) p = p.substring(0, 500) + "...";
-        if (/(.)\1{8,}/.test(p)) return "🤐 (Flooding blocked)";
+
+        // Zalgo / Unicode normalization
+        p = p.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        // Improved flooding: repeated characters
+        if (/(.)\1{15,}/.test(p)) return "🤐 (Flooding blocked)";
+        // Symbol/Emoji spam check
+        const symbols =
+          p.match(/[^\w\s\d,.<>?/;:'"\[\]\\{}|`~!@#$%^&*()\-=_+]/gu) || [];
+        if (symbols.length > 20) return "🤐 (Too many symbols)";
+
+        // Improved flooding: repeated sequences (e.g. abcabcabcabc)
+        if (/(.{2,})\1{5,}/.test(p)) return "🤐 (Sequence flooding blocked)";
 
         if (
           window.obscenity &&
@@ -1253,13 +1266,13 @@ upgrade-insecure-requests;
           p = window.obscenity.censor.applyTo(p, matches);
         }
 
-        if (BLACKLIST.length === 0) return p;
-
-        BLACKLIST.forEach((word) => {
-          const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-          const regex = new RegExp(`\\b${safeWord}\\b`, "gi");
-          p = p.replace(regex, "🤐");
-        });
+        if (BLACKLIST.length > 0) {
+          BLACKLIST.forEach((word) => {
+            const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const regex = new RegExp(`\\b${safeWord}\\b`, "gi");
+            p = p.replace(regex, "🤐");
+          });
+        }
 
         const capsCount = (p.match(/[A-Z]/g) || []).length;
         if (capsCount > p.length * 0.7 && p.length > 5) p = p.toLowerCase();
@@ -1268,7 +1281,13 @@ upgrade-insecure-requests;
 
       function isBanned(text) {
         if (!text) return false;
-        let p = text.toLowerCase();
+        let p = text
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+        // Remove common bypass characters for checking
+        const clean = p.replace(/[^a-z0-9]/g, "");
+
         if (/(.)\1{8,}/.test(p)) return true;
 
         if (
@@ -1284,7 +1303,16 @@ upgrade-insecure-requests;
         return BLACKLIST.some((word) => {
           const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
           const regex = new RegExp(`\\b${safeWord}\\b`, "i");
-          return regex.test(p);
+          if (regex.test(p)) return true;
+          // Check if it's hidden without spaces/symbols
+          const cleanWord = word.toLowerCase().replace(/[^a-z0-9]/g, "");
+          if (
+            cleanWord &&
+            cleanWord.length > 3 &&
+            clean.includes(cleanWord)
+          )
+            return true;
+          return false;
         });
       }
 
@@ -1416,9 +1444,9 @@ upgrade-insecure-requests;
         const c = document.getElementById("authConfirm").value;
         if (!u || !p) return;
 
-        if (/\s/.test(u)) {
+        if (/[^a-zA-Z0-9_]/.test(u)) {
           return (document.getElementById("authMessage").textContent =
-            "Username cannot contain spaces");
+            "Username must be alphanumeric or underscores");
         }
 
         const isSignup = document
@@ -1811,7 +1839,34 @@ upgrade-insecure-requests;
           );
           return;
         }
+
+        if (text === lastSentMsg && text.length > 5) {
+          showModal(
+            "🚫 Duplicate",
+            "Please don't send the same message twice.",
+            null,
+            { showInput: false, hideCancel: true },
+          );
+          return;
+        }
+
+        const mentions = text.match(/@([a-zA-Z0-9_]+)/g) || [];
+        if (mentions.length > 4) {
+          showModal("🚫 Too many mentions", "Limit is 4 mentions per message.", null, {
+            showInput: false,
+            hideCancel: true,
+          });
+          return;
+        }
+
         text = await autoMod(text);
+
+        // If automod blocked the message (by returning a notification string)
+        // we don't send the message or trigger notifications.
+        if (text.startsWith("🤐")) {
+          return;
+        }
+
         const msgRef = db.ref("messages/" + currentChannel).push();
         await msgRef.set({
           user: username,
@@ -1820,8 +1875,8 @@ upgrade-insecure-requests;
           replyTo: replyingToId,
         });
 
-        const mentions = text.match(/@([a-zA-Z0-9_]+)/g);
-        if (mentions) {
+        lastSentMsg = text;
+        if (mentions.length > 0) {
           const uniqueMentions = [
             ...new Set(mentions.map((m) => m.substring(1))),
           ];
@@ -2227,10 +2282,13 @@ upgrade-insecure-requests;
                 });
                 return;
               }
-              if (newChannelName.toLowerCase().startsWith("dm__")) {
+              if (
+                newChannelName.toLowerCase().startsWith("dm__") ||
+                /[^a-zA-Z0-9_-]/.test(newChannelName)
+              ) {
                 showModal(
                   "Error",
-                  "Channel name cannot start with 'dm__'",
+                  "Invalid channel name (alphanumeric, -, _ only, no dm__ prefix)",
                   null,
                   { hideCancel: true },
                 );
